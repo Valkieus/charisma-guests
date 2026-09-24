@@ -38,8 +38,8 @@ eleventyComputed:
       <td><span class="badge {{ 'oui' if c.dechant_present else 'non' }}">{{ "Oui" if c.dechant_present else "Non" }}</span></td>
       <td><span class="badge {{ 'oui' if c.traduit_disponible else 'non' }}">{{ "Oui" if c.traduit_disponible else "Non" }}</span></td>
       <td>
-        {% if c.fichier %}<a href="{{ c.fichier }}">Fichier</a>
-        {% elif c.lien_youtube %}<a href="{{ c.lien_youtube }}">Vidéo YouTube</a>
+        {% if c.fichier %}<a href="{{ c.fichier }}" data-preview="{{ c.fichier }}" data-preview-label="{{ c.titre }}">Voir</a>
+        {% elif c.lien_youtube %}<a href="{{ c.lien_youtube }}" data-preview="{{ c.lien_youtube }}" data-preview-label="{{ c.titre }}">Voir (YouTube)</a>
         {% else %}<span class="empty">—</span>{% endif %}
       </td>
       <td>{{ c.notes or "" }}</td>
@@ -54,7 +54,7 @@ eleventyComputed:
 <h2>Documents ({{ invite.data.documents.length }})</h2>
 <ul class="doc-list">
   {% for doc in invite.data.documents %}
-  <li>{% if doc.fichier %}<a href="{{ doc.fichier }}">{{ doc.label }}</a>{% else %}{{ doc.label }}{% endif %}</li>
+  <li>{% if doc.fichier %}<a href="{{ doc.fichier }}" data-preview="{{ doc.fichier }}" data-preview-label="{{ doc.label }}">{{ doc.label }}</a>{% else %}{{ doc.label }}{% endif %}</li>
   {% endfor %}
 </ul>
 {% endif %}
