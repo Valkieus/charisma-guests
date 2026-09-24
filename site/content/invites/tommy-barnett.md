@@ -35,6 +35,22 @@ documents:
   fichier: /uploads/tommy-barnett/année inconnue - tommyprofile.png
   traduit_fr: false
 notes: 'Les deux fichiers "Surprise Me copie VF.pptx" (éditions 2022 et 16-10-2022, ~74 Mo chacun) n''ont pas pu être importés : ils dépassent la limite de 10 Mo de l''outil de téléchargement Google Drive disponible. Voir le rapport d''import pour les identifiants Drive de ces fichiers.'
-liens_youtube: []
+liens_youtube:
+- titre: Chanson
+  lien: https://www.youtube.com/watch?v=58f5CbIO-hk&hd=1
+- titre: Chanson
+  lien: https://www.youtube.com/watch?v=IzdWN_9mLUE&hd=1
+- titre: Chanson
+  lien: https://www.youtube.com/watch?v=MEqaSjEC_j8&hd=1
+- titre: Chanson
+  lien: https://www.youtube.com/watch?v=8mIS2JkIlxI&hd=1
+- titre: Chanson
+  lien: https://www.youtube.com/watch?v=NJHeC8HWAsY&hd=1
+- titre: Chanson
+  lien: https://www.youtube.com/watch?v=cgRVy-cyO9A&hd=1
+- titre: Chanson
+  lien: https://www.youtube.com/watch?v=pZln-UN54ik&hd=1
+- titre: Chanson
+  lien: https://www.youtube.com/watch?v=bv46Al1VzN0&hd=1
 collaborations: []
 ---

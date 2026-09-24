@@ -36,6 +36,30 @@ documents:
 - label: Liste de chants audio (références YouTube complètes)
   fichier: /uploads/john-wilds/liste-chants-audio-john-wilds.md
   traduit_fr: false
-liens_youtube: []
+liens_youtube:
+- titre: Unto The Lamb (Upperroom)
+  lien: https://www.youtube.com/watch?v=d5IZfkgXXgI
+- titre: My King Forever (Josh Baldwin)
+  lien: https://www.youtube.com/watch?v=ClywI6Y7Yno
+- titre: Sing of This (Bethel Music)
+  lien: https://www.youtube.com/watch?v=VwWK8hxY6Ns
+- titre: Washed (Elevation)
+  lien: https://www.youtube.com/watch?v=JjgkhHlTROQ
+- titre: Chanson
+  lien: https://www.youtube.com/watch?v=2c3_F6QW-dw
+- titre: We Crown You (Jeremy Riddle)
+  lien: https://www.youtube.com/watch?v=tsLKnyDrDBE
+- titre: Our God Reigns (Bethel Music/Cody Carnes/Martin Smith)
+  lien: https://www.youtube.com/watch?v=Usc6-WjJwZg
+- titre: Goodbye Yesterday (Elevation)
+  lien: https://www.youtube.com/watch?v=qOD9M95_fS0
+- titre: Chanson
+  lien: https://www.youtube.com/watch?v=S7NAFiYvEU
+- titre: Jesus Have It All (Jeremy Riddle)
+  lien: https://www.youtube.com/watch?v=anz_4BZ1-2s
+- titre: Marvelous (Bethel Music)
+  lien: https://www.youtube.com/watch?v=ds--RaPW8mY
+- titre: Reigning (Jeremy Riddle)
+  lien: https://www.youtube.com/watch?v=orUSxB8gCbU
 collaborations: []
 ---
