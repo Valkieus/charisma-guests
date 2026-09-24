@@ -1,0 +1,25 @@
+---
+layout: base.njk
+title: Invités
+---
+<h1>Invités musicaux — Église Charisma</h1>
+<p>Base de données des invités déjà venus à l'église : leurs chansons, la présence de déchants, le statut de traduction et les fichiers ou vidéos disponibles.</p>
+
+<table>
+  <thead>
+    <tr><th>Invité</th><th>Type</th><th>Chansons</th></tr>
+  </thead>
+  <tbody>
+    {% for invite in collections.invite %}
+    <tr>
+      <td><a href="/invites/{{ invite.data.slug }}/">{{ invite.data.nom }}</a></td>
+      <td>{{ invite.data.type or "—" }}</td>
+      <td>{{ invite.data.chansons.length or 0 }}</td>
+    </tr>
+    {% else %}
+    <tr><td colspan="3" class="empty">Aucun invité pour l'instant.</td></tr>
+    {% endfor %}
+  </tbody>
+</table>
+
+<p><a href="/admin/">→ Ajouter ou modifier un invité</a></p>

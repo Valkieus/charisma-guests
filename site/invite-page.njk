@@ -1,0 +1,55 @@
+---
+layout: base.njk
+pagination:
+  data: collections.invite
+  size: 1
+  alias: invite
+permalink: "invites/{{ invite.data.slug }}/index.html"
+eleventyComputed:
+  title: "{{ invite.data.nom }}"
+---
+<p><a href="/">← Tous les invités</a></p>
+<h1>{{ invite.data.nom }}</h1>
+{% if invite.data.type %}<p><span class="badge {{ 'oui' if invite.data.type == 'Invité externe' else 'non' }}">{{ invite.data.type }}</span></p>{% endif %}
+
+<table>
+  <thead>
+    <tr>
+      <th>Année</th>
+      <th>Chanson</th>
+      <th>Déchant</th>
+      <th>Traduit / disponible</th>
+      <th>Fichier / lien</th>
+      <th>Notes</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for c in invite.data.chansons %}
+    <tr>
+      <td>{{ c.annee or "—" }}</td>
+      <td>{{ c.titre }}</td>
+      <td><span class="badge {{ 'oui' if c.dechant_present else 'non' }}">{{ "Oui" if c.dechant_present else "Non" }}</span></td>
+      <td><span class="badge {{ 'oui' if c.traduit_disponible else 'non' }}">{{ "Oui" if c.traduit_disponible else "Non" }}</span></td>
+      <td>
+        {% if c.fichier %}<a href="{{ c.fichier }}">Fichier</a>
+        {% elif c.lien_youtube %}<a href="{{ c.lien_youtube }}">Vidéo YouTube</a>
+        {% else %}<span class="empty">—</span>{% endif %}
+      </td>
+      <td>{{ c.notes or "" }}</td>
+    </tr>
+    {% else %}
+    <tr><td colspan="6" class="empty">Aucune chanson renseignée pour l'instant.</td></tr>
+    {% endfor %}
+  </tbody>
+</table>
+
+{% if invite.data.documents.length %}
+<h2>Documents</h2>
+<ul>
+  {% for doc in invite.data.documents %}
+  <li>{% if doc.fichier %}<a href="{{ doc.fichier }}">{{ doc.label }}</a>{% else %}{{ doc.label }}{% endif %}</li>
+  {% endfor %}
+</ul>
+{% endif %}
+
+<p><a href="/admin/">→ Modifier cet invité</a></p>

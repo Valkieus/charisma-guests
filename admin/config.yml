@@ -1,0 +1,43 @@
+backend:
+  name: github
+  repo: Valkieus/charisma-guests
+  branch: main
+  base_url: https://api.netlify.com
+  auth_endpoint: auth
+
+publish_mode: simple
+media_folder: "uploads/{{slug}}"
+public_folder: "/uploads/{{slug}}"
+
+collections:
+  - name: "invites"
+    label: "Invités"
+    label_singular: "Invité"
+    folder: "site/content/invites"
+    create: true
+    slug: "{{slug}}"
+    identifier_field: nom
+    fields:
+      - { label: "Nom de l'invité", name: "nom", widget: "string" }
+      - { label: "Slug (URL, sans espaces/accents)", name: "slug", widget: "string" }
+      - { label: "Type", name: "type", widget: "select", options: ["Invité externe", "Équipe / ministère interne"], default: "Invité externe", required: false }
+      - label: "Chansons"
+        name: "chansons"
+        widget: "list"
+        summary: "{{fields.annee}} — {{fields.titre}}"
+        fields:
+          - { label: "Année de la venue", name: "annee", widget: "number", value_type: "int", required: false }
+          - { label: "Titre de la chanson", name: "titre", widget: "string" }
+          - { label: "Déchant présent dans l'église", name: "dechant_present", widget: "boolean", default: false }
+          - { label: "Déjà traduit et disponible dans les fichiers de l'église", name: "traduit_disponible", widget: "boolean", default: false }
+          - { label: "Fichier (si traduit et disponible)", name: "fichier", widget: "file", required: false }
+          - { label: "Lien vidéo YouTube originale (si pas traduit)", name: "lien_youtube", widget: "string", required: false }
+          - { label: "Notes", name: "notes", widget: "text", required: false }
+      - label: "Documents généraux (setlists, suivis...)"
+        name: "documents"
+        widget: "list"
+        required: false
+        summary: "{{fields.label}}"
+        fields:
+          - { label: "Libellé", name: "label", widget: "string" }
+          - { label: "Fichier", name: "fichier", widget: "file", required: false }
