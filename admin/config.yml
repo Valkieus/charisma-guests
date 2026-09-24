@@ -22,6 +22,7 @@ collections:
       - label: "Chansons"
         name: "chansons"
         widget: "list"
+        required: false
         summary: "{{fields.annee}} — {{fields.titre}}"
         fields:
           - { label: "Année de la venue", name: "annee", widget: "number", value_type: "int", required: false }
@@ -31,7 +32,7 @@ collections:
           - { label: "Fichier (si traduit et disponible)", name: "fichier", widget: "file", required: false }
           - { label: "Lien vidéo YouTube originale (si pas traduit)", name: "lien_youtube", widget: "string", required: false }
           - { label: "Notes", name: "notes", widget: "text", required: false }
-      - label: "Documents généraux (setlists, suivis...)"
+      - label: "Documents / fichiers"
         name: "documents"
         widget: "list"
         required: false
@@ -39,3 +40,20 @@ collections:
         fields:
           - { label: "Libellé", name: "label", widget: "string" }
           - { label: "Fichier", name: "fichier", widget: "file", required: false }
+          - { label: "Traduit en français (prêt à projeter)", name: "traduit_fr", widget: "boolean", default: true }
+      - label: "Chansons YouTube en ligne"
+        name: "liens_youtube"
+        widget: "list"
+        required: false
+        summary: "{{fields.titre}}"
+        fields:
+          - { label: "Titre", name: "titre", widget: "string" }
+          - { label: "Lien YouTube", name: "lien", widget: "string" }
+      - label: "Featurings / collaborations"
+        name: "collaborations"
+        widget: "list"
+        required: false
+        summary: "{{fields.nom}}"
+        fields:
+          - { label: "Nom", name: "nom", widget: "string" }
+          - { label: "Lien (optionnel)", name: "lien", widget: "string", required: false }

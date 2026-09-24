@@ -1,5 +1,5 @@
 {
-  "name": "charisma-guests-site",
+  "name": "church-guests-site",
   "private": true,
   "scripts": {
     "build": "eleventy",

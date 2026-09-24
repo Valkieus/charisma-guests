@@ -10,6 +10,9 @@ eleventyComputed:
 ---
 {% set typeClass = {"Invité externe": "type-invite", "Événement": "type-evenement", "Équipe / ministère interne": "type-interne", "Autre / Divers": "type-autre"} %}
 
+<script>location.replace('/#{{ invite.data.slug }}');</script>
+<noscript>
+
 <a class="back-link" href="/">← Tous les invités</a>
 
 <div class="detail-header">
@@ -60,3 +63,4 @@ eleventyComputed:
 {% endif %}
 
 <p style="margin-top:2rem"><a href="/admin/">→ Modifier cet invité</a></p>
+</noscript>

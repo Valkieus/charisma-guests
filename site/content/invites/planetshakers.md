@@ -4,98 +4,147 @@ slug: planetshakers
 type: Invité externe
 chansons: []
 documents:
-  - label: "2022 — 1-ENDLESS PRAISE_DES CRIS DE JOIE_BB"
-    fichier: "/uploads/planetshakers/2022 - 1-ENDLESS PRAISE_DES CRIS DE JOIE_BB.pptx"
-  - label: "2022 — 10-MADE FOR WORSHIP - J EXISTE POUR T ADORER - A 739"
-    fichier: "/uploads/planetshakers/2022 - 10-MADE FOR WORSHIP - J EXISTE POUR T ADORER - A 739.pptx"
-  - label: "2022 — 11-PROPHESY THIS IS OUR TIME_JE PROPHETISE VOICI L INSTANT C EST LE MOMENT_BB"
-    fichier: "/uploads/planetshakers/2022 - 11-PROPHESY THIS IS OUR TIME_JE PROPHETISE VOICI L INSTANT C EST LE MOMENT_BB.pptx"
-  - label: "2022 — 12-I KNOW YOU CAN - TU PEUX LE FAIRE"
-    fichier: "/uploads/planetshakers/2022 - 12-I KNOW YOU CAN - TU PEUX LE FAIRE.pptx"
-  - label: "2022 — 13-THE ANTHEM NOTHING IS IMPOSSIBLE_RIEN N EST IMPOSSIBLE_BB"
-    fichier: "/uploads/planetshakers/2022 - 13-THE ANTHEM NOTHING IS IMPOSSIBLE_RIEN N EST IMPOSSIBLE_BB.pptx"
-  - label: "2022 — 14-TURN IT UP_MONTE LE SON_BB"
-    fichier: "/uploads/planetshakers/2022 - 14-TURN IT UP_MONTE LE SON_BB.pptx"
-  - label: "2022 — 2-COME RIGHT NOW - VIENS MAINTENANT_BB"
-    fichier: "/uploads/planetshakers/2022 - 2-COME RIGHT NOW - VIENS MAINTENANT_BB.pptx"
-  - label: "2022 — 3-THE GREATEST_LE PLUS GRAND_BB"
-    fichier: "/uploads/planetshakers/2022 - 3-THE GREATEST_LE PLUS GRAND_BB.pptx"
-  - label: "2022 — 4-DANCE_DANSE_BB"
-    fichier: "/uploads/planetshakers/2022 - 4-DANCE_DANSE_BB.pptx"
-  - label: "2022 — 5-WAY TRUTH LIFE - CHEMIN, VÉRITÉ, VIE"
-    fichier: "/uploads/planetshakers/2022 - 5-WAY TRUTH LIFE - CHEMIN, VÉRITÉ, VIE.pptx"
-  - label: "2022 — 7-GOD IS ON THE THRONE_DIEU EST SUR LE TRONE_BB"
-    fichier: "/uploads/planetshakers/2022 - 7-GOD IS ON THE THRONE_DIEU EST SUR LE TRONE_BB.pptx"
-  - label: "2022 — 8-NO OTHER NAME - LE NOM DE JESUS - A 746"
-    fichier: "/uploads/planetshakers/2022 - 8-NO OTHER NAME - LE NOM DE JESUS - A 746.pptx"
-  - label: "2022 — 9-THE ANTHEM LEAVE ME ASTOUNDED - LAISSE-MOI SANS VOIX"
-    fichier: "/uploads/planetshakers/2022 - 9-THE ANTHEM LEAVE ME ASTOUNDED - LAISSE-MOI SANS VOIX.pptx"
-  - label: "2022 — ALIVE AGAIN_RESSUCITER_BB"
-    fichier: "/uploads/planetshakers/2022 - ALIVE AGAIN_RESSUCITER_BB.pptx"
-  - label: "2022 — DECOUPAGE_INCRUSTATION"
-    fichier: "/uploads/planetshakers/2022 - DECOUPAGE_INCRUSTATION.ppt"
-  - label: "2022 — HOW I PRAISE_BB"
-    fichier: "/uploads/planetshakers/2022 - HOW I PRAISE_BB.pptx"
-  - label: "2022 — I CAME FOR YOU _JE SUIS LA POUR TOI_BB"
-    fichier: "/uploads/planetshakers/2022 - I CAME FOR YOU _JE SUIS LA POUR TOI_BB.pptx"
-  - label: "2022 — LEAVE ME ASTOUNDED - LAISSE-MOI SANS VOIX"
-    fichier: "/uploads/planetshakers/2022 - LEAVE ME ASTOUNDED - LAISSE-MOI SANS VOIX.pptx"
-  - label: "2022 — NOTHING IS IMPOSSIBLE_RIEN N EST IMPOSSIBLE_BB"
-    fichier: "/uploads/planetshakers/2022 - NOTHING IS IMPOSSIBLE_RIEN N EST IMPOSSIBLE_BB.pptx"
-  - label: "2022 — ONLY WAY_LE SEUL CHEMIN_BB"
-    fichier: "/uploads/planetshakers/2022 - ONLY WAY_LE SEUL CHEMIN_BB.ppt"
-  - label: "2022 — PLANETSHAKERS_MAI 2022"
-    fichier: "/uploads/planetshakers/2022 - PLANETSHAKERS_MAI 2022.doc"
-  - label: "2022 — PROPHESY_JE PROPHETISE_BB"
-    fichier: "/uploads/planetshakers/2022 - PROPHESY_JE PROPHETISE_BB.pptx"
-  - label: "2022 — RAIN YOUR GLORY DOWN_BB"
-    fichier: "/uploads/planetshakers/2022 - RAIN YOUR GLORY DOWN_BB.pptx"
-  - label: "2022 — TEMOIGNAGE.pptx"
-    fichier: "/uploads/planetshakers/2022 - TEMOIGNAGE.pptx.docx"
-  - label: "2022 — THE ANTHEM_L HYME SA PUISSANCE NOUS GUERRIT_BB"
-    fichier: "/uploads/planetshakers/2022 - THE ANTHEM_L HYME SA PUISSANCE NOUS GUERRIT_BB.pptx"
-  - label: "2022 — THIS IS OUR TIME_C EST NOTRE MOMENT_BB"
-    fichier: "/uploads/planetshakers/2022 - THIS IS OUR TIME_C EST NOTRE MOMENT_BB.pptx"
-  - label: "2022 — THROUGH IT ALL_EN TOUT TEMPS_BB"
-    fichier: "/uploads/planetshakers/2022 - THROUGH IT ALL_EN TOUT TEMPS_BB.pptx"
-  - label: "2023 — DECOUPAGE_INCRUSTATION"
-    fichier: "/uploads/planetshakers/2023 - DECOUPAGE_INCRUSTATION.ppt"
-  - label: "2023 — LAST_PLANETSHAKERS_25_JUIN_2023"
-    fichier: "/uploads/planetshakers/2023 - LAST_PLANETSHAKERS_25_JUIN_2023.docx"
-  - label: "année inconnue — ALIVE AGAIN_RESSUCITER_BB"
-    fichier: "/uploads/planetshakers/annee inconnue - ALIVE AGAIN_RESSUCITER_BB.pptx"
-  - label: "année inconnue — COME RIGHT NOW_VIENS MAINTENANT_BB"
-    fichier: "/uploads/planetshakers/annee inconnue - COME RIGHT NOW_VIENS MAINTENANT_BB.pptx"
-  - label: "année inconnue — DANCE_DANSE_BB"
-    fichier: "/uploads/planetshakers/annee inconnue - DANCE_DANSE_BB.pptx"
-  - label: "année inconnue — ENDLESS PRAISE_DES CRIS DE JOIE_BB"
-    fichier: "/uploads/planetshakers/annee inconnue - ENDLESS PRAISE_DES CRIS DE JOIE_BB.pptx"
-  - label: "année inconnue — HEAVEN ON EARTH_LE CIEL SUR LA TERRE_BB"
-    fichier: "/uploads/planetshakers/annee inconnue - HEAVEN ON EARTH_LE CIEL SUR LA TERRE_BB.pptx"
-  - label: "année inconnue — I CAME FOR YOU _JE SUIS LA POUR TOI_BB"
-    fichier: "/uploads/planetshakers/annee inconnue - I CAME FOR YOU _JE SUIS LA POUR TOI_BB.pptx"
-  - label: "année inconnue — I WANT JESUS_JE VEUX JESUS_BB"
-    fichier: "/uploads/planetshakers/annee inconnue - I WANT JESUS_JE VEUX JESUS_BB.pptx"
-  - label: "année inconnue — NOTHING IS IMPOSSIBLE_RIEN N EST IMPOSSIBLE_BB"
-    fichier: "/uploads/planetshakers/annee inconnue - NOTHING IS IMPOSSIBLE_RIEN N EST IMPOSSIBLE_BB.pptx"
-  - label: "année inconnue — ONLY WAY_LE SEUL CHEMIN_BB"
-    fichier: "/uploads/planetshakers/annee inconnue - ONLY WAY_LE SEUL CHEMIN_BB.ppt"
-  - label: "année inconnue — PLANETSHAKERS_MAI 2019_Complet (1)"
-    fichier: "/uploads/planetshakers/annee inconnue - PLANETSHAKERS_MAI 2019_Complet (1).doc"
-  - label: "année inconnue — PROPHESY_JE PROPHETISE_BB"
-    fichier: "/uploads/planetshakers/annee inconnue - PROPHESY_JE PROPHETISE_BB.pptx"
-  - label: "année inconnue — RIGHT NOW_MAINTENANT_BB"
-    fichier: "/uploads/planetshakers/annee inconnue - RIGHT NOW_MAINTENANT_BB.pptx"
-  - label: "année inconnue — THE ANTHEM_L HYME SA PUISSANCE NOUS GUERRIT_BB"
-    fichier: "/uploads/planetshakers/annee inconnue - THE ANTHEM_L HYME SA PUISSANCE NOUS GUERRIT_BB.pptx"
-  - label: "année inconnue — THE GREATEST_LE PLUS GRAND_BB"
-    fichier: "/uploads/planetshakers/annee inconnue - THE GREATEST_LE PLUS GRAND_BB.pptx"
-  - label: "année inconnue — THIS IS OUR TIME_C EST NOTRE MOMENT_BB"
-    fichier: "/uploads/planetshakers/annee inconnue - THIS IS OUR TIME_C EST NOTRE MOMENT_BB.pptx"
-  - label: "année inconnue — TURN IT UP_MONTE LE SON_BB"
-    fichier: "/uploads/planetshakers/annee inconnue - TURN IT UP_MONTE LE SON_BB.pptx"
-  - label: "année inconnue — WE ARE FREE_NOUS SOMMES LIBRES_BB"
-    fichier: "/uploads/planetshakers/annee inconnue - WE ARE FREE_NOUS SOMMES LIBRES_BB.pptx"
-  - label: "année inconnue — WE SPEAK LIFE_NOUS PARLONS LA VIE_BB"
-    fichier: "/uploads/planetshakers/annee inconnue - WE SPEAK LIFE_NOUS PARLONS LA VIE_BB.pptx"
+- label: 2022 — 1-ENDLESS PRAISE_DES CRIS DE JOIE_BB
+  fichier: /uploads/planetshakers/2022 - 1-ENDLESS PRAISE_DES CRIS DE JOIE_BB.pptx
+  traduit_fr: true
+- label: 2022 — 10-MADE FOR WORSHIP - J EXISTE POUR T ADORER - A 739
+  fichier: /uploads/planetshakers/2022 - 10-MADE FOR WORSHIP - J EXISTE POUR T ADORER - A 739.pptx
+  traduit_fr: true
+- label: 2022 — 11-PROPHESY THIS IS OUR TIME_JE PROPHETISE VOICI L INSTANT C EST LE MOMENT_BB
+  fichier: /uploads/planetshakers/2022 - 11-PROPHESY THIS IS OUR TIME_JE PROPHETISE VOICI L INSTANT C EST LE MOMENT_BB.pptx
+  traduit_fr: true
+- label: 2022 — 12-I KNOW YOU CAN - TU PEUX LE FAIRE
+  fichier: /uploads/planetshakers/2022 - 12-I KNOW YOU CAN - TU PEUX LE FAIRE.pptx
+  traduit_fr: true
+- label: 2022 — 13-THE ANTHEM NOTHING IS IMPOSSIBLE_RIEN N EST IMPOSSIBLE_BB
+  fichier: /uploads/planetshakers/2022 - 13-THE ANTHEM NOTHING IS IMPOSSIBLE_RIEN N EST IMPOSSIBLE_BB.pptx
+  traduit_fr: true
+- label: 2022 — 14-TURN IT UP_MONTE LE SON_BB
+  fichier: /uploads/planetshakers/2022 - 14-TURN IT UP_MONTE LE SON_BB.pptx
+  traduit_fr: true
+- label: 2022 — 2-COME RIGHT NOW - VIENS MAINTENANT_BB
+  fichier: /uploads/planetshakers/2022 - 2-COME RIGHT NOW - VIENS MAINTENANT_BB.pptx
+  traduit_fr: true
+- label: 2022 — 3-THE GREATEST_LE PLUS GRAND_BB
+  fichier: /uploads/planetshakers/2022 - 3-THE GREATEST_LE PLUS GRAND_BB.pptx
+  traduit_fr: true
+- label: 2022 — 4-DANCE_DANSE_BB
+  fichier: /uploads/planetshakers/2022 - 4-DANCE_DANSE_BB.pptx
+  traduit_fr: true
+- label: 2022 — 5-WAY TRUTH LIFE - CHEMIN, VÉRITÉ, VIE
+  fichier: /uploads/planetshakers/2022 - 5-WAY TRUTH LIFE - CHEMIN, VÉRITÉ, VIE.pptx
+  traduit_fr: true
+- label: 2022 — 7-GOD IS ON THE THRONE_DIEU EST SUR LE TRONE_BB
+  fichier: /uploads/planetshakers/2022 - 7-GOD IS ON THE THRONE_DIEU EST SUR LE TRONE_BB.pptx
+  traduit_fr: true
+- label: 2022 — 8-NO OTHER NAME - LE NOM DE JESUS - A 746
+  fichier: /uploads/planetshakers/2022 - 8-NO OTHER NAME - LE NOM DE JESUS - A 746.pptx
+  traduit_fr: true
+- label: 2022 — 9-THE ANTHEM LEAVE ME ASTOUNDED - LAISSE-MOI SANS VOIX
+  fichier: /uploads/planetshakers/2022 - 9-THE ANTHEM LEAVE ME ASTOUNDED - LAISSE-MOI SANS VOIX.pptx
+  traduit_fr: true
+- label: 2022 — ALIVE AGAIN_RESSUCITER_BB
+  fichier: /uploads/planetshakers/2022 - ALIVE AGAIN_RESSUCITER_BB.pptx
+  traduit_fr: true
+- label: 2022 — DECOUPAGE_INCRUSTATION
+  fichier: /uploads/planetshakers/2022 - DECOUPAGE_INCRUSTATION.ppt
+  traduit_fr: true
+- label: 2022 — HOW I PRAISE_BB
+  fichier: /uploads/planetshakers/2022 - HOW I PRAISE_BB.pptx
+  traduit_fr: true
+- label: 2022 — I CAME FOR YOU _JE SUIS LA POUR TOI_BB
+  fichier: /uploads/planetshakers/2022 - I CAME FOR YOU _JE SUIS LA POUR TOI_BB.pptx
+  traduit_fr: true
+- label: 2022 — LEAVE ME ASTOUNDED - LAISSE-MOI SANS VOIX
+  fichier: /uploads/planetshakers/2022 - LEAVE ME ASTOUNDED - LAISSE-MOI SANS VOIX.pptx
+  traduit_fr: true
+- label: 2022 — NOTHING IS IMPOSSIBLE_RIEN N EST IMPOSSIBLE_BB
+  fichier: /uploads/planetshakers/2022 - NOTHING IS IMPOSSIBLE_RIEN N EST IMPOSSIBLE_BB.pptx
+  traduit_fr: true
+- label: 2022 — ONLY WAY_LE SEUL CHEMIN_BB
+  fichier: /uploads/planetshakers/2022 - ONLY WAY_LE SEUL CHEMIN_BB.ppt
+  traduit_fr: true
+- label: 2022 — PLANETSHAKERS_MAI 2022
+  fichier: /uploads/planetshakers/2022 - PLANETSHAKERS_MAI 2022.doc
+  traduit_fr: true
+- label: 2022 — PROPHESY_JE PROPHETISE_BB
+  fichier: /uploads/planetshakers/2022 - PROPHESY_JE PROPHETISE_BB.pptx
+  traduit_fr: true
+- label: 2022 — RAIN YOUR GLORY DOWN_BB
+  fichier: /uploads/planetshakers/2022 - RAIN YOUR GLORY DOWN_BB.pptx
+  traduit_fr: true
+- label: 2022 — TEMOIGNAGE.pptx
+  fichier: /uploads/planetshakers/2022 - TEMOIGNAGE.pptx.docx
+  traduit_fr: true
+- label: 2022 — THE ANTHEM_L HYME SA PUISSANCE NOUS GUERRIT_BB
+  fichier: /uploads/planetshakers/2022 - THE ANTHEM_L HYME SA PUISSANCE NOUS GUERRIT_BB.pptx
+  traduit_fr: true
+- label: 2022 — THIS IS OUR TIME_C EST NOTRE MOMENT_BB
+  fichier: /uploads/planetshakers/2022 - THIS IS OUR TIME_C EST NOTRE MOMENT_BB.pptx
+  traduit_fr: true
+- label: 2022 — THROUGH IT ALL_EN TOUT TEMPS_BB
+  fichier: /uploads/planetshakers/2022 - THROUGH IT ALL_EN TOUT TEMPS_BB.pptx
+  traduit_fr: true
+- label: 2023 — DECOUPAGE_INCRUSTATION
+  fichier: /uploads/planetshakers/2023 - DECOUPAGE_INCRUSTATION.ppt
+  traduit_fr: true
+- label: 2023 — LAST_PLANETSHAKERS_25_JUIN_2023
+  fichier: /uploads/planetshakers/2023 - LAST_PLANETSHAKERS_25_JUIN_2023.docx
+  traduit_fr: true
+- label: année inconnue — ALIVE AGAIN_RESSUCITER_BB
+  fichier: /uploads/planetshakers/annee inconnue - ALIVE AGAIN_RESSUCITER_BB.pptx
+  traduit_fr: true
+- label: année inconnue — COME RIGHT NOW_VIENS MAINTENANT_BB
+  fichier: /uploads/planetshakers/annee inconnue - COME RIGHT NOW_VIENS MAINTENANT_BB.pptx
+  traduit_fr: true
+- label: année inconnue — DANCE_DANSE_BB
+  fichier: /uploads/planetshakers/annee inconnue - DANCE_DANSE_BB.pptx
+  traduit_fr: true
+- label: année inconnue — ENDLESS PRAISE_DES CRIS DE JOIE_BB
+  fichier: /uploads/planetshakers/annee inconnue - ENDLESS PRAISE_DES CRIS DE JOIE_BB.pptx
+  traduit_fr: true
+- label: année inconnue — HEAVEN ON EARTH_LE CIEL SUR LA TERRE_BB
+  fichier: /uploads/planetshakers/annee inconnue - HEAVEN ON EARTH_LE CIEL SUR LA TERRE_BB.pptx
+  traduit_fr: true
+- label: année inconnue — I CAME FOR YOU _JE SUIS LA POUR TOI_BB
+  fichier: /uploads/planetshakers/annee inconnue - I CAME FOR YOU _JE SUIS LA POUR TOI_BB.pptx
+  traduit_fr: true
+- label: année inconnue — I WANT JESUS_JE VEUX JESUS_BB
+  fichier: /uploads/planetshakers/annee inconnue - I WANT JESUS_JE VEUX JESUS_BB.pptx
+  traduit_fr: true
+- label: année inconnue — NOTHING IS IMPOSSIBLE_RIEN N EST IMPOSSIBLE_BB
+  fichier: /uploads/planetshakers/annee inconnue - NOTHING IS IMPOSSIBLE_RIEN N EST IMPOSSIBLE_BB.pptx
+  traduit_fr: true
+- label: année inconnue — ONLY WAY_LE SEUL CHEMIN_BB
+  fichier: /uploads/planetshakers/annee inconnue - ONLY WAY_LE SEUL CHEMIN_BB.ppt
+  traduit_fr: true
+- label: année inconnue — PLANETSHAKERS_MAI 2019_Complet (1)
+  fichier: /uploads/planetshakers/annee inconnue - PLANETSHAKERS_MAI 2019_Complet (1).doc
+  traduit_fr: true
+- label: année inconnue — PROPHESY_JE PROPHETISE_BB
+  fichier: /uploads/planetshakers/annee inconnue - PROPHESY_JE PROPHETISE_BB.pptx
+  traduit_fr: true
+- label: année inconnue — RIGHT NOW_MAINTENANT_BB
+  fichier: /uploads/planetshakers/annee inconnue - RIGHT NOW_MAINTENANT_BB.pptx
+  traduit_fr: true
+- label: année inconnue — THE ANTHEM_L HYME SA PUISSANCE NOUS GUERRIT_BB
+  fichier: /uploads/planetshakers/annee inconnue - THE ANTHEM_L HYME SA PUISSANCE NOUS GUERRIT_BB.pptx
+  traduit_fr: true
+- label: année inconnue — THE GREATEST_LE PLUS GRAND_BB
+  fichier: /uploads/planetshakers/annee inconnue - THE GREATEST_LE PLUS GRAND_BB.pptx
+  traduit_fr: true
+- label: année inconnue — THIS IS OUR TIME_C EST NOTRE MOMENT_BB
+  fichier: /uploads/planetshakers/annee inconnue - THIS IS OUR TIME_C EST NOTRE MOMENT_BB.pptx
+  traduit_fr: true
+- label: année inconnue — TURN IT UP_MONTE LE SON_BB
+  fichier: /uploads/planetshakers/annee inconnue - TURN IT UP_MONTE LE SON_BB.pptx
+  traduit_fr: true
+- label: année inconnue — WE ARE FREE_NOUS SOMMES LIBRES_BB
+  fichier: /uploads/planetshakers/annee inconnue - WE ARE FREE_NOUS SOMMES LIBRES_BB.pptx
+  traduit_fr: true
+- label: année inconnue — WE SPEAK LIFE_NOUS PARLONS LA VIE_BB
+  fichier: /uploads/planetshakers/annee inconnue - WE SPEAK LIFE_NOUS PARLONS LA VIE_BB.pptx
+  traduit_fr: true
+liens_youtube: []
+collaborations: []
 ---

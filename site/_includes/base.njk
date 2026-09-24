@@ -3,18 +3,18 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>{{ title }} — Charisma Guests</title>
+  <title>{{ title }} — Church Guests</title>
   <link rel="stylesheet" href="/style.css">
   <script src="https://identity.netlify.com/v1/netlify-identity-widget.js"></script>
 </head>
 <body>
   <header class="site-header">
-    <div class="wrap">
-      <a class="brand" href="/"><span class="dot"></span> Charisma Guests</a>
+    <div class="wrap-header">
+      <a class="brand" href="/"><span class="dot"></span> Church Guests</a>
       <a class="admin-link" href="/admin/">Gérer →</a>
     </div>
   </header>
-  <main class="wrap">
+  <main class="{{ 'wrap' if not fullBleed }}">
     {{ content | safe }}
   </main>
 
