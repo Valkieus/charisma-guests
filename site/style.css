@@ -555,6 +555,24 @@ h2 {
   padding: 0.5rem 0.7rem;
   font-size: 0.85rem;
 }
+
+.yt-list li { padding: 0; overflow: hidden; }
+
+.yt-card {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  padding: 0.4rem;
+}
+
+.yt-thumb {
+  width: 72px;
+  height: 40px;
+  object-fit: cover;
+  border-radius: 6px;
+  flex-shrink: 0;
+  background: var(--no-bg);
+}
 .yt-list a, .collab-list a { text-decoration: none; }
 .yt-list a:hover, .collab-list a:hover { text-decoration: underline; }
 

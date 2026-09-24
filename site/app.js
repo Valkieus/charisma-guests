@@ -18,6 +18,11 @@
     return TYPE_CLASS[t] || "type-invite";
   }
 
+  function youTubeId(url) {
+    var m = String(url || "").match(/(?:youtu\.be\/|youtube\.com\/watch\?v=)([\w-]+)/);
+    return m ? m[1] : null;
+  }
+
   function computeStats(guest) {
     var docs = guest.documents || [];
     var translated = docs.filter(function (d) { return d.traduit_fr !== false; }).length;
@@ -115,9 +120,12 @@
       (yts.length
         ? '<ul class="yt-list">' +
           yts.map(function (y) {
+            var vid = youTubeId(y.lien);
+            var thumb = vid ? '<img class="yt-thumb" src="https://img.youtube.com/vi/' + vid + '/hqdefault.jpg" alt="" loading="lazy">' : "";
             return (
               '<li><a href="' + escapeHtml(y.lien) + '" data-preview="' + escapeHtml(y.lien) +
-              '" data-preview-label="' + escapeHtml(y.titre) + '">▶ ' + escapeHtml(y.titre) + "</a></li>"
+              '" data-preview-label="' + escapeHtml(y.titre) + '" class="yt-card">' + thumb +
+              '<span>▶ ' + escapeHtml(y.titre) + "</span></a></li>"
             );
           }).join("") +
           "</ul>"
