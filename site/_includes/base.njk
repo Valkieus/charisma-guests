@@ -8,10 +8,12 @@
 </head>
 <body>
   <header class="site-header">
-    <a href="/"><strong>Charisma Guests</strong></a>
-    <a href="/admin/">Gérer</a>
+    <div class="wrap">
+      <a class="brand" href="/"><span class="dot"></span> Charisma Guests</a>
+      <a class="admin-link" href="/admin/">Gérer →</a>
+    </div>
   </header>
-  <main>
+  <main class="wrap">
     {{ content | safe }}
   </main>
 </body>

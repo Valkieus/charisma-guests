@@ -20,7 +20,8 @@ collections:
     fields:
       - { label: "Nom de l'invité", name: "nom", widget: "string" }
       - { label: "Slug (URL, sans espaces/accents)", name: "slug", widget: "string" }
-      - { label: "Type", name: "type", widget: "select", options: ["Invité externe", "Équipe / ministère interne"], default: "Invité externe", required: false }
+      - { label: "Type", name: "type", widget: "select", options: ["Invité externe", "Équipe / ministère interne", "Événement", "Autre / Divers"], default: "Invité externe", required: false }
+      - { label: "Note interne (classification incertaine, etc.)", name: "notes", widget: "text", required: false }
       - label: "Chansons"
         name: "chansons"
         widget: "list"

@@ -8,9 +8,16 @@ permalink: "invites/{{ invite.data.slug }}/index.html"
 eleventyComputed:
   title: "{{ invite.data.nom }}"
 ---
-<p><a href="/">← Tous les invités</a></p>
-<h1>{{ invite.data.nom }}</h1>
-{% if invite.data.type %}<p><span class="badge {{ 'oui' if invite.data.type == 'Invité externe' else 'non' }}">{{ invite.data.type }}</span></p>{% endif %}
+{% set typeClass = {"Invité externe": "type-invite", "Événement": "type-evenement", "Équipe / ministère interne": "type-interne", "Autre / Divers": "type-autre"} %}
+
+<a class="back-link" href="/">← Tous les invités</a>
+
+<div class="detail-header">
+  <h1>{{ invite.data.nom }}</h1>
+  {% if invite.data.type %}<span class="badge {{ typeClass[invite.data.type] or 'type-invite' }}">{{ invite.data.type }}</span>{% endif %}
+</div>
+
+{% if invite.data.notes %}<div class="detail-note">{{ invite.data.notes }}</div>{% endif %}
 
 <table>
   <thead>
@@ -44,12 +51,12 @@ eleventyComputed:
 </table>
 
 {% if invite.data.documents.length %}
-<h2>Documents</h2>
-<ul>
+<h2>Documents ({{ invite.data.documents.length }})</h2>
+<ul class="doc-list">
   {% for doc in invite.data.documents %}
   <li>{% if doc.fichier %}<a href="{{ doc.fichier }}">{{ doc.label }}</a>{% else %}{{ doc.label }}{% endif %}</li>
   {% endfor %}
 </ul>
 {% endif %}
 
-<p><a href="/admin/">→ Modifier cet invité</a></p>
+<p style="margin-top:2rem"><a href="/admin/">→ Modifier cet invité</a></p>

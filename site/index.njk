@@ -2,24 +2,79 @@
 layout: base.njk
 title: Invités
 ---
-<h1>Invités musicaux — Église Charisma</h1>
-<p>Base de données des invités déjà venus à l'église : leurs chansons, la présence de déchants, le statut de traduction et les fichiers ou vidéos disponibles.</p>
+{% set typeOrder = ["Invité externe", "Événement", "Équipe / ministère interne", "Autre / Divers"] %}
+{% set typeClass = {"Invité externe": "type-invite", "Événement": "type-evenement", "Équipe / ministère interne": "type-interne", "Autre / Divers": "type-autre"} %}
+{% set typeLabelPlural = {"Invité externe": "Invités", "Événement": "Événements", "Équipe / ministère interne": "Équipes internes", "Autre / Divers": "Divers"} %}
 
-<table>
-  <thead>
-    <tr><th>Invité</th><th>Type</th><th>Chansons</th></tr>
-  </thead>
-  <tbody>
+{% set totalSongs = 0 %}
+{% for invite in collections.invite %}{% set totalSongs = totalSongs + (invite.data.chansons.length or 0) %}{% endfor %}
+
+<section class="hero">
+  <h1>Invités musicaux — Église Charisma</h1>
+  <p>Base de données des invités et événements de l'église : chansons, déchants, statut de traduction, fichiers et vidéos.</p>
+
+  <div class="search-box">
+    <input type="search" id="search" placeholder="Rechercher un invité, un événement…" autocomplete="off">
+  </div>
+
+  <div class="stats">
+    <div class="stat"><strong>{{ collections.invite.length }}</strong> fiches</div>
+    <div class="stat"><strong>{{ totalSongs }}</strong> chansons référencées</div>
+  </div>
+</section>
+
+<div id="results">
+  {% for type in typeOrder %}
+    {% set items = [] %}
     {% for invite in collections.invite %}
-    <tr>
-      <td><a href="/invites/{{ invite.data.slug }}/">{{ invite.data.nom }}</a></td>
-      <td>{{ invite.data.type or "—" }}</td>
-      <td>{{ invite.data.chansons.length or 0 }}</td>
-    </tr>
-    {% else %}
-    <tr><td colspan="3" class="empty">Aucun invité pour l'instant.</td></tr>
+      {% if invite.data.type == type %}{% set items = (items.push(invite), items) %}{% endif %}
     {% endfor %}
-  </tbody>
-</table>
+    {% if items.length %}
+    <section class="section" data-section>
+      <h2 class="section-title">{{ typeLabelPlural[type] }} <span class="count">{{ items.length }}</span></h2>
+      <div class="grid">
+        {% for invite in items %}
+        <a class="card" href="/invites/{{ invite.data.slug }}/" data-name="{{ invite.data.nom | lower }}">
+          <div class="name">{{ invite.data.nom }}</div>
+          <div class="meta">
+            <span class="badge {{ typeClass[type] }}">{{ type }}</span>
+            {% if invite.data.chansons.length %}<span class="badge non">{{ invite.data.chansons.length }} chanson{{ "s" if invite.data.chansons.length > 1 else "" }}</span>{% endif %}
+            {% if invite.data.documents.length %}<span class="badge non">{{ invite.data.documents.length }} document{{ "s" if invite.data.documents.length > 1 else "" }}</span>{% endif %}
+          </div>
+        </a>
+        {% endfor %}
+      </div>
+    </section>
+    {% endif %}
+  {% endfor %}
+  {% if collections.invite.length == 0 %}
+  <p class="empty">Aucune fiche pour l'instant.</p>
+  {% endif %}
+</div>
 
-<p><a href="/admin/">→ Ajouter ou modifier un invité</a></p>
+<p id="no-results" class="empty" hidden>Aucun résultat.</p>
+
+<script>
+(function () {
+  var input = document.getElementById('search');
+  var cards = Array.prototype.slice.call(document.querySelectorAll('.card'));
+  var sections = Array.prototype.slice.call(document.querySelectorAll('[data-section]'));
+  var noResults = document.getElementById('no-results');
+
+  input.addEventListener('input', function () {
+    var q = input.value.trim().toLowerCase();
+    var anyVisible = false;
+    sections.forEach(function (section) {
+      var sectionHasMatch = false;
+      section.querySelectorAll('.card').forEach(function (card) {
+        var match = !q || card.getAttribute('data-name').indexOf(q) !== -1;
+        card.style.display = match ? '' : 'none';
+        if (match) sectionHasMatch = true;
+      });
+      section.style.display = sectionHasMatch ? '' : 'none';
+      if (sectionHasMatch) anyVisible = true;
+    });
+    noResults.hidden = anyVisible;
+  });
+})();
+</script>
