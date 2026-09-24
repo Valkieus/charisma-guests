@@ -1,38 +1,19 @@
 :root {
-  --bg: #f7f6fb;
-  --surface: #ffffff;
-  --border: #e5e2f0;
-  --text: #221f33;
-  --muted: #6b6780;
-  --brand: #5b3df0;
-  --brand-dark: #4529c9;
-  --brand-soft: #efeaff;
-  --accent: #ff7a59;
-  --ok-bg: #e1f7ea;
-  --ok-text: #14804a;
-  --no-bg: #f1eef8;
-  --no-text: #6b6780;
-  --shadow: 0 1px 2px rgba(31, 20, 80, 0.04), 0 8px 24px -12px rgba(31, 20, 80, 0.18);
+  --bg: #05070d;
+  --surface: #0e1422;
+  --border: #1e293f;
+  --text: #e9edf7;
+  --muted: #8892a8;
+  --brand: #3457e6;
+  --brand-dark: #2440bd;
+  --brand-soft: #142140;
+  --accent: #5aa9ff;
+  --ok-bg: #0f3324;
+  --ok-text: #4ade80;
+  --no-bg: #161d2e;
+  --no-text: #8892a8;
+  --shadow: 0 1px 2px rgba(0, 0, 0, 0.4), 0 12px 30px -14px rgba(0, 0, 0, 0.75);
   --radius: 14px;
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --bg: #14121f;
-    --surface: #1d1a2b;
-    --border: #2c2840;
-    --text: #f1f0f7;
-    --muted: #a29dc2;
-    --brand: #9b86ff;
-    --brand-dark: #7c63ff;
-    --brand-soft: #26204a;
-    --accent: #ff9478;
-    --ok-bg: #113626;
-    --ok-text: #5fe0a3;
-    --no-bg: #221e38;
-    --no-text: #a29dc2;
-    --shadow: 0 1px 2px rgba(0, 0, 0, 0.3), 0 8px 24px -12px rgba(0, 0, 0, 0.5);
-  }
 }
 
 * { box-sizing: border-box; }
@@ -223,14 +204,10 @@ main { padding-bottom: 4rem; }
 }
 .badge.oui { background: var(--ok-bg); color: var(--ok-text); }
 .badge.non { background: var(--no-bg); color: var(--no-text); }
-.badge.type-invite { background: var(--brand-soft); color: var(--brand-dark); }
+.badge.type-invite { background: var(--brand-soft); color: var(--accent); }
 .badge.type-interne { background: var(--no-bg); color: var(--no-text); }
-.badge.type-evenement { background: #ffe9de; color: #c8531c; }
+.badge.type-evenement { background: #402515; color: #ffb18d; }
 .badge.type-autre { background: var(--no-bg); color: var(--no-text); }
-
-@media (prefers-color-scheme: dark) {
-  .badge.type-evenement { background: #402515; color: #ffb18d; }
-}
 
 .empty {
   color: var(--muted);
@@ -264,7 +241,7 @@ main { padding-bottom: 4rem; }
 
 .detail-note {
   background: var(--brand-soft);
-  color: var(--brand-dark);
+  color: var(--accent);
   border-radius: 10px;
   padding: 0.75rem 1rem;
   font-size: 0.88rem;
@@ -389,7 +366,7 @@ h2 {
   font-size: 0.9rem;
   line-height: 1;
 }
-.doc-modal__actions button:hover { background: var(--brand-soft); color: var(--brand-dark); }
+.doc-modal__actions button:hover { background: var(--brand-soft); color: var(--accent); }
 
 .doc-modal__body {
   flex: 1;
