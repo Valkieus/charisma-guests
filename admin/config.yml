@@ -1,9 +1,6 @@
 backend:
-  name: github
-  repo: Valkieus/charisma-guests
+  name: git-gateway
   branch: main
-  base_url: https://api.netlify.com
-  auth_endpoint: auth
 
 publish_mode: simple
 media_folder: "uploads/{{slug}}"
