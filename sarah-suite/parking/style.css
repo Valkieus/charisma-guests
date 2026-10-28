@@ -1,0 +1,38 @@
+/* Garé Gratuit — mise en page carte + liste */
+body { overflow: hidden; }
+.pk { display: grid; grid-template-rows: auto 1fr; height: 100vh; height: 100dvh; }
+.pk-head { display: flex; gap: 10px; align-items: center; padding: 10px 16px; background: var(--panel); border-bottom: 1px solid var(--line); flex-wrap: wrap; z-index: 500; }
+.pk-head .brand { padding: 0; }
+.pk-search { position: relative; flex: 1; min-width: 220px; display: flex; gap: 8px; }
+.pk-search input { flex: 1; }
+.sugg { position: absolute; top: 100%; left: 0; right: 0; background: var(--panel); border: 1px solid var(--line); border-radius: 10px; box-shadow: var(--shadow); margin-top: 4px; z-index: 1000; overflow: hidden; }
+.sugg button { display: block; width: 100%; text-align: left; padding: 9px 12px; border: 0; background: none; color: var(--text); font: inherit; cursor: pointer; }
+.sugg button:hover, .sugg button:focus { background: var(--accent-2); }
+.pk-body { display: grid; grid-template-columns: 380px 1fr; min-height: 0; }
+.pk-side { overflow-y: auto; border-right: 1px solid var(--line); background: var(--bg); padding: 14px; display: flex; flex-direction: column; gap: 12px; min-height: 0; }
+#map { height: 100%; width: 100%; background: var(--panel-2); }
+.filters { display: flex; flex-wrap: wrap; gap: 6px; }
+.chip { border: 1px solid var(--line); background: var(--panel); color: var(--text); border-radius: 99px; padding: 5px 11px; font: inherit; font-size: .84rem; cursor: pointer; }
+.chip.on { background: var(--accent); border-color: var(--accent); color: #fff; }
+.spot { background: var(--panel); border: 1px solid var(--line); border-radius: 12px; padding: 12px; cursor: pointer; }
+.spot:hover, .spot.sel { border-color: var(--accent); }
+.spot h4 { margin: 0 0 4px; font-size: .98rem; }
+.spot .meta { display: flex; flex-wrap: wrap; gap: 5px; font-size: .8rem; color: var(--muted); align-items: center; }
+.dot { width: 10px; height: 10px; border-radius: 50%; display: inline-block; flex: none; }
+.legend { display: flex; gap: 12px; flex-wrap: wrap; font-size: .8rem; color: var(--muted); }
+.legend span { display: inline-flex; gap: 5px; align-items: center; }
+.leaflet-popup-content { font: 14px/1.45 var(--font); }
+.leaflet-popup-content h4 { margin: 0 0 4px; }
+.loading { display: flex; gap: 10px; align-items: center; color: var(--muted); }
+.spin { width: 18px; height: 18px; border: 3px solid var(--line); border-top-color: var(--accent); border-radius: 50%; animation: sp 0.8s linear infinite; }
+@keyframes sp { to { transform: rotate(360deg); } }
+@media (prefers-reduced-motion: reduce) { .spin { animation: none; } }
+.tabbar { display: none; }
+@media (max-width: 860px) {
+  .pk-body { grid-template-columns: 1fr; grid-template-rows: 1fr; position: relative; }
+  .pk-side { position: absolute; inset: 0; z-index: 400; border-right: 0; padding-bottom: 80px; }
+  .pk-body.show-map .pk-side { display: none; }
+  .tabbar { display: flex; position: fixed; bottom: 16px; left: 50%; transform: translateX(-50%); z-index: 600; background: var(--panel); border: 1px solid var(--line); border-radius: 99px; box-shadow: var(--shadow); padding: 4px; gap: 4px; }
+  .tabbar button { border: 0; background: none; font: inherit; font-weight: 600; padding: 8px 18px; border-radius: 99px; color: var(--text); cursor: pointer; }
+  .tabbar button.on { background: var(--accent); color: #fff; }
+}

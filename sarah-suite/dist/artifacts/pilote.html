@@ -350,6 +350,7 @@ const SUITE = [
   { id: 'pilote', name: 'Pilote — Projets', url: 'https://pilote-projets-sarah.netlify.app', ico: '📋' },
   { id: 'rh', name: 'RH Studio', url: 'https://rh-studio-sarah.netlify.app', ico: '🗂️' },
   { id: 'sarah', name: 'Sarah HR — Formation', url: 'https://sarah-hr.netlify.app', ico: '🎓' },
+  { id: 'parking', name: 'Garé Gratuit IDF', url: 'https://gare-gratuit-idf.netlify.app', ico: '🅿️' },
 ];
 function suiteLinks(current) {
   return `<div class="nav"><div class="sec">La suite</div>${SUITE.filter((s) => s.id !== current).map((s) => `<a href="${s.url}" target="_blank" rel="noopener"><span class="ico">${s.ico}</span>${esc(s.name)}</a>`).join('')}</div>`;

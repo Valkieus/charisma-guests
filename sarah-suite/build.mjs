@@ -15,6 +15,10 @@ const APPS = {
     accent: '#be185d', icon: '🎓', css: ['shared/base.css', 'sarah-hr/style.css'],
     js: ['shared/core.js', 'sarah-hr/content-1.js', 'sarah-hr/content-2.js', 'sarah-hr/content-3.js', 'sarah-hr/glossary.js', 'sarah-hr/games.js', 'sarah-hr/app.js'],
   },
+  parking: {
+    title: 'Garé Gratuit', description: 'Trouver des places de parking gratuites en Île-de-France autour d\'une adresse ou de sa position.',
+    accent: '#15803d', icon: '🅿️', css: ['shared/base.css', 'parking/vendor/leaflet.css', 'parking/style.css'], js: ['shared/core.js', 'parking/vendor/leaflet.js', 'parking/app.js'],
+  },
 };
 
 const only = process.argv[2];
