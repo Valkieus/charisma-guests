@@ -327,7 +327,7 @@ const view = {
     });
     $$('[data-ob]').forEach((c) => c.onchange = () => { mutate((x) => { x.onboardings.find((y) => y.id === c.dataset.ob).items[c.dataset.k].done = c.checked; }); view.onboarding(); });
     $$('[data-add]').forEach((i) => i.onkeydown = (ev) => { if (ev.key === 'Enter' && i.value.trim()) { mutate((x) => x.onboardings.find((y) => y.id === i.dataset.add).items.push({ t: i.value.trim(), done: false })); view.onboarding(); } });
-    $$('[data-delob]').forEach((b) => b.onclick = () => { if (confirm('Supprimer ce parcours ?')) { mutate((x) => { x.onboardings = x.onboardings.filter((y) => y.id !== b.dataset.delob); }); view.onboarding(); } });
+    $$('[data-delob]').forEach((b) => b.onclick = async () => { if (await ask('Supprimer ce parcours ?')) { mutate((x) => { x.onboardings = x.onboardings.filter((y) => y.id !== b.dataset.delob); }); view.onboarding(); } });
     after();
   },
 
@@ -374,7 +374,7 @@ const view = {
         mutate((x) => { x.projects.push({ id: uid(), titre, pilote: fd.pilote, echeance: fd.echeance, tasks: (tpl?.[1] || []).map((t, i) => ({ t, done: false, due: addDays(todayISO(), Math.round(((i + 1) / n) * daysBetween(todayISO(), fd.echeance))) })) }); journal(x, `Projet RH « ${titre} » créé`); }); view.projects(); } }));
     $$('[data-p]').forEach((c) => c.onchange = () => { mutate((x) => { x.projects.find((p) => p.id === c.dataset.p).tasks[c.dataset.k].done = c.checked; }); view.projects(); });
     $$('[data-addp]').forEach((i) => i.onkeydown = (ev) => { if (ev.key === 'Enter' && i.value.trim()) { mutate((x) => x.projects.find((p) => p.id === i.dataset.addp).tasks.push({ t: i.value.trim(), done: false, due: '' })); view.projects(); } });
-    $$('[data-delp]').forEach((b) => b.onclick = () => { if (confirm('Supprimer ce projet ?')) { mutate((x) => { x.projects = x.projects.filter((p) => p.id !== b.dataset.delp); }); view.projects(); } });
+    $$('[data-delp]').forEach((b) => b.onclick = async () => { if (await ask('Supprimer ce projet ?')) { mutate((x) => { x.projects = x.projects.filter((p) => p.id !== b.dataset.delp); }); view.projects(); } });
     after();
   },
 
@@ -465,7 +465,7 @@ const view = {
       if (!store.get(simKey(sc.id), null)) { const o = { id: uid(), ...sc.org(), settings: { ...DEFAULT_SETTINGS } }; o.sim = { done: {}, active: sc.missions[0].id }; store.set(simKey(sc.id), o); }
       store.set(modeKey(), sc.id); location.hash = '#/simulation'; boot();
     });
-    $$('[data-reset]').forEach((b) => b.onclick = () => { if (!confirm('Effacer toute la progression de ce scénario ?')) return; store.del(simKey(b.dataset.reset)); if (mode() === b.dataset.reset) store.set(modeKey(), 'real'); boot(); });
+    $$('[data-reset]').forEach((b) => b.onclick = async () => { if (!await ask('Effacer toute la progression de ce scénario ?')) return; store.del(simKey(b.dataset.reset)); if (mode() === b.dataset.reset) store.set(modeKey(), 'real'); boot(); });
     $$('[data-m]').forEach((b) => b.onclick = () => location.hash = '#/simulation/' + b.dataset.m);
     after();
   },
@@ -497,7 +497,7 @@ const view = {
       <div class="table-wrap"><table><tr><th>Nom</th><th>E-mail</th><th>Rôle</th><th>Dossier lié</th><th></th></tr>${list.map((u) => `<tr><td>${esc(u.name)}${u.mustChange ? ' <span class="badge warn">provisoire</span>' : ''}</td><td>${esc(u.email)}</td><td>${ROLES[u.role]}</td><td>${esc(empName(o, u.empId))}</td><td>${u.id !== ME.id ? `<button class="btn sm danger" data-del="${u.id}">Supprimer</button>` : ''}</td></tr>`).join('')}</table></div>`;
     $('#nu').onclick = () => modal({ title: 'Nouveau compte', body: `<div class="fields">${fInput('name', 'Nom', '', { req: true })}${fInput('email', 'E-mail', '', { type: 'email', req: true })}${fSelect('role', 'Rôle', Object.entries(ROLES), 'salarie')}${fSelect('empId', 'Dossier lié', [['', '—'], ...o.employees.filter(isActive).map((e) => [e.id, e.prenom + ' ' + e.nom])])}${fInput('password', 'Mot de passe provisoire', 'Bienvenue' + Math.floor(100 + Math.random() * 900), { full: true })}</div>`,
       async onSubmit(fd) { await auth.create({ name: fd.name, email: fd.email, password: fd.password, role: fd.role, wsId: ME.wsId, extra: { empId: fd.empId, mustChange: true } }); toast(`Compte créé — mot de passe provisoire : ${fd.password}`, 6000); view.accounts(); } });
-    $$('[data-del]').forEach((b) => b.onclick = () => { if (confirm('Supprimer ce compte ?')) { auth.remove(b.dataset.del); view.accounts(); } });
+    $$('[data-del]').forEach((b) => b.onclick = async () => { if (await ask('Supprimer ce compte ?')) { auth.remove(b.dataset.del); view.accounts(); } });
   },
 
   me() {
@@ -534,7 +534,7 @@ function employeeForm(o, e, isNew) {
     location.hash = '#/employee/' + id; router.run();
   };
   modal({ title: isNew ? `Nouveau dossier ${V.emp}` : 'Modifier le dossier', body: html, wide: true, onSubmit,
-    danger: !isNew ? { label: 'Supprimer le dossier', onClick: () => { if (!confirm('Supprimer définitivement ce dossier ? (Pour un départ, renseignez plutôt la date de sortie.)')) return false; mutate((x) => { x.employees = x.employees.filter((y) => y.id !== e.id); x.absences = x.absences.filter((a) => a.empId !== e.id); journal(x, `Dossier supprimé : ${e.prenom} ${e.nom}`); }); location.hash = '#/employees'; } } : null });
+    danger: !isNew ? { label: 'Supprimer le dossier', onClick: async () => { if (!await ask('Supprimer définitivement ce dossier ? (Pour un départ, renseignez plutôt la date de sortie.)')) return false; mutate((x) => { x.employees = x.employees.filter((y) => y.id !== e.id); x.absences = x.absences.filter((a) => a.empId !== e.id); journal(x, `Dossier supprimé : ${e.prenom} ${e.nom}`); }); location.hash = '#/employees'; } } : null });
   if (isNew) main.innerHTML = page('Nouveau dossier') + '<p class="muted">Remplissez le formulaire.</p>';
 }
 
@@ -557,10 +557,10 @@ function absenceForm(o, a, empId) {
     ${fInput('debut', 'Du', a.debut, { type: 'date' })}${fInput('fin', 'Au (inclus)', a.fin, { type: 'date' })}${self ? '' : fSelect('statut', 'Statut', [['demandee', 'En attente'], ['validee', 'Validée'], ['refusee', 'Refusée']], a.statut)}${fText('motif', 'Commentaire', a.motif)}</div><p class="muted" id="cnt"></p>`,
     onOpen(f) { const upd = () => { const fd = Object.fromEntries(new FormData(f).entries()); $('#cnt', f).textContent = `Décompte : ${absenceDays(o, fd)} jour(s).`; }; f.addEventListener('input', upd); upd(); },
     danger: !isNew && !self ? { label: 'Supprimer', onClick: () => { mutate((x) => { x.absences = x.absences.filter((y) => y.id !== a.id); }); router.run(); } } : null,
-    onSubmit(fd) {
+    async onSubmit(fd) {
       if (!fd.empId) throw new Error('Choisissez la personne'); if (fd.fin < fd.debut) throw new Error('La date de fin est avant le début');
       const overlap = o.absences.find((x) => x.id !== a.id && x.empId === fd.empId && x.statut !== 'refusee' && x.debut <= fd.fin && x.fin >= fd.debut);
-      if (overlap && !confirm(`Attention : chevauchement avec une absence existante (${overlap.type}, ${fmtDate(overlap.debut)} – ${fmtDate(overlap.fin)}). Enregistrer quand même ?`)) return false;
+      if (overlap && !await ask(`Attention : chevauchement avec une absence existante (${overlap.type}, ${fmtDate(overlap.debut)} – ${fmtDate(overlap.fin)}). Enregistrer quand même ?`)) return false;
       mutate((x) => { const data = { ...fd, statut: self ? 'demandee' : fd.statut }; if (isNew) { x.absences.push({ id: uid(), ...data }); journal(x, `Absence saisie pour ${empName(x, fd.empId)} (${fd.type})`); } else Object.assign(x.absences.find((y) => y.id === a.id), data); });
       router.run();
     } });

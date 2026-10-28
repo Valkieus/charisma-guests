@@ -3,7 +3,7 @@ import { readFileSync, writeFileSync, mkdirSync } from 'node:fs';
 
 const APPS = {
   pilote: {
-    title: 'Pilote — Projets', description: 'Gestion de projet simple et pas chère : Kanban, Gantt, risques, budget et académie intégrée.',
+    title: 'Pilote Projets', description: 'Gestion de projet simple et pas chère : Kanban, Gantt, risques, budget et académie intégrée.',
     accent: '#4f46e5', icon: '📋', css: ['shared/base.css'], js: ['shared/core.js', 'pilote/academy.js', 'pilote/app.js'],
   },
   'rh-studio': {
@@ -47,5 +47,10 @@ ${js.replace(/<\/script/gi, '<\\/script')}
 `;
   mkdirSync(`dist/${id}`, { recursive: true });
   writeFileSync(`dist/${id}/index.html`, html);
+  // Netlify : publier ce dossier tel quel (dossier de base = sarah-suite/dist/<app>)
+  writeFileSync(`dist/${id}/netlify.toml`, '[build]\n  command = "echo static"\n  publish = "."\n');
+  // Variante pour une page claude.ai (le squelette html/head/body est ajouté à la publication)
+  mkdirSync('dist/artifacts', { recursive: true });
+  writeFileSync(`dist/artifacts/${id}.html`, html.replace(/^[\s\S]*?<head>\n/, '').replace('</head>\n<body>\n', '').replace('</body>\n</html>\n', ''));
   console.log(`dist/${id}/index.html  ${(html.length / 1024).toFixed(0)} Ko`);
 }

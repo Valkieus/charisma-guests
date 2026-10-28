@@ -1,0 +1,1165 @@
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Pilote Projets</title>
+<meta name="description" content="Gestion de projet simple et pas chère : Kanban, Gantt, risques, budget et académie intégrée.">
+<link rel="icon" href="data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%20100%20100%22%3E%3Ctext%20y%3D%22.9em%22%20font-size%3D%2290%22%3E%F0%9F%93%8B%3C%2Ftext%3E%3C%2Fsvg%3E">
+<style>
+/* Socle visuel commun aux trois applications de la suite */
+:root {
+  --bg: #f6f7fb;
+  --panel: #ffffff;
+  --panel-2: #f0f2f8;
+  --line: #e2e5ee;
+  --text: #1b1f2e;
+  --muted: #646b80;
+  --accent: #4f46e5;
+  --accent-2: color-mix(in srgb, var(--accent) 13%, var(--panel));
+  --accent-text: #ffffff;
+  --ok: #15803d;
+  --ok-bg: #e7f6ec;
+  --warn: #b45309;
+  --warn-bg: #fdf3e2;
+  --bad: #b91c1c;
+  --bad-bg: #fdeaea;
+  --info: #0369a1;
+  --info-bg: #e5f3fb;
+  --shadow: 0 1px 2px rgba(20, 24, 40, .06), 0 4px 16px rgba(20, 24, 40, .05);
+  --radius: 12px;
+  --font: "Inter", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  color-scheme: light;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #0f1220; --panel: #171b2d; --panel-2: #1e2338; --line: #2a3050;
+    --text: #e8eaf3; --muted: #9aa1ba;
+    --ok-bg: #12301f; --warn-bg: #3a2a10; --bad-bg: #3b1616; --info-bg: #10283a;
+    --ok: #4ade80; --warn: #fbbf24; --bad: #f87171; --info: #38bdf8;
+    --shadow: 0 1px 2px rgba(0,0,0,.4); color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #0f1220; --panel: #171b2d; --panel-2: #1e2338; --line: #2a3050;
+  --text: #e8eaf3; --muted: #9aa1ba;
+  --ok-bg: #12301f; --warn-bg: #3a2a10; --bad-bg: #3b1616; --info-bg: #10283a;
+  --ok: #4ade80; --warn: #fbbf24; --bad: #f87171; --info: #38bdf8;
+  --shadow: 0 1px 2px rgba(0,0,0,.4); color-scheme: dark;
+}
+* { box-sizing: border-box; }
+html, body { margin: 0; padding: 0; }
+body { background: var(--bg); color: var(--text); font: 15px/1.55 var(--font); -webkit-font-smoothing: antialiased; }
+a { color: var(--accent); }
+h1, h2, h3, h4 { line-height: 1.25; margin: 0 0 .5em; }
+h1 { font-size: 1.6rem; } h2 { font-size: 1.25rem; } h3 { font-size: 1.05rem; }
+p { margin: 0 0 .8em; }
+small, .muted { color: var(--muted); }
+code { background: var(--panel-2); padding: 1px 5px; border-radius: 5px; font-size: .9em; }
+hr { border: 0; border-top: 1px solid var(--line); margin: 1rem 0; }
+
+/* Mise en page */
+.app { display: grid; grid-template-columns: 248px 1fr; min-height: 100vh; }
+.app > div { min-width: 0; }
+.side { background: var(--panel); border-right: 1px solid var(--line); padding: 18px 12px; position: sticky; top: 0; height: 100vh; overflow-y: auto; display: flex; flex-direction: column; gap: 4px; }
+.brand { display: flex; align-items: center; gap: 10px; font-weight: 800; font-size: 1.1rem; padding: 4px 10px 14px; }
+.brand .logo { width: 32px; height: 32px; border-radius: 9px; background: var(--accent); color: var(--accent-text); display: grid; place-items: center; font-size: .95rem; }
+.nav a { display: flex; align-items: center; gap: 10px; padding: 8px 10px; border-radius: 8px; color: var(--text); text-decoration: none; font-weight: 500; }
+.nav a:hover { background: var(--panel-2); }
+.nav a.active { background: var(--accent-2); color: var(--accent); font-weight: 650; }
+.nav .sec { font-size: .72rem; text-transform: uppercase; letter-spacing: .06em; color: var(--muted); padding: 14px 10px 4px; font-weight: 700; }
+.nav .ico { width: 20px; text-align: center; }
+.side .foot { margin-top: auto; padding: 10px; font-size: .85rem; color: var(--muted); border-top: 1px solid var(--line); }
+.main { padding: 26px 32px 60px; max-width: 1280px; width: 100%; min-width: 0; }
+.topbar { display: none; }
+.page-head { display: flex; align-items: flex-start; justify-content: space-between; gap: 16px; margin-bottom: 18px; flex-wrap: wrap; }
+.page-head p { margin: 0; color: var(--muted); }
+
+/* Composants */
+.card { background: var(--panel); border: 1px solid var(--line); border-radius: var(--radius); padding: 18px; box-shadow: var(--shadow); min-width: 0; }
+.card + .card { margin-top: 14px; }
+.card h3 { margin-bottom: .6em; }
+.grid { display: grid; gap: 14px; }
+.g2 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+.g3 { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+.g4 { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+.row { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
+.between { justify-content: space-between; }
+.stack > * + * { margin-top: 10px; }
+.kpi { display: flex; flex-direction: column; gap: 2px; }
+.kpi .v { font-size: 1.8rem; font-weight: 800; letter-spacing: -.02em; }
+.kpi .l { color: var(--muted); font-size: .85rem; }
+
+.btn { display: inline-flex; align-items: center; gap: 6px; border: 1px solid var(--line); background: var(--panel); color: var(--text); padding: 8px 14px; border-radius: 9px; font: inherit; font-weight: 600; cursor: pointer; text-decoration: none; white-space: nowrap; }
+.btn:hover { background: var(--panel-2); }
+.btn.primary { background: var(--accent); border-color: var(--accent); color: var(--accent-text); }
+.btn.primary:hover { filter: brightness(1.08); }
+.btn.danger { color: var(--bad); }
+.btn.sm { padding: 4px 10px; font-size: .85rem; border-radius: 7px; }
+.btn.ghost { border-color: transparent; background: transparent; }
+.btn:disabled { opacity: .5; cursor: not-allowed; }
+
+label { display: block; font-weight: 600; font-size: .88rem; margin-bottom: 4px; }
+input, select, textarea { width: 100%; font: inherit; color: var(--text); background: var(--panel); border: 1px solid var(--line); border-radius: 8px; padding: 8px 10px; }
+input:focus, select:focus, textarea:focus { outline: 2px solid var(--accent); outline-offset: -1px; border-color: transparent; }
+input[type=checkbox], input[type=radio] { width: auto; accent-color: var(--accent); }
+textarea { min-height: 80px; resize: vertical; }
+.field { margin-bottom: 12px; }
+.fields { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 0 12px; }
+.fields .full { grid-column: 1 / -1; }
+
+.badge { display: inline-flex; align-items: center; gap: 4px; padding: 2px 9px; border-radius: 99px; font-size: .78rem; font-weight: 650; background: var(--panel-2); color: var(--muted); white-space: nowrap; }
+.badge.ok { background: var(--ok-bg); color: var(--ok); }
+.badge.warn { background: var(--warn-bg); color: var(--warn); }
+.badge.bad { background: var(--bad-bg); color: var(--bad); }
+.badge.info { background: var(--info-bg); color: var(--info); }
+.badge.acc { background: var(--accent-2); color: var(--accent); }
+
+.table-wrap { overflow-x: auto; border: 1px solid var(--line); border-radius: var(--radius); background: var(--panel); }
+table { width: 100%; border-collapse: collapse; font-size: .92rem; }
+th, td { text-align: left; padding: 10px 12px; border-bottom: 1px solid var(--line); vertical-align: top; }
+th { font-size: .78rem; text-transform: uppercase; letter-spacing: .04em; color: var(--muted); background: var(--panel-2); }
+tr:last-child td { border-bottom: 0; }
+tr.click { cursor: pointer; } tr.click:hover td { background: var(--panel-2); }
+
+.progress { height: 8px; background: var(--panel-2); border-radius: 99px; overflow: hidden; }
+.progress > i { display: block; height: 100%; background: var(--accent); border-radius: 99px; }
+.tabs { display: flex; gap: 4px; border-bottom: 1px solid var(--line); margin-bottom: 16px; overflow-x: auto; }
+.tabs a, .tabs button { padding: 9px 14px; border: 0; background: none; font: inherit; font-weight: 600; color: var(--muted); cursor: pointer; border-bottom: 2px solid transparent; text-decoration: none; white-space: nowrap; }
+.tabs .active { color: var(--accent); border-bottom-color: var(--accent); }
+
+.alert { padding: 12px 14px; border-radius: 10px; background: var(--info-bg); color: var(--text); border-left: 4px solid var(--info); margin-bottom: 12px; }
+.alert.ok { background: var(--ok-bg); border-color: var(--ok); }
+.alert.warn { background: var(--warn-bg); border-color: var(--warn); }
+.alert.bad { background: var(--bad-bg); border-color: var(--bad); }
+.empty { text-align: center; padding: 34px 16px; color: var(--muted); }
+
+/* Kanban */
+.kanban { display: grid; grid-auto-flow: column; grid-auto-columns: minmax(250px, 1fr); gap: 12px; overflow-x: auto; padding-bottom: 8px; }
+.col { background: var(--panel-2); border-radius: var(--radius); padding: 10px; min-height: 200px; }
+.col h4 { display: flex; justify-content: space-between; font-size: .85rem; text-transform: uppercase; letter-spacing: .04em; color: var(--muted); margin: 4px 4px 10px; }
+.col.over { outline: 2px dashed var(--accent); }
+.tcard { background: var(--panel); border: 1px solid var(--line); border-radius: 10px; padding: 10px; margin-bottom: 8px; cursor: grab; box-shadow: var(--shadow); }
+.tcard .t { font-weight: 600; margin-bottom: 6px; }
+.tcard .meta { display: flex; gap: 6px; flex-wrap: wrap; font-size: .8rem; color: var(--muted); align-items: center; }
+
+/* Modale & toast */
+.modal-bg { position: fixed; inset: 0; background: rgba(10, 12, 24, .5); display: grid; place-items: center; z-index: 50; padding: 16px; }
+.modal { background: var(--panel); border-radius: 14px; width: min(640px, 100%); max-height: 90vh; overflow-y: auto; padding: 22px; box-shadow: 0 20px 60px rgba(0,0,0,.3); }
+.modal.wide { width: min(900px, 100%); }
+.modal .actions { display: flex; justify-content: flex-end; gap: 8px; margin-top: 16px; }
+.toast { position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); background: var(--text); color: var(--bg); padding: 10px 18px; border-radius: 10px; z-index: 60; font-weight: 600; box-shadow: var(--shadow); max-width: calc(100% - 32px); }
+
+/* Authentification */
+.auth { min-height: 100vh; display: grid; place-items: center; padding: 16px; }
+.auth .box { width: min(440px, 100%); }
+.avatar { width: 30px; height: 30px; border-radius: 50%; background: var(--accent-2); color: var(--accent); display: inline-grid; place-items: center; font-weight: 700; font-size: .78rem; flex: none; }
+.lesson { max-width: 780px; }
+.lesson h2 { margin-top: 1.2em; }
+.lesson ul, .lesson ol { padding-left: 1.3em; }
+.lesson li { margin-bottom: .3em; }
+.lesson table { margin: .8em 0; border: 1px solid var(--line); }
+.callout { background: var(--accent-2); border-radius: 10px; padding: 12px 14px; margin: 12px 0; }
+.callout.tip::before { content: "💡 "; } .callout.warn::before { content: "⚠️ "; }
+
+@media (max-width: 900px) {
+  .app { grid-template-columns: 1fr; }
+  .side { position: fixed; inset: 0 auto 0 0; width: 270px; z-index: 40; transform: translateX(-100%); transition: transform .2s; }
+  .side.open { transform: none; box-shadow: 0 0 40px rgba(0,0,0,.3); }
+  .topbar { display: flex; align-items: center; gap: 10px; padding: 10px 16px; background: var(--panel); border-bottom: 1px solid var(--line); position: sticky; top: 0; z-index: 30; }
+  .main { padding: 18px 16px 60px; }
+  .g2, .g3, .g4 { grid-template-columns: 1fr; }
+  .g4.kpis { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .fields { grid-template-columns: 1fr; }
+}
+@media print {
+  .side, .topbar, .no-print { display: none !important; }
+  .app { display: block; } .main { padding: 0; }
+  .card { box-shadow: none; }
+}
+
+:root{--accent:#4f46e5}
+</style>
+<noscript>Cette application nécessite JavaScript.</noscript>
+<script>
+/* ---- shared/core.js ---- */
+/* Outils communs aux trois applications : stockage, comptes, routage, modales. */
+'use strict';
+
+const $ = (s, r = document) => r.querySelector(s);
+const $$ = (s, r = document) => [...r.querySelectorAll(s)];
+const esc = (v) => String(v ?? '').replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+const uid = () => Date.now().toString(36) + Math.random().toString(36).slice(2, 8);
+const todayISO = () => new Date().toISOString().slice(0, 10);
+const addDays = (iso, n) => { const d = new Date(iso + 'T12:00:00'); d.setDate(d.getDate() + n); return d.toISOString().slice(0, 10); };
+const daysBetween = (a, b) => Math.round((new Date(b + 'T12:00:00') - new Date(a + 'T12:00:00')) / 86400000);
+const fmtDate = (iso) => iso ? new Date(iso + 'T12:00:00').toLocaleDateString('fr-FR', { day: '2-digit', month: 'short', year: 'numeric' }) : '—';
+const fmtEur = (n) => (Number(n) || 0).toLocaleString('fr-FR', { style: 'currency', currency: 'EUR', maximumFractionDigits: 0 });
+const fmtEur2 = (n) => (Number(n) || 0).toLocaleString('fr-FR', { style: 'currency', currency: 'EUR' });
+const initials = (name) => String(name || '?').split(/\s+/).map((p) => p[0]).join('').slice(0, 2).toUpperCase();
+const shuffle = (a) => { const b = [...a]; for (let i = b.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [b[i], b[j]] = [b[j], b[i]]; } return b; };
+const pick = (a, n) => shuffle(a).slice(0, n);
+const clamp = (v, a, b) => Math.max(a, Math.min(b, v));
+
+/* Stockage local, isolé par application (préfixe). */
+function makeStore(prefix) {
+  const mem = {};
+  return {
+    get(key, def) {
+      try { const raw = localStorage.getItem(prefix + key); return raw == null ? (key in mem ? mem[key] : def) : JSON.parse(raw); }
+      catch { return key in mem ? mem[key] : def; }
+    },
+    set(key, val) {
+      mem[key] = val;
+      try { localStorage.setItem(prefix + key, JSON.stringify(val)); } catch { /* stockage indisponible : on garde en mémoire */ }
+    },
+    del(key) { delete mem[key]; try { localStorage.removeItem(prefix + key); } catch { } },
+    dump() {
+      const out = {};
+      try { for (let i = 0; i < localStorage.length; i++) { const k = localStorage.key(i); if (k.startsWith(prefix)) out[k.slice(prefix.length)] = JSON.parse(localStorage.getItem(k)); } }
+      catch { Object.assign(out, mem); }
+      return out;
+    },
+    load(obj) { Object.entries(obj).forEach(([k, v]) => this.set(k, v)); },
+    clear() { Object.keys(this.dump()).forEach((k) => this.del(k)); },
+  };
+}
+
+async function hashPassword(pw, salt) {
+  const data = new TextEncoder().encode(salt + '::' + pw);
+  if (window.crypto && crypto.subtle) {
+    const buf = await crypto.subtle.digest('SHA-256', data);
+    return [...new Uint8Array(buf)].map((b) => b.toString(16).padStart(2, '0')).join('');
+  }
+  let h = 5381; for (const b of data) h = ((h << 5) + h + b) >>> 0; return 'x' + h.toString(16);
+}
+
+/* Comptes utilisateurs (locaux au navigateur). */
+function makeAuth(store) {
+  return {
+    users() { return store.get('users', []); },
+    saveUsers(list) { store.set('users', list); },
+    current() { const id = store.get('session', null); return this.users().find((u) => u.id === id) || null; },
+    async create({ name, email, password, role = 'member', wsId, extra = {} }) {
+      email = String(email).trim().toLowerCase();
+      if (!name || !email || !password) throw new Error('Nom, e-mail et mot de passe sont obligatoires.');
+      if (password.length < 6) throw new Error('Le mot de passe doit faire au moins 6 caractères.');
+      if (this.users().some((u) => u.email === email)) throw new Error('Un compte existe déjà avec cet e-mail.');
+      const salt = uid();
+      const user = { id: uid(), name: name.trim(), email, salt, pw: await hashPassword(password, salt), role, wsId, created: todayISO(), ...extra };
+      this.saveUsers([...this.users(), user]);
+      return user;
+    },
+    async login(email, password) {
+      email = String(email).trim().toLowerCase();
+      const u = this.users().find((x) => x.email === email);
+      if (!u || u.pw !== await hashPassword(password, u.salt)) throw new Error('E-mail ou mot de passe incorrect.');
+      store.set('session', u.id);
+      return u;
+    },
+    async setPassword(userId, password) {
+      if (password.length < 6) throw new Error('Le mot de passe doit faire au moins 6 caractères.');
+      const list = this.users(); const u = list.find((x) => x.id === userId); if (!u) return;
+      u.salt = uid(); u.pw = await hashPassword(password, u.salt); u.mustChange = false; this.saveUsers(list);
+    },
+    update(userId, patch) { const list = this.users(); const u = list.find((x) => x.id === userId); if (u) Object.assign(u, patch); this.saveUsers(list); return u; },
+    remove(userId) { this.saveUsers(this.users().filter((u) => u.id !== userId)); },
+    logout() { store.del('session'); },
+  };
+}
+
+function toast(msg, ms = 2600) {
+  const t = document.createElement('div'); t.className = 'toast'; t.textContent = msg; document.body.appendChild(t);
+  setTimeout(() => t.remove(), ms);
+}
+
+/* Modale générique. body = HTML ; onSubmit(formData, el) peut renvoyer false pour garder ouvert. */
+function modal({ title, body, submit = 'Enregistrer', cancel = 'Annuler', wide = false, onSubmit, onOpen, danger }) {
+  const bg = document.createElement('div'); bg.className = 'modal-bg';
+  bg.innerHTML = `<form class="modal ${wide ? 'wide' : ''}" novalidate><h2>${esc(title)}</h2><div class="mbody">${body}</div>
+    <div class="actions">${danger ? `<button type="button" class="btn danger" data-danger style="margin-right:auto">${esc(danger.label)}</button>` : ''}
+    ${cancel ? `<button type="button" class="btn" data-cancel>${esc(cancel)}</button>` : ''}${submit ? `<button class="btn primary">${esc(submit)}</button>` : ''}</div></form>`;
+  const form = bg.querySelector('form');
+  const close = () => { bg.remove(); document.removeEventListener('keydown', onKey); };
+  const onKey = (e) => { if (e.key === 'Escape') close(); };
+  document.addEventListener('keydown', onKey);
+  bg.addEventListener('mousedown', (e) => { if (e.target === bg) close(); });
+  form.querySelector('[data-cancel]')?.addEventListener('click', close);
+  form.querySelector('[data-danger]')?.addEventListener('click', async () => { if (await danger.onClick() !== false) close(); });
+  form.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const fd = Object.fromEntries(new FormData(form).entries());
+    $$('input[type=checkbox]', form).forEach((c) => { if (c.name) fd[c.name] = c.checked; });
+    try { if (!onSubmit || await onSubmit(fd, form) !== false) close(); }
+    catch (err) { toast(err.message || String(err)); }
+  });
+  document.body.appendChild(bg);
+  onOpen?.(form);
+  form.querySelector('input:not([type=hidden]),select,textarea')?.focus();
+  return { close, form };
+}
+/* Confirmation intégrée à la page (les boîtes natives sont bloquées dans certains lecteurs). */
+function ask(text, ok = 'Confirmer') {
+  return new Promise((res) => {
+    const bg = document.createElement('div'); bg.className = 'modal-bg'; bg.style.zIndex = 70;
+    bg.innerHTML = `<div class="modal" role="alertdialog" style="width:min(440px,100%)"><p style="font-weight:600;margin:0">${esc(text)}</p><div class="actions"><button type="button" class="btn" data-no>Annuler</button><button type="button" class="btn primary" data-yes>${esc(ok)}</button></div></div>`;
+    const done = (v) => { bg.remove(); res(v); };
+    bg.querySelector('[data-no]').onclick = () => done(false);
+    bg.querySelector('[data-yes]').onclick = () => done(true);
+    document.body.appendChild(bg); bg.querySelector('[data-yes]').focus();
+  });
+}
+
+/* Champs de formulaire */
+function fInput(name, label, value = '', { type = 'text', full = false, req = false, attrs = '' } = {}) {
+  return `<div class="field ${full ? 'full' : ''}"><label>${esc(label)}${req ? ' *' : ''}</label><input name="${name}" type="${type}" value="${esc(value)}" ${req ? 'required' : ''} ${attrs}></div>`;
+}
+function fSelect(name, label, options, value = '', { full = false } = {}) {
+  const opts = options.map((o) => (typeof o === 'string' ? [o, o] : o)).map(([v, l]) => `<option value="${esc(v)}" ${String(v) === String(value) ? 'selected' : ''}>${esc(l)}</option>`).join('');
+  return `<div class="field ${full ? 'full' : ''}"><label>${esc(label)}</label><select name="${name}">${opts}</select></div>`;
+}
+function fText(name, label, value = '', { full = true } = {}) {
+  return `<div class="field ${full ? 'full' : ''}"><label>${esc(label)}</label><textarea name="${name}">${esc(value)}</textarea></div>`;
+}
+
+/* Routeur par hash : #/route/param */
+function makeRouter(routes, fallback) {
+  const run = () => {
+    $$('.modal-bg').forEach((m) => m.remove());
+    const parts = (location.hash.replace(/^#\/?/, '') || '').split('/').map(decodeURIComponent);
+    const fn = routes[parts[0]] || fallback;
+    fn(...parts.slice(1));
+    $$('.nav a').forEach((a) => a.classList.toggle('active', a.getAttribute('href') === '#/' + parts[0]));
+    $('.side')?.classList.remove('open');
+    window.scrollTo(0, 0);
+  };
+  window.addEventListener('hashchange', run);
+  return { run, go: (h) => { if (location.hash === h) run(); else location.hash = h; } };
+}
+
+function download(filename, content, type = 'application/json') {
+  const blob = new Blob([content], { type }); const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob); a.download = filename; a.click(); setTimeout(() => URL.revokeObjectURL(a.href), 1000);
+}
+function pickFile(accept = '.json') {
+  return new Promise((res) => { const i = document.createElement('input'); i.type = 'file'; i.accept = accept; i.onchange = () => { const f = i.files[0]; if (!f) return; const r = new FileReader(); r.onload = () => res(r.result); r.readAsText(f); }; i.click(); });
+}
+function toCSV(rows) {
+  return rows.map((r) => r.map((c) => `"${String(c ?? '').replace(/"/g, '""')}"`).join(';')).join('\n');
+}
+
+/* Liens entre les trois applications de la suite */
+const SUITE = [
+  { id: 'pilote', name: 'Pilote — Projets', url: 'https://pilote-projets-sarah.netlify.app', ico: '📋' },
+  { id: 'rh', name: 'RH Studio', url: 'https://rh-studio-sarah.netlify.app', ico: '🗂️' },
+  { id: 'sarah', name: 'Sarah HR — Formation', url: 'https://sarah-hr.netlify.app', ico: '🎓' },
+];
+function suiteLinks(current) {
+  return `<div class="nav"><div class="sec">La suite</div>${SUITE.filter((s) => s.id !== current).map((s) => `<a href="${s.url}" target="_blank" rel="noopener"><span class="ico">${s.ico}</span>${esc(s.name)}</a>`).join('')}</div>`;
+}
+
+function themeToggle(store) {
+  const t = store.get('theme', null); if (t) document.documentElement.dataset.theme = t;
+  return () => { const cur = document.documentElement.dataset.theme || (matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light'); const n = cur === 'dark' ? 'light' : 'dark'; document.documentElement.dataset.theme = n; store.set('theme', n); };
+}
+
+/* Coquille : barre latérale + zone principale */
+function shell({ brand, logo, nav, foot, current }) {
+  document.body.innerHTML = `<div class="app"><aside class="side"><div class="brand"><span class="logo">${logo}</span>${esc(brand)}</div>
+    <nav class="nav">${nav}</nav>${suiteLinks(current)}<div class="foot">${foot}</div></aside>
+    <div><div class="topbar"><button class="btn sm" id="menuBtn" aria-label="Menu">☰</button><strong>${esc(brand)}</strong></div><main class="main" id="main"></main></div></div>`;
+  $('#menuBtn').onclick = () => $('.side').classList.toggle('open');
+  return $('#main');
+}
+function navLink(route, ico, label, extra = '') { return `<a href="#/${route}"><span class="ico">${ico}</span>${esc(label)}${extra}</a>`; }
+function bar(pct, color) { return `<div class="progress"><i style="width:${clamp(pct, 0, 100)}%;${color ? 'background:' + color : ''}"></i></div>`; }
+
+/* ---- pilote/academy.js ---- */
+/* Contenu de l'Académie Pilote : formations intégrées à la gestion de projet. */
+const ACADEMY = [
+  {
+    id: 'outil', ico: '🧭', title: 'Prendre en main Pilote', level: 'Démarrage',
+    lessons: [
+      { t: 'Comptes, rôles et espace de travail', html: `
+<p>Pilote fonctionne par <strong>espace de travail</strong> (votre organisation). La personne qui crée l'espace en devient <strong>administratrice</strong>.</p>
+<table><tr><th>Rôle</th><th>Ce qu'il peut faire</th></tr>
+<tr><td>Administrateur</td><td>Tout : paramètres, comptes, projets, suppression.</td></tr>
+<tr><td>Chef de projet</td><td>Créer et modifier des projets, gérer toutes les tâches, risques, budget.</td></tr>
+<tr><td>Membre</td><td>Voir les projets dont il est membre, mettre à jour ses tâches, commenter.</td></tr></table>
+<h2>Créer le compte d'un collègue</h2>
+<ol><li>Menu <strong>Équipe</strong> → <em>Créer un compte</em>.</li><li>Saisissez nom, e-mail, rôle et un mot de passe provisoire.</li><li>Transmettez ces identifiants : à la première connexion, la personne devra choisir son propre mot de passe.</li></ol>
+<div class="callout warn">Les données sont enregistrées dans ce navigateur. Pour travailler à plusieurs sur des appareils différents, utilisez <em>Paramètres → Exporter</em> puis <em>Importer</em> sur l'autre poste.</div>` },
+      { t: 'Le processus projet dans Pilote', html: `
+<p>Chaque projet suit les <strong>5 phases</strong> classiques. Une phase ne devrait être franchie qu'une fois sa <em>check-list de passage</em> (le « jalon de décision ») complétée.</p>
+<ol><li><strong>Cadrage</strong> — pourquoi, quoi, pour qui, avec quels moyens.</li><li><strong>Planification</strong> — découpage, planning, budget, rôles, risques.</li><li><strong>Exécution</strong> — on produit : réunions de lancement, suivi hebdomadaire.</li><li><strong>Contrôle</strong> — on mesure, on corrige, on recette.</li><li><strong>Clôture</strong> — on livre, on fait le bilan, on capitalise.</li></ol>
+<p>Dans l'onglet <em>Vue d'ensemble</em> d'un projet, cochez les éléments de la phase en cours puis cliquez sur <strong>Passer à la phase suivante</strong>.</p>` },
+      { t: 'Tâches, tableau et planning', html: `
+<ul><li><strong>Tableau (Kanban)</strong> : glissez-déposez les cartes entre <em>À faire</em>, <em>En cours</em>, <em>En revue</em>, <em>Terminé</em>.</li>
+<li><strong>Liste</strong> : vue tableur, triable, idéale pour une revue rapide.</li>
+<li><strong>Planning</strong> : diagramme de Gantt calculé à partir des dates de début et d'échéance des tâches, avec les jalons.</li>
+<li><strong>Mes tâches</strong> : tout ce qui vous est assigné, tous projets confondus, trié par échéance.</li></ul>
+<div class="callout tip">Une tâche sans échéance n'existe pas vraiment : donnez toujours une date et un responsable unique.</div>` },
+      { t: 'Risques, budget et météo du projet', html: `
+<p>La <strong>météo</strong> d'un projet (☀️ / ⛅ / ⛈️) est calculée automatiquement :</p>
+<ul><li>tâches en retard,</li><li>budget consommé par rapport à l'avancement,</li><li>risques critiques ouverts (probabilité × impact ≥ 9).</li></ul>
+<p>Renseignez les dépenses dans l'onglet <strong>Budget</strong> et les risques dans l'onglet <strong>Risques</strong> pour que l'indicateur soit fiable.</p>` },
+    ],
+    quiz: [
+      { q: 'Qui peut créer le compte d\'un nouveau collègue ?', c: ['Tout membre', 'L\'administrateur', 'Personne, chacun s\'inscrit seul'], a: 1, e: 'Seul l\'administrateur gère les comptes depuis le menu Équipe.' },
+      { q: 'Quand passer à la phase suivante d\'un projet ?', c: ['À la date prévue, quoi qu\'il arrive', 'Quand la check-list de la phase est complète et validée', 'Quand le budget est consommé'], a: 1, e: 'Le passage de phase est un jalon de décision : on vérifie que les livrables de la phase sont là.' },
+      { q: 'Que signifie une météo ⛈️ ?', c: ['Le projet est terminé', 'Plusieurs signaux d\'alerte : retards, budget ou risques critiques', 'Le projet n\'a pas de tâches'], a: 1, e: 'La météo combine retards, budget et risques critiques.' },
+    ],
+  },
+  {
+    id: 'bases', ico: '🏗️', title: 'Les fondamentaux de la gestion de projet', level: 'Débutant',
+    lessons: [
+      { t: 'Qu\'est-ce qu\'un projet ?', html: `
+<p>Un projet est un <strong>effort temporaire</strong> entrepris pour créer un résultat <strong>unique</strong>. Il a un début, une fin, un objectif, des ressources limitées.</p>
+<p>À l'inverse, une <strong>activité récurrente</strong> (faire la paie chaque mois) n'est pas un projet. Mettre en place un nouveau logiciel de paie, si.</p>
+<h2>Le triangle Qualité – Coût – Délai (QCD)</h2>
+<p>Toute décision projet arbitre entre trois contraintes : le <strong>périmètre/qualité</strong>, le <strong>coût</strong> et le <strong>délai</strong>. Si l'on ajoute du périmètre sans bouger le délai, il faut plus de moyens… ou accepter une qualité moindre.</p>
+<div class="callout tip">Face à une demande nouvelle, posez toujours la question : « qu'est-ce qu'on enlève ou qu'est-ce qu'on décale ? »</div>` },
+      { t: 'Les rôles clés', html: `
+<table><tr><th>Rôle</th><th>Mission</th></tr>
+<tr><td><strong>Sponsor / commanditaire</strong></td><td>Porte le projet au niveau de la direction, arbitre, débloque les moyens.</td></tr>
+<tr><td><strong>MOA</strong> (maîtrise d'ouvrage)</td><td>Exprime le besoin, représente les utilisateurs, valide (recette).</td></tr>
+<tr><td><strong>MOE</strong> (maîtrise d'œuvre)</td><td>Réalise la solution (équipe interne, prestataire).</td></tr>
+<tr><td><strong>Chef de projet</strong></td><td>Organise, planifie, coordonne, alerte. Il n'a pas à tout faire : il fait faire.</td></tr>
+<tr><td><strong>COPIL</strong></td><td>Comité de pilotage : instance de décision (sponsor, directions).</td></tr>
+<tr><td><strong>COPROJ / comité projet</strong></td><td>Instance opérationnelle de suivi, plus fréquente.</td></tr></table>` },
+      { t: 'Le cycle de vie', html: `
+<p>Approche dite <strong>« prédictive » ou « en cascade »</strong> : Cadrage → Planification → Exécution → Contrôle → Clôture. Adaptée quand le besoin est stable (déménagement, mise en conformité réglementaire).</p>
+<p>Approche <strong>agile / itérative</strong> : on livre par petits incréments et on ajuste. Adaptée quand le besoin est incertain (nouvel outil numérique, nouveau service).</p>
+<p>Beaucoup d'organisations utilisent un <strong>hybride</strong> : cadrage et jalons formels, réalisation itérative.</p>` },
+    ],
+    quiz: [
+      { q: 'Lequel est un projet ?', c: ['Établir les bulletins de paie mensuels', 'Déployer un nouveau logiciel de gestion des congés', 'Répondre aux e-mails des agents'], a: 1, e: 'Un projet est temporaire et produit un résultat unique.' },
+      { q: 'Que représente le triangle QCD ?', c: ['Qualité, Coût, Délai', 'Quantité, Contrôle, Décision', 'Qualification, Compétence, Développement'], a: 0, e: 'Ce sont les trois contraintes à arbitrer.' },
+      { q: 'Qui valide que le résultat répond au besoin (recette) ?', c: ['La MOE', 'La MOA', 'Le fournisseur'], a: 1, e: 'La maîtrise d\'ouvrage exprime le besoin et valide la recette.' },
+      { q: 'Quand privilégier une approche agile ?', c: ['Quand le besoin est flou ou évolutif', 'Pour une obligation réglementaire au contenu figé', 'Jamais dans le secteur public'], a: 0, e: 'L\'agilité est utile quand on apprend en avançant. Elle est tout à fait utilisée dans le public.' },
+    ],
+  },
+  {
+    id: 'cadrage', ico: '🎯', title: 'Cadrer un projet', level: 'Débutant',
+    lessons: [
+      { t: 'La note de cadrage', html: `
+<p>Document court (2 à 5 pages) validé par le sponsor. Il répond à :</p>
+<ul><li><strong>Contexte et enjeux</strong> : pourquoi maintenant ?</li><li><strong>Objectifs</strong> mesurables.</li><li><strong>Périmètre</strong> : ce qui est inclus <em>et ce qui est exclu</em>.</li><li><strong>Livrables</strong> attendus.</li><li><strong>Parties prenantes</strong> et gouvernance (COPIL, fréquence).</li><li><strong>Moyens</strong> : budget, équipe, temps.</li><li><strong>Planning macro</strong> et jalons.</li><li><strong>Risques</strong> majeurs identifiés.</li></ul>` },
+      { t: 'Des objectifs SMART', html: `
+<p>Un objectif est <strong>S</strong>pécifique, <strong>M</strong>esurable, <strong>A</strong>tteignable, <strong>R</strong>éaliste (ou pertinent), <strong>T</strong>emporellement défini.</p>
+<p>❌ « Améliorer l'intégration des nouveaux agents. »<br>✅ « D'ici le 30 juin, 100 % des nouveaux arrivants reçoivent un livret d'accueil et un entretien à 1 mois, mesuré par le tableau de suivi RH. »</p>` },
+      { t: 'Cartographier les parties prenantes', html: `
+<p>Listez toutes les personnes ou groupes <strong>concernés</strong> ou <strong>capables d'influencer</strong> le projet : direction, managers, agents, représentants du personnel, prestataires, usagers…</p>
+<p>Placez-les sur une matrice <strong>Influence × Intérêt</strong> :</p>
+<ul><li>forte influence / fort intérêt → <em>associer étroitement</em> ;</li><li>forte influence / faible intérêt → <em>satisfaire, tenir informé des décisions</em> ;</li><li>faible influence / fort intérêt → <em>informer régulièrement</em> ;</li><li>faible / faible → <em>surveiller</em>.</li></ul>
+<div class="callout tip">Dans un projet RH, pensez tôt aux instances représentatives (CSE dans le privé, CST/CSA dans le public) : beaucoup de projets d'organisation doivent leur être présentés.</div>` },
+    ],
+    quiz: [
+      { q: 'Que doit absolument contenir le périmètre ?', c: ['Uniquement ce qui est inclus', 'Ce qui est inclus ET ce qui est exclu', 'La liste des fournisseurs'], a: 1, e: 'Écrire ce qui est exclu évite les malentendus et la dérive du périmètre.' },
+      { q: 'Quel objectif est SMART ?', c: ['Moderniser la fonction RH', 'Réduire de 20 % le délai de recrutement moyen d\'ici décembre', 'Faire mieux que l\'an dernier'], a: 1, e: 'Il est précis, chiffré et daté.' },
+      { q: 'Une partie prenante à forte influence et faible intérêt doit être…', c: ['Ignorée', 'Satisfaite et tenue informée des décisions', 'Associée à toutes les réunions'], a: 1, e: 'On évite qu\'elle ne devienne opposante, sans la surcharger.' },
+    ],
+  },
+  {
+    id: 'planif', ico: '🗓️', title: 'Planifier', level: 'Intermédiaire',
+    lessons: [
+      { t: 'Découper : le WBS', html: `
+<p>Le <strong>WBS</strong> (<em>Work Breakdown Structure</em>, organigramme des tâches) découpe le projet en <strong>lots</strong>, puis en <strong>tâches</strong> assez petites pour être estimées et confiées à une personne (idéalement 1 à 10 jours).</p>
+<p>Exemple — <em>Campagne d'entretiens annuels</em> : Lot 1 Préparation (support, calendrier, formation des managers) · Lot 2 Réalisation (entretiens, relances) · Lot 3 Exploitation (synthèse, besoins de formation, recours).</p>` },
+      { t: 'Estimer, ordonner, chemin critique', html: `
+<ul><li><strong>Estimer</strong> : en jours-homme ; utilisez l'avis des personnes qui feront le travail.</li><li><strong>Dépendances</strong> : « fin → début » est la plus courante (on ne forme pas les managers avant d'avoir le support).</li><li><strong>Chemin critique</strong> : la suite de tâches dont le moindre retard retarde tout le projet. C'est là qu'il faut concentrer la vigilance.</li><li><strong>Jalon</strong> : événement de durée nulle marquant une étape clé (validation COPIL, mise en production).</li></ul>` },
+      { t: 'Qui fait quoi : la matrice RACI', html: `
+<table><tr><th>Lettre</th><th>Signification</th></tr><tr><td><strong>R</strong> — Responsible</td><td>Réalise la tâche.</td></tr><tr><td><strong>A</strong> — Accountable</td><td>Rend des comptes, valide. <em>Un seul A par tâche.</em></td></tr><tr><td><strong>C</strong> — Consulted</td><td>Consulté avant (avis).</td></tr><tr><td><strong>I</strong> — Informed</td><td>Informé après.</td></tr></table>
+<div class="callout tip">Si une tâche a deux « A », personne n'est vraiment responsable.</div>` },
+    ],
+    quiz: [
+      { q: 'À quoi sert le WBS ?', c: ['À calculer la paie', 'À découper le projet en lots et tâches', 'À recruter l\'équipe'], a: 1, e: 'C\'est l\'organigramme des tâches.' },
+      { q: 'Le chemin critique, c\'est…', c: ['La liste des risques', 'La suite de tâches sans marge : tout retard décale la fin du projet', 'Le budget minimal'], a: 1, e: 'Les tâches critiques n\'ont aucune marge.' },
+      { q: 'Combien de « A » par tâche dans un RACI ?', c: ['Un seul', 'Deux', 'Autant que nécessaire'], a: 0, e: 'Une seule personne rend des comptes.' },
+      { q: 'Un jalon a une durée…', c: ['D\'une semaine', 'Nulle', 'Égale au projet'], a: 1, e: 'C\'est un point de passage, pas une tâche.' },
+    ],
+  },
+  {
+    id: 'pilotage', ico: '📈', title: 'Piloter et maîtriser les risques', level: 'Intermédiaire',
+    lessons: [
+      { t: 'Suivre l\'avancement', html: `
+<ul><li><strong>Point hebdomadaire</strong> (15–30 min) : fait / à faire / blocages.</li><li><strong>Tableau de bord</strong> : avancement réel vs prévu, budget consommé vs prévu, jalons, risques majeurs.</li><li><strong>Météo projet</strong> : un indicateur simple pour la direction.</li><li><strong>COPIL</strong> : on y vient avec des <em>décisions à prendre</em>, pas seulement des informations.</li></ul>` },
+      { t: 'Gérer les risques', html: `
+<p>Un risque est un événement <strong>incertain</strong> qui aurait un impact sur les objectifs. Pour chacun : <strong>probabilité</strong> (1 à 4) × <strong>impact</strong> (1 à 4) = criticité (1 à 16).</p>
+<p>Quatre réponses possibles : <strong>éviter</strong> (changer de plan), <strong>réduire</strong> (actions préventives), <strong>transférer</strong> (assurance, prestataire), <strong>accepter</strong> (avec un plan B).</p>
+<div class="callout warn">Un risque qui se réalise devient un <strong>problème</strong> : il se traite immédiatement, il ne s'« analyse » plus.</div>` },
+      { t: 'Les demandes de changement', html: `
+<p>Toute demande qui modifie le périmètre, le coût ou le délai passe par une <strong>demande de changement</strong> : description, impact QCD, décision (COPIL ou sponsor). Cela protège l'équipe contre l'« effet tunnel » des petits ajouts.</p>` },
+    ],
+    quiz: [
+      { q: 'Un risque de probabilité 3 et d\'impact 4 a une criticité de…', c: ['7', '12', '34'], a: 1, e: 'Criticité = probabilité × impact.' },
+      { q: 'Souscrire une assurance, c\'est…', c: ['Éviter le risque', 'Transférer le risque', 'Accepter le risque'], a: 1, e: 'On transfère les conséquences à un tiers.' },
+      { q: 'Au COPIL, on vient surtout avec…', c: ['Des décisions à faire prendre', 'Le détail de toutes les tâches', 'Rien de préparé'], a: 0, e: 'Le COPIL est une instance de décision.' },
+    ],
+  },
+  {
+    id: 'agile', ico: '🔁', title: 'Méthodes agiles : Scrum et Kanban', level: 'Intermédiaire',
+    lessons: [
+      { t: 'Scrum en 5 minutes', html: `
+<p><strong>Rôles</strong> : Product Owner (priorise le besoin), Scrum Master (facilite, lève les obstacles), équipe de développement.</p>
+<p><strong>Événements</strong> : Sprint (1 à 4 semaines), planification du sprint, mêlée quotidienne (15 min), revue de sprint (démonstration), rétrospective (amélioration).</p>
+<p><strong>Artefacts</strong> : backlog produit, backlog du sprint, incrément livré.</p>` },
+      { t: 'Kanban : visualiser et limiter', html: `
+<ol><li><strong>Visualiser</strong> le flux (colonnes) — c'est l'onglet <em>Tableau</em> de Pilote.</li><li><strong>Limiter le travail en cours</strong> (WIP) : par exemple 3 cartes maximum en « En cours » par personne. Terminer avant de commencer.</li><li><strong>Mesurer le flux</strong> : temps entre « À faire » et « Terminé ».</li></ol>
+<div class="callout tip">Pilote affiche un avertissement quand une personne a plus de 3 tâches « En cours ».</div>` },
+    ],
+    quiz: [
+      { q: 'Qui priorise le backlog dans Scrum ?', c: ['Le Scrum Master', 'Le Product Owner', 'Le sponsor'], a: 1, e: 'Le Product Owner porte la valeur métier.' },
+      { q: 'La rétrospective sert à…', c: ['Montrer le produit au client', 'Améliorer la façon de travailler de l\'équipe', 'Faire le planning'], a: 1, e: 'Elle porte sur le « comment ».' },
+      { q: 'Limiter le WIP permet…', c: ['De commencer plus de choses', 'De finir plus vite ce qui est commencé', 'De supprimer les réunions'], a: 1, e: '« Arrêtez de commencer, commencez à finir. »' },
+    ],
+  },
+  {
+    id: 'humain', ico: '🤝', title: 'Animer l\'équipe et conduire le changement', level: 'Avancé',
+    lessons: [
+      { t: 'Réunions efficaces', html: `
+<ul><li>Un <strong>objectif</strong> et un <strong>ordre du jour</strong> envoyés avant.</li><li>Les bonnes personnes, pas toutes les personnes.</li><li>Un <strong>compte rendu</strong> court : décisions, actions (qui / quoi / quand).</li><li>Commencer et finir à l'heure.</li></ul>` },
+      { t: 'Accompagner le changement', html: `
+<p>Les personnes traversent souvent les étapes de la <strong>courbe du deuil</strong> (Kübler-Ross) : choc, déni, colère, marchandage, tristesse, acceptation, engagement.</p>
+<p>Leviers : <strong>donner du sens</strong> (pourquoi), <strong>associer</strong> tôt, <strong>former</strong>, <strong>communiquer</strong> souvent et de façon honnête, <strong>célébrer</strong> les premiers succès, identifier des <strong>relais</strong> (ambassadeurs).</p>` },
+    ],
+    quiz: [
+      { q: 'Un bon compte rendu contient surtout…', c: ['La retranscription intégrale', 'Les décisions et actions (qui/quoi/quand)', 'Les absents'], a: 1, e: 'Court et actionnable.' },
+      { q: 'Premier levier face aux résistances ?', c: ['Imposer', 'Donner du sens et associer', 'Attendre que ça passe'], a: 1, e: 'Comprendre le pourquoi réduit les résistances.' },
+    ],
+  },
+  {
+    id: 'cloture', ico: '🏁', title: 'Clôturer et capitaliser', level: 'Avancé',
+    lessons: [
+      { t: 'Recette et livraison', html: `
+<p>La <strong>recette</strong> vérifie que le livrable correspond au besoin, à partir de <strong>scénarios de tests</strong> préparés en amont. Elle se conclut par un <strong>procès-verbal (PV)</strong> : recette prononcée, avec ou sans réserves.</p>` },
+      { t: 'Bilan et retour d\'expérience (REX)', html: `
+<ul><li>Objectifs atteints ? Écarts QCD et leurs causes.</li><li>Ce qui a bien marché / ce qu'on ferait autrement.</li><li>Transfert vers l'exploitation (qui maintient, qui forme les nouveaux).</li><li>Archivage des documents.</li><li>Remercier l'équipe — ça compte.</li></ul>
+<div class="callout tip">Un REX utile est <strong>sans recherche de coupable</strong> : on analyse le système, pas les personnes.</div>` },
+    ],
+    quiz: [
+      { q: 'Le PV de recette peut être prononcé…', c: ['Uniquement sans réserve', 'Avec ou sans réserves', 'Par le fournisseur seul'], a: 1, e: 'Les réserves listent ce qui reste à corriger.' },
+      { q: 'Un REX efficace…', c: ['Désigne un responsable des échecs', 'Analyse les causes sans chercher de coupable', 'Est facultatif'], a: 1, e: 'On apprend du système, pas d\'un bouc émissaire.' },
+    ],
+  },
+];
+
+const PHASES = [
+  { name: 'Cadrage', gates: ['Besoin et contexte formalisés', 'Objectifs SMART définis', 'Périmètre inclus / exclu écrit', 'Parties prenantes identifiées', 'Note de cadrage validée par le sponsor'] },
+  { name: 'Planification', gates: ['Découpage en lots et tâches (WBS)', 'Planning avec jalons', 'Rôles définis (RACI)', 'Budget prévisionnel', 'Registre des risques initial'] },
+  { name: 'Exécution', gates: ['Réunion de lancement tenue', 'Point d\'avancement hebdomadaire en place', 'Demandes de changement tracées'] },
+  { name: 'Contrôle', gates: ['Tableau de bord partagé', 'Revue des risques à jour', 'Recette réalisée'] },
+  { name: 'Clôture', gates: ['PV de recette signé', 'Bilan / retour d\'expérience', 'Documents archivés', 'Communication de fin de projet'] },
+];
+
+const TEMPLATES = {
+  vide: { name: 'Projet vide', tasks: [] },
+  rh_entretiens: { name: 'Campagne d\'entretiens annuels', tasks: [
+    ['Mettre à jour le support d\'entretien', 0, 5], ['Définir le calendrier de la campagne', 0, 2], ['Former les managers à la conduite d\'entretien', 7, 3],
+    ['Communiquer auprès des équipes', 10, 1], ['Réaliser les entretiens', 14, 30], ['Relancer les entretiens non faits', 35, 5],
+    ['Consolider les besoins de formation', 45, 7], ['Traiter les demandes de révision', 45, 15], ['Bilan de campagne', 60, 3]] },
+  recrutement: { name: 'Recrutement d\'un poste', tasks: [
+    ['Rédiger la fiche de poste', 0, 3], ['Valider le budget du poste', 0, 2], ['Publier l\'offre', 3, 1], ['Trier les candidatures', 5, 10],
+    ['Organiser les entretiens', 15, 7], ['Décision et proposition', 22, 3], ['Préparer l\'arrivée (matériel, accès, parrain)', 25, 10]] },
+  deploiement: { name: 'Déploiement d\'un nouvel outil', tasks: [
+    ['Recueillir les besoins des utilisateurs', 0, 10], ['Comparer les solutions', 10, 10], ['Choisir et contractualiser', 20, 10], ['Paramétrer l\'outil', 30, 15],
+    ['Recette avec des utilisateurs pilotes', 45, 10], ['Former les utilisateurs', 55, 10], ['Mise en service', 65, 1], ['Bilan à 3 mois', 155, 2]] },
+  evenement: { name: 'Organisation d\'un événement', tasks: [
+    ['Fixer date, lieu et budget', 0, 5], ['Réserver le lieu', 5, 3], ['Programme et intervenants', 5, 15], ['Invitations', 20, 2],
+    ['Logistique (repas, matériel)', 20, 15], ['Jour J', 40, 1], ['Questionnaire de satisfaction et bilan', 41, 5]] },
+};
+
+/* ---- pilote/app.js ---- */
+/* Pilote — gestion de projet simple et pas chère. */
+const store = makeStore('pilote:');
+const auth = makeAuth(store);
+const toggleTheme = themeToggle(store);
+const STATUSES = [['todo', 'À faire'], ['doing', 'En cours'], ['review', 'En revue'], ['done', 'Terminé']];
+const PRIOS = ['Basse', 'Normale', 'Haute', 'Urgente'];
+const PROJ_STATUS = ['Pas démarré', 'En cours', 'En pause', 'Terminé'];
+const ROLES = { admin: 'Administrateur', manager: 'Chef de projet', member: 'Membre' };
+const COLORS = ['#4f46e5', '#0891b2', '#16a34a', '#ea580c', '#db2777', '#7c3aed', '#ca8a04'];
+let ME = null;
+let main = null;
+
+/* ---------- Données ---------- */
+const wsKey = () => 'ws:' + ME.wsId;
+function ws() { return store.get(wsKey(), null); }
+function saveWs(w) { store.set(wsKey(), w); }
+function mutate(fn) { const w = ws(); fn(w); saveWs(w); return w; }
+function log(w, txt) { w.activity.unshift({ d: new Date().toISOString(), u: ME.id, txt }); w.activity = w.activity.slice(0, 200); }
+const members = () => auth.users().filter((u) => u.wsId === ME.wsId);
+const userName = (id) => auth.users().find((u) => u.id === id)?.name || '—';
+const can = (what) => ({ admin: ['all'], manager: ['project', 'task'], member: ['task'] }[ME.role] || []).some((x) => x === 'all' || x === what);
+const visibleProjects = (w) => ME.role === 'member' ? w.projects.filter((p) => p.members.includes(ME.id) || p.ownerId === ME.id) : w.projects;
+
+function projectStats(w, p) {
+  const tasks = w.tasks.filter((t) => t.projectId === p.id);
+  const done = tasks.filter((t) => t.status === 'done').length;
+  const late = tasks.filter((t) => t.status !== 'done' && t.due && t.due < todayISO()).length;
+  const progress = tasks.length ? Math.round((done / tasks.length) * 100) : 0;
+  const spent = (p.expenses || []).reduce((s, e) => s + Number(e.amount || 0), 0);
+  const budgetPct = p.budget ? Math.round((spent / p.budget) * 100) : 0;
+  const critical = (p.risks || []).filter((r) => r.status !== 'Clos' && r.prob * r.impact >= 9).length;
+  let score = 0;
+  if (late > 0) score++; if (late > 2) score++;
+  if (p.budget && budgetPct > progress + 15) score++; if (p.budget && budgetPct > 100) score++;
+  if (critical) score++;
+  const weather = p.status === 'Terminé' ? ['🏁', 'Terminé', 'ok'] : score === 0 ? ['☀️', 'Au beau fixe', 'ok'] : score <= 2 ? ['⛅', 'Vigilance', 'warn'] : ['⛈️', 'En difficulté', 'bad'];
+  return { tasks, done, late, progress, spent, budgetPct, critical, weather };
+}
+
+function newWorkspace(name, ownerId) {
+  return { id: uid(), name, plan: 'Gratuit', created: todayISO(), ownerId, projects: [], tasks: [], activity: [] };
+}
+
+function addProject(w, data, template = 'vide') {
+  const p = { id: uid(), name: data.name, code: data.code || data.name.slice(0, 4).toUpperCase(), desc: data.desc || '', ownerId: data.ownerId || ME.id,
+    sponsor: data.sponsor || '', start: data.start || todayISO(), end: data.end || addDays(data.start || todayISO(), 90), budget: Number(data.budget) || 0,
+    status: data.status || 'En cours', phase: 0, gates: {}, members: [ME.id], risks: [], milestones: [], expenses: [], color: data.color || COLORS[w.projects.length % COLORS.length] };
+  w.projects.push(p);
+  (TEMPLATES[template]?.tasks || []).forEach(([title, off, dur]) => {
+    w.tasks.push(newTask(p.id, { title, start: addDays(p.start, off), due: addDays(p.start, off + dur), estimate: Math.max(1, Math.round(dur * 2)) }));
+  });
+  log(w, `a créé le projet « ${p.name} »`);
+  return p;
+}
+function newTask(projectId, d) {
+  return { id: uid(), projectId, title: d.title, desc: d.desc || '', status: d.status || 'todo', priority: d.priority || 'Normale', assignee: d.assignee || '',
+    start: d.start || todayISO(), due: d.due || '', estimate: Number(d.estimate) || 0, spent: Number(d.spent) || 0, checklist: d.checklist || [], comments: [], created: todayISO() };
+}
+
+function seedDemo(w) {
+  const others = members().filter((m) => m.id !== ME.id).map((m) => m.id);
+  const team = [ME.id, ...others];
+  const start = addDays(todayISO(), -30);
+  const p1 = addProject(w, { name: 'Campagne d\'entretiens 2026', code: 'ENT26', desc: 'Organiser et suivre la campagne d\'entretiens professionnels annuels de tous les agents.', start, end: addDays(start, 75), budget: 3500, sponsor: 'Directrice générale des services' }, 'rh_entretiens');
+  p1.phase = 2; p1.gates = { 0: [true, true, true, true, true], 1: [true, true, true, true, false], 2: [true, false, false] };
+  p1.members = team;
+  p1.risks = [
+    { id: uid(), title: 'Managers peu disponibles pendant la période', prob: 3, impact: 3, owner: ME.id, mitigation: 'Bloquer des créneaux dès maintenant dans les agendas', status: 'Ouvert' },
+    { id: uid(), title: 'Support d\'entretien non conforme au nouveau cadre', prob: 2, impact: 4, owner: ME.id, mitigation: 'Relecture par le service juridique', status: 'Ouvert' },
+  ];
+  p1.milestones = [{ id: uid(), title: 'Validation du support en COPIL', date: addDays(start, 10), done: true }, { id: uid(), title: 'Fin des entretiens', date: addDays(start, 50), done: false }];
+  p1.expenses = [{ id: uid(), label: 'Formation des managers (prestataire)', amount: 1800, date: addDays(start, 8), cat: 'Prestation' }];
+  w.tasks.filter((t) => t.projectId === p1.id).forEach((t, i) => {
+    t.assignee = team[i % team.length];
+    t.status = i < 3 ? 'done' : i === 3 ? 'review' : i === 4 ? 'doing' : 'todo';
+  });
+  const p2 = addProject(w, { name: 'Nouveau logiciel de gestion des congés', code: 'CONG', desc: 'Remplacer les formulaires papier par un outil en ligne.', start: addDays(todayISO(), -10), budget: 12000 }, 'deploiement');
+  p2.members = team; p2.gates = { 0: [true, true, false, true, false] };
+  p2.risks = [{ id: uid(), title: 'Résistance des services habitués au papier', prob: 3, impact: 2, owner: ME.id, mitigation: 'Identifier un référent par service', status: 'Ouvert' }];
+  w.tasks.filter((t) => t.projectId === p2.id).forEach((t, i) => { t.assignee = team[i % team.length]; if (i === 0) t.status = 'doing'; });
+  log(w, 'a chargé les projets de démonstration');
+}
+
+/* ---------- Écrans publics ---------- */
+function landing() {
+  document.body.innerHTML = `<div style="max-width:1080px;margin:0 auto;padding:24px 16px 60px">
+  <div class="row between" style="margin-bottom:40px"><div class="brand"><span class="logo">P</span>Pilote</div>
+  <div class="row"><button class="btn" id="lt">🌓</button><a class="btn" href="#/login">Se connecter</a><a class="btn primary" href="#/signup">Créer un compte</a></div></div>
+  <div style="text-align:center;max-width:720px;margin:0 auto 40px">
+    <span class="badge acc">Simple · Pas cher · Formation intégrée</span>
+    <h1 style="font-size:clamp(1.9rem,5vw,3rem);margin:14px 0">La gestion de projet sans la complexité.</h1>
+    <p class="muted" style="font-size:1.1rem">Projets, tâches en Kanban, planning de Gantt, risques, budget et une académie intégrée pour apprendre la méthode en même temps que l'outil.</p>
+    <div class="row" style="justify-content:center;margin-top:20px"><a class="btn primary" href="#/signup">Démarrer gratuitement</a><a class="btn" href="#/login">J'ai déjà un compte</a></div>
+  </div>
+  <div class="grid g3">${[
+    ['📋', 'Tableau Kanban', 'Glissez-déposez vos tâches, limitez le travail en cours, voyez qui fait quoi.'],
+    ['🗓️', 'Planning Gantt', 'Visualisez les tâches et jalons dans le temps, repérez les retards en un coup d\'œil.'],
+    ['🚦', 'Processus en 5 phases', 'Cadrage → Planification → Exécution → Contrôle → Clôture, avec check-lists de passage.'],
+    ['⚠️', 'Risques & budget', 'Matrice probabilité × impact, suivi des dépenses, météo projet automatique.'],
+    ['👥', 'Comptes & rôles', 'Administrateur, chef de projet, membre : chacun voit ce qui le concerne.'],
+    ['🎓', 'Académie intégrée', '8 formations courtes avec quiz pour apprendre à mener un projet.'],
+  ].map(([i, t, d]) => `<div class="card"><div style="font-size:1.6rem">${i}</div><h3>${t}</h3><p class="muted">${d}</p></div>`).join('')}</div>
+  <h2 style="text-align:center;margin:50px 0 20px">Tarifs</h2>
+  <div class="grid g3">${[
+    ['Gratuit', '0 €', 'Jusqu\'à 3 utilisateurs, 3 projets, académie complète.'],
+    ['Équipe', '3 € / utilisateur / mois', 'Projets illimités, modèles, export, support e-mail.'],
+    ['Organisation', '6 € / utilisateur / mois', 'Plusieurs espaces, rapports avancés, accompagnement au démarrage.'],
+  ].map(([n, p, d], i) => `<div class="card" ${i === 1 ? 'style="border:2px solid var(--accent)"' : ''}><h3>${n}</h3><div class="kpi"><span class="v">${p}</span></div><p class="muted">${d}</p></div>`).join('')}</div>
+  <p class="muted" style="text-align:center;margin-top:30px">Version actuelle : toutes les fonctionnalités sont accessibles, les données restent dans votre navigateur.</p></div>`;
+  $('#lt').onclick = toggleTheme;
+}
+
+function authPage(mode) {
+  const signup = mode === 'signup';
+  document.body.innerHTML = `<div class="auth"><div class="box">
+    <div class="brand" style="justify-content:center"><span class="logo">P</span>Pilote</div>
+    <form class="card" id="f"><h2>${signup ? 'Créer votre espace' : 'Connexion'}</h2>
+    ${signup ? fInput('name', 'Votre nom', '', { req: true }) + fInput('org', 'Nom de votre organisation / équipe', '', { req: true }) : ''}
+    ${fInput('email', 'E-mail', '', { type: 'email', req: true })}${fInput('password', 'Mot de passe', '', { type: 'password', req: true })}
+    ${signup ? `<label class="row" style="font-weight:500"><input type="checkbox" name="demo" checked> Ajouter des projets de démonstration</label><br>` : ''}
+    <button class="btn primary" style="width:100%;justify-content:center">${signup ? 'Créer mon compte' : 'Se connecter'}</button>
+    <p class="muted" style="margin-top:12px;text-align:center">${signup ? 'Déjà inscrit ? <a href="#/login">Se connecter</a>' : 'Pas encore de compte ? <a href="#/signup">Créer un espace</a>'}</p>
+    <p style="text-align:center"><a href="#/">← Retour</a></p></form></div></div>`;
+  $('#f').onsubmit = async (e) => {
+    e.preventDefault();
+    const fd = Object.fromEntries(new FormData(e.target).entries());
+    try {
+      if (signup) {
+        const wsId = uid();
+        const u = await auth.create({ name: fd.name, email: fd.email, password: fd.password, role: 'admin', wsId });
+        const w = newWorkspace(fd.org, u.id); w.id = wsId;
+        store.set('ws:' + wsId, w);
+        await auth.login(fd.email, fd.password);
+        ME = auth.current();
+        if (e.target.demo.checked) { const w2 = ws(); seedDemo(w2); saveWs(w2); }
+        location.hash = '#/guide'; boot();
+      } else {
+        await auth.login(fd.email, fd.password); location.hash = '#/dash'; boot();
+      }
+    } catch (err) { toast(err.message); }
+  };
+}
+
+function forcePassword() {
+  document.body.innerHTML = `<div class="auth"><form class="card box" id="f"><h2>Choisissez votre mot de passe</h2><p class="muted">Bienvenue ${esc(ME.name)} ! Votre compte a été créé avec un mot de passe provisoire.</p>
+  ${fInput('p1', 'Nouveau mot de passe', '', { type: 'password', req: true })}${fInput('p2', 'Confirmation', '', { type: 'password', req: true })}<button class="btn primary">Valider</button></form></div>`;
+  $('#f').onsubmit = async (e) => { e.preventDefault(); const { p1, p2 } = Object.fromEntries(new FormData(e.target)); if (p1 !== p2) return toast('Les deux mots de passe diffèrent.'); try { await auth.setPassword(ME.id, p1); boot(); } catch (err) { toast(err.message); } };
+}
+
+/* ---------- Application connectée ---------- */
+function boot() {
+  ME = auth.current();
+  if (!ME) { const r = location.hash.replace(/^#\/?/, ''); return r === 'login' ? authPage('login') : r === 'signup' ? authPage('signup') : landing(); }
+  if (ME.mustChange) return forcePassword();
+  const w = ws();
+  const myOpen = w.tasks.filter((t) => t.assignee === ME.id && t.status !== 'done').length;
+  main = shell({ brand: 'Pilote', logo: 'P', current: 'pilote',
+    nav: navLink('dash', '🏠', 'Tableau de bord') + navLink('projects', '📁', 'Projets') + navLink('tasks', '✅', 'Mes tâches', myOpen ? ` <span class="badge acc" style="margin-left:auto">${myOpen}</span>` : '') +
+      navLink('team', '👥', 'Équipe') + '<div class="sec">Apprendre</div>' + navLink('academy', '🎓', 'Académie') + navLink('guide', '🧭', 'Guide & processus') +
+      '<div class="sec">Compte</div>' + navLink('settings', '⚙️', 'Paramètres'),
+    foot: `<div class="row"><span class="avatar">${initials(ME.name)}</span><div style="min-width:0"><div style="font-weight:600;color:var(--text)">${esc(ME.name)}</div><div>${ROLES[ME.role]} · ${esc(w.name)}</div></div></div>
+      <div class="row" style="margin-top:8px"><button class="btn sm" id="th">🌓 Thème</button><button class="btn sm" id="lo">Déconnexion</button></div>` });
+  $('#lo').onclick = () => { auth.logout(); location.hash = '#/'; boot(); };
+  $('#th').onclick = toggleTheme;
+  router.run();
+}
+
+const view = {
+  dash() {
+    const w = ws(); const projs = visibleProjects(w);
+    const myTasks = w.tasks.filter((t) => t.assignee === ME.id && t.status !== 'done').sort((a, b) => (a.due || '9') < (b.due || '9') ? -1 : 1);
+    const visibleIds = new Set(projs.map((p) => p.id));
+    const allOpen = w.tasks.filter((t) => visibleIds.has(t.projectId) && t.status !== 'done');
+    const late = allOpen.filter((t) => t.due && t.due < todayISO());
+    const week = allOpen.filter((t) => t.due && t.due >= todayISO() && t.due <= addDays(todayISO(), 7));
+    const budget = projs.reduce((s, p) => s + (p.budget || 0), 0); const spent = projs.reduce((s, p) => s + projectStats(w, p).spent, 0);
+    const academyDone = Object.keys(ME.academy?.quiz || {}).length;
+    main.innerHTML = `<div class="page-head"><div><h1>Bonjour ${esc(ME.name.split(' ')[0])} 👋</h1><p>${new Date().toLocaleDateString('fr-FR', { weekday: 'long', day: 'numeric', month: 'long' })} · ${esc(w.name)}</p></div>
+      ${can('project') ? '<button class="btn primary" id="np">+ Nouveau projet</button>' : ''}</div>
+      ${!projs.length ? `<div class="alert">Aucun projet pour l'instant. ${can('project') ? 'Créez votre premier projet ou suivez le <a href="#/guide">guide de démarrage</a>.' : 'Demandez à un chef de projet de vous ajouter à un projet.'}</div>` : ''}
+      <div class="grid g4 kpis">
+        <div class="card kpi"><span class="v">${projs.filter((p) => p.status === 'En cours').length}</span><span class="l">Projets en cours</span></div>
+        <div class="card kpi"><span class="v" style="color:${late.length ? 'var(--bad)' : 'inherit'}">${late.length}</span><span class="l">Tâches en retard</span></div>
+        <div class="card kpi"><span class="v">${week.length}</span><span class="l">Échéances sous 7 jours</span></div>
+        <div class="card kpi"><span class="v">${budget ? Math.round((spent / budget) * 100) : 0}%</span><span class="l">Budget consommé (${fmtEur(spent)} / ${fmtEur(budget)})</span></div>
+      </div>
+      <div class="grid g2" style="margin-top:14px">
+        <div class="card"><h3>Météo des projets</h3>${projs.length ? `<div class="stack">${projs.map((p) => { const s = projectStats(w, p); return `<a href="#/project/${p.id}" style="text-decoration:none;color:inherit;display:block"><div class="row between"><strong><span style="color:${p.color}">●</span> ${esc(p.name)}</strong><span title="${s.weather[1]}">${s.weather[0]} <span class="badge ${s.weather[2]}">${s.weather[1]}</span></span></div>
+          <div class="row" style="margin-top:6px"><div style="flex:1">${bar(s.progress, p.color)}</div><small>${s.progress}% · ${PHASES[p.phase].name}</small></div></a>`; }).join('')}</div>` : '<p class="empty">Rien à afficher</p>'}</div>
+        <div class="card"><div class="row between"><h3>Mes prochaines tâches</h3><a href="#/tasks">Tout voir</a></div>${myTasks.length ? taskTable(myTasks.slice(0, 6), w, true) : '<p class="empty">Aucune tâche ouverte 🎉</p>'}</div>
+      </div>
+      <div class="grid g2" style="margin-top:14px">
+        <div class="card"><h3>Activité récente</h3>${w.activity.slice(0, 8).map((a) => `<div class="row" style="margin-bottom:8px"><span class="avatar">${initials(userName(a.u))}</span><div><strong>${esc(userName(a.u))}</strong> ${esc(a.txt)}<br><small>${new Date(a.d).toLocaleString('fr-FR', { dateStyle: 'short', timeStyle: 'short' })}</small></div></div>`).join('') || '<p class="empty">Pas encore d\'activité</p>'}</div>
+        <div class="card"><h3>🎓 Continuer à apprendre</h3><p>${academyDone} formation(s) validée(s) sur ${ACADEMY.length}.</p>${bar((academyDone / ACADEMY.length) * 100)}
+          <p style="margin-top:12px">${(() => { const next = ACADEMY.find((m) => !(ME.academy?.quiz || {})[m.id]); return next ? `Prochaine formation : <a href="#/academy/${next.id}/0">${next.ico} ${esc(next.title)}</a>` : 'Toutes les formations sont validées. Bravo ! <a href="#/academy">Voir le certificat</a>'; })()}</p></div>
+      </div>`;
+    $('#np')?.addEventListener('click', () => projectForm());
+    bindTaskRows(main);
+  },
+
+  projects() {
+    const w = ws(); const projs = visibleProjects(w);
+    main.innerHTML = `<div class="page-head"><div><h1>Projets</h1><p>${projs.length} projet(s)</p></div>${can('project') ? '<button class="btn primary" id="np">+ Nouveau projet</button>' : ''}</div>
+      <div class="grid g3">${projs.map((p) => { const s = projectStats(w, p); return `<a class="card" href="#/project/${p.id}" style="text-decoration:none;color:inherit;border-top:4px solid ${p.color}">
+        <div class="row between"><span class="badge">${esc(p.code)}</span><span>${s.weather[0]}</span></div><h3 style="margin-top:8px">${esc(p.name)}</h3>
+        <p class="muted" style="min-height:2.6em">${esc(p.desc.slice(0, 110))}${p.desc.length > 110 ? '…' : ''}</p>
+        ${bar(s.progress, p.color)}<div class="row between" style="margin-top:8px"><small>${s.done}/${s.tasks.length} tâches · ${PHASES[p.phase].name}</small><span class="badge ${p.status === 'Terminé' ? 'ok' : p.status === 'En pause' ? 'warn' : ''}">${p.status}</span></div>
+        <small>📅 ${fmtDate(p.start)} → ${fmtDate(p.end)}</small></a>`; }).join('') || '<div class="card empty">Aucun projet.</div>'}</div>`;
+    $('#np')?.addEventListener('click', () => projectForm());
+  },
+
+  project(id, tab = 'overview') {
+    const w = ws(); const p = w.projects.find((x) => x.id === id);
+    if (!p) { main.innerHTML = '<div class="empty">Projet introuvable. <a href="#/projects">Retour</a></div>'; return; }
+    const s = projectStats(w, p);
+    const tabs = [['overview', 'Vue d\'ensemble'], ['board', 'Tableau'], ['list', 'Liste'], ['gantt', 'Planning'], ['risks', 'Risques'], ['budget', 'Budget'], ['members', 'Membres']];
+    main.innerHTML = `<div class="page-head"><div><a href="#/projects" class="muted">← Projets</a><h1 style="margin-top:6px"><span style="color:${p.color}">●</span> ${esc(p.name)}</h1>
+      <p>${esc(p.code)} · Responsable : ${esc(userName(p.ownerId))} · ${s.weather[0]} ${s.weather[1]}</p></div>
+      <div class="row">${can('task') ? '<button class="btn primary" id="nt">+ Tâche</button>' : ''}${can('project') ? '<button class="btn" id="ep">Modifier</button>' : ''}</div></div>
+      <div class="tabs">${tabs.map(([k, l]) => `<a href="#/project/${p.id}/${k}" class="${k === tab ? 'active' : ''}">${l}</a>`).join('')}</div><div id="tab"></div>`;
+    $('#nt')?.addEventListener('click', () => taskForm(null, p.id));
+    $('#ep')?.addEventListener('click', () => projectForm(p));
+    (projectTabs[tab] || projectTabs.overview)($('#tab'), w, p, s);
+  },
+
+  tasks() {
+    const w = ws();
+    const mine = w.tasks.filter((t) => t.assignee === ME.id).sort((a, b) => (a.status === 'done') - (b.status === 'done') || ((a.due || '9') < (b.due || '9') ? -1 : 1));
+    const open = mine.filter((t) => t.status !== 'done');
+    const doing = open.filter((t) => t.status === 'doing').length;
+    main.innerHTML = `<div class="page-head"><div><h1>Mes tâches</h1><p>${open.length} ouverte(s) · ${mine.length - open.length} terminée(s)</p></div></div>
+      ${doing > 3 ? `<div class="alert warn">Vous avez ${doing} tâches « En cours ». Conseil Kanban : terminez-en avant d'en commencer de nouvelles (limite recommandée : 3).</div>` : ''}
+      <div class="card">${mine.length ? taskTable(mine, w, true) : '<p class="empty">Aucune tâche ne vous est assignée.</p>'}</div>`;
+    bindTaskRows(main);
+  },
+
+  team() {
+    const w = ws(); const list = members();
+    main.innerHTML = `<div class="page-head"><div><h1>Équipe</h1><p>${list.length} compte(s) dans l'espace « ${esc(w.name)} »</p></div>${ME.role === 'admin' ? '<button class="btn primary" id="nu">+ Créer un compte</button>' : ''}</div>
+      <div class="table-wrap"><table><tr><th>Nom</th><th>E-mail</th><th>Rôle</th><th>Charge (tâches ouvertes)</th><th>Heures estimées restantes</th>${ME.role === 'admin' ? '<th></th>' : ''}</tr>
+      ${list.map((u) => { const t = w.tasks.filter((x) => x.assignee === u.id && x.status !== 'done'); const hrs = t.reduce((s, x) => s + Math.max(0, (x.estimate || 0) - (x.spent || 0)), 0);
+        return `<tr><td><div class="row"><span class="avatar">${initials(u.name)}</span>${esc(u.name)} ${u.mustChange ? '<span class="badge warn">mot de passe provisoire</span>' : ''}</div></td><td>${esc(u.email)}</td><td>${ROLES[u.role]}</td>
+        <td><div class="row"><div style="width:100px">${bar(t.length * 10, t.length > 8 ? 'var(--bad)' : '')}</div>${t.length}</div></td><td>${hrs} h</td>
+        ${ME.role === 'admin' ? `<td><button class="btn sm" data-edit="${u.id}">Modifier</button></td>` : ''}</tr>`; }).join('')}</table></div>
+      <div class="alert" style="margin-top:14px">Pour créer un compte : saisissez un mot de passe provisoire et communiquez-le à la personne. Elle choisira le sien à sa première connexion. Les comptes sont stockés dans ce navigateur : pour un autre ordinateur, exportez l'espace depuis les Paramètres.</div>`;
+    $('#nu')?.addEventListener('click', () => userForm());
+    $$('[data-edit]').forEach((b) => b.onclick = () => userForm(auth.users().find((u) => u.id === b.dataset.edit)));
+  },
+
+  academy(modId, lessonIdx) {
+    if (modId) return academyLesson(modId, Number(lessonIdx || 0));
+    const res = ME.academy || { read: {}, quiz: {} };
+    const done = ACADEMY.filter((m) => res.quiz?.[m.id]).length;
+    main.innerHTML = `<div class="page-head"><div><h1>Académie Pilote</h1><p>Apprenez la gestion de projet pas à pas. Chaque formation se termine par un quiz (70 % pour valider).</p></div></div>
+      <div class="card"><div class="row between"><strong>Votre progression</strong><span>${done} / ${ACADEMY.length} formations validées</span></div><div style="margin-top:8px">${bar((done / ACADEMY.length) * 100)}</div>
+      ${done === ACADEMY.length ? '<p style="margin-top:12px">🏆 Parcours complet ! <button class="btn sm" id="cert">Afficher mon attestation</button></p>' : ''}</div>
+      <div class="grid g2" style="margin-top:14px">${ACADEMY.map((m) => { const read = m.lessons.filter((_, i) => res.read?.[m.id + ':' + i]).length; const q = res.quiz?.[m.id];
+        return `<a class="card" href="#/academy/${m.id}/0" style="text-decoration:none;color:inherit"><div class="row between"><span style="font-size:1.5rem">${m.ico}</span><span class="badge ${q ? 'ok' : ''}">${q ? '✓ Validée ' + q + '%' : m.level}</span></div>
+        <h3 style="margin-top:8px">${esc(m.title)}</h3><small>${m.lessons.length} leçons · ${m.quiz.length} questions</small><div style="margin-top:8px">${bar((read / m.lessons.length) * 100)}</div></a>`; }).join('')}</div>`;
+    $('#cert')?.addEventListener('click', certificate);
+  },
+
+  guide() {
+    const w = ws();
+    const steps = [
+      ['Créer votre espace de travail', true, 'C\'est fait : vous êtes administrateur de « ' + w.name + ' ».', ''],
+      ['Créer les comptes de votre équipe', members().length > 1, 'Menu Équipe → Créer un compte. Choisissez le rôle de chacun.', '#/team'],
+      ['Créer un premier projet', w.projects.length > 0, 'Partez d\'un modèle (entretiens, recrutement, déploiement d\'outil…) pour gagner du temps.', '#/projects'],
+      ['Compléter le cadrage', w.projects.some((p) => (p.gates[0] || []).filter(Boolean).length >= 3), 'Dans la vue d\'ensemble du projet, cochez la check-list de cadrage.', w.projects[0] ? '#/project/' + w.projects[0].id : '#/projects'],
+      ['Assigner les tâches', w.tasks.some((t) => t.assignee), 'Chaque tâche : un responsable, une échéance.', w.projects[0] ? '#/project/' + w.projects[0].id + '/list' : '#/projects'],
+      ['Déclarer les risques', w.projects.some((p) => p.risks.length), 'Onglet Risques : probabilité × impact.', w.projects[0] ? '#/project/' + w.projects[0].id + '/risks' : '#/projects'],
+      ['Suivre en Kanban', w.tasks.some((t) => t.status === 'done'), 'Faites glisser les cartes au fil de l\'avancement.', w.projects[0] ? '#/project/' + w.projects[0].id + '/board' : '#/projects'],
+      ['Se former', Object.keys(ME.academy?.quiz || {}).length > 0, 'Validez au moins une formation de l\'Académie.', '#/academy'],
+    ];
+    const ok = steps.filter((s) => s[1]).length;
+    main.innerHTML = `<div class="page-head"><div><h1>Guide de démarrage & processus</h1><p>Le chemin complet, de la création des comptes à la clôture d'un projet.</p></div></div>
+      <div class="card"><div class="row between"><strong>Mise en route</strong><span>${ok} / ${steps.length}</span></div><div style="margin:8px 0 14px">${bar((ok / steps.length) * 100)}</div>
+      ${steps.map(([t, d, h, link], i) => `<div class="row" style="padding:10px 0;border-top:1px solid var(--line);flex-wrap:nowrap"><span class="badge ${d ? 'ok' : ''}" style="min-width:34px;justify-content:center">${d ? '✓' : i + 1}</span><div style="flex:1"><strong>${t}</strong><br><small>${h}</small></div>${link && !d ? `<a class="btn sm" href="${link}">Y aller</a>` : ''}</div>`).join('')}</div>
+      <div class="card"><h3>Le processus projet en 5 phases</h3><div class="grid g3" style="grid-template-columns:repeat(auto-fit,minmax(180px,1fr))">${PHASES.map((ph, i) => `<div style="background:var(--panel-2);border-radius:10px;padding:12px"><span class="badge acc">Phase ${i + 1}</span><h4 style="margin:8px 0">${ph.name}</h4><ul style="padding-left:1.1em;margin:0;font-size:.88rem">${ph.gates.map((g) => `<li>${g}</li>`).join('')}</ul></div>`).join('')}</div>
+      <p style="margin-top:12px" class="muted">Approfondissez chaque phase dans l'<a href="#/academy">Académie</a>.</p></div>`;
+  },
+
+  settings() {
+    const w = ws();
+    main.innerHTML = `<div class="page-head"><div><h1>Paramètres</h1></div></div>
+      <div class="grid g2"><form class="card" id="wsf"><h3>Espace de travail</h3>${fInput('name', 'Nom', w.name)}${fSelect('plan', 'Formule', ['Gratuit', 'Équipe', 'Organisation'], w.plan)}
+        <button class="btn primary" ${ME.role !== 'admin' ? 'disabled' : ''}>Enregistrer</button></form>
+      <form class="card" id="pwf"><h3>Mon mot de passe</h3>${fInput('p1', 'Nouveau mot de passe', '', { type: 'password' })}<button class="btn">Changer</button></form></div>
+      <div class="card"><h3>Sauvegarde & transfert</h3><p class="muted">Exportez tout l'espace (projets, tâches et comptes) dans un fichier, puis importez-le sur un autre ordinateur.</p>
+        <div class="row"><button class="btn" id="exp">⬇️ Exporter l'espace</button><button class="btn" id="imp">⬆️ Importer un fichier</button><button class="btn" id="csv">Exporter les tâches (CSV)</button>
+        ${ME.role === 'admin' ? '<button class="btn" id="demo">Ajouter les projets de démonstration</button><button class="btn danger" id="wipe">Tout effacer</button>' : ''}</div></div>`;
+    $('#wsf').onsubmit = (e) => { e.preventDefault(); const fd = Object.fromEntries(new FormData(e.target)); mutate((x) => { x.name = fd.name; x.plan = fd.plan; }); toast('Enregistré'); boot(); };
+    $('#pwf').onsubmit = async (e) => { e.preventDefault(); try { await auth.setPassword(ME.id, e.target.p1.value); toast('Mot de passe changé'); e.target.reset(); } catch (err) { toast(err.message); } };
+    $('#exp').onclick = () => download(`pilote-${w.name}.json`, JSON.stringify({ app: 'pilote', ws: ws(), users: members() }, null, 2));
+    $('#imp').onclick = async () => {
+      try { const data = JSON.parse(await pickFile()); if (data.app !== 'pilote') throw new Error('Fichier non reconnu');
+        store.set('ws:' + data.ws.id, data.ws); const others = auth.users().filter((u) => !data.users.some((d) => d.id === u.id || d.email === u.email)); auth.saveUsers([...others, ...data.users]);
+        toast('Import réussi — reconnectez-vous'); auth.logout(); location.hash = '#/login'; boot(); } catch (err) { toast('Import impossible : ' + err.message); }
+    };
+    $('#csv').onclick = () => download('taches.csv', '﻿' + toCSV([['Projet', 'Tâche', 'Statut', 'Priorité', 'Responsable', 'Début', 'Échéance', 'Estimé (h)', 'Passé (h)'],
+      ...w.tasks.map((t) => [w.projects.find((p) => p.id === t.projectId)?.name, t.title, STATUSES.find((s) => s[0] === t.status)[1], t.priority, userName(t.assignee), t.start, t.due, t.estimate, t.spent])]), 'text/csv');
+    $('#demo')?.addEventListener('click', () => { mutate(seedDemo); toast('Projets de démonstration ajoutés'); });
+    $('#wipe')?.addEventListener('click', async () => { if (await ask('Effacer définitivement tous les projets et tâches de cet espace ?')) { mutate((x) => { x.projects = []; x.tasks = []; log(x, 'a effacé toutes les données'); }); toast('Données effacées'); } });
+  },
+};
+
+/* ---------- Onglets projet ---------- */
+const projectTabs = {
+  overview(el, w, p, s) {
+    const gates = p.gates[p.phase] || [];
+    const phase = PHASES[p.phase];
+    const allChecked = phase.gates.every((_, i) => gates[i]);
+    el.innerHTML = `<div class="grid g4 kpis"><div class="card kpi"><span class="v">${s.progress}%</span><span class="l">Avancement</span></div>
+      <div class="card kpi"><span class="v" style="color:${s.late ? 'var(--bad)' : ''}">${s.late}</span><span class="l">Tâches en retard</span></div>
+      <div class="card kpi"><span class="v">${p.budget ? s.budgetPct + '%' : '—'}</span><span class="l">Budget consommé</span></div>
+      <div class="card kpi"><span class="v" style="color:${s.critical ? 'var(--bad)' : ''}">${s.critical}</span><span class="l">Risques critiques</span></div></div>
+      <div class="grid g2" style="margin-top:14px"><div class="card"><h3>Processus projet</h3>
+        <div class="row" style="gap:4px;margin-bottom:14px">${PHASES.map((ph, i) => `<span class="badge ${i < p.phase ? 'ok' : i === p.phase ? 'acc' : ''}" style="flex:1;justify-content:center">${i < p.phase ? '✓ ' : ''}${ph.name}</span>`).join('')}</div>
+        <strong>Check-list « ${phase.name} »</strong>
+        <div style="margin-top:8px">${phase.gates.map((g, i) => `<label class="row" style="font-weight:500;padding:4px 0;flex-wrap:nowrap"><input type="checkbox" data-gate="${i}" ${gates[i] ? 'checked' : ''} ${can('project') ? '' : 'disabled'}> ${g}</label>`).join('')}</div>
+        ${can('project') ? `<div class="row" style="margin-top:12px">${p.phase > 0 ? '<button class="btn sm" id="prev">← Phase précédente</button>' : ''}${p.phase < PHASES.length - 1 ? `<button class="btn sm ${allChecked ? 'primary' : ''}" id="next">Passer à « ${PHASES[p.phase + 1].name} » →</button>` : ''}</div>` : ''}
+        ${!allChecked && p.phase < PHASES.length - 1 ? '<small class="muted">Conseil : complétez la check-list avant de passer à la phase suivante.</small>' : ''}</div>
+      <div class="card"><h3>Informations</h3><p>${esc(p.desc) || '<span class="muted">Pas de description</span>'}</p>
+        <table><tr><td class="muted">Période</td><td>${fmtDate(p.start)} → ${fmtDate(p.end)} (${daysBetween(todayISO(), p.end)} j restants)</td></tr><tr><td class="muted">Sponsor</td><td>${esc(p.sponsor) || '—'}</td></tr>
+        <tr><td class="muted">Statut</td><td>${p.status}</td></tr><tr><td class="muted">Budget</td><td>${fmtEur(s.spent)} / ${fmtEur(p.budget)}</td></tr></table></div></div>
+      <div class="card"><div class="row between"><h3>Jalons</h3>${can('project') ? '<button class="btn sm" id="nm">+ Jalon</button>' : ''}</div>
+        ${p.milestones.length ? p.milestones.sort((a, b) => a.date < b.date ? -1 : 1).map((m) => `<label class="row" style="font-weight:500;padding:6px 0;border-top:1px solid var(--line);flex-wrap:nowrap"><input type="checkbox" data-ms="${m.id}" ${m.done ? 'checked' : ''}> ◆ <span style="flex:1">${esc(m.title)}</span><small>${fmtDate(m.date)}</small>${!m.done && m.date < todayISO() ? '<span class="badge bad">dépassé</span>' : ''}</label>`).join('') : '<p class="muted">Aucun jalon. Un jalon marque une étape clé (validation, livraison…).</p>'}</div>`;
+    $$('[data-gate]', el).forEach((c) => c.onchange = () => { mutate((x) => { const pp = x.projects.find((y) => y.id === p.id); pp.gates[pp.phase] = pp.gates[pp.phase] || []; pp.gates[pp.phase][c.dataset.gate] = c.checked; }); view.project(p.id, 'overview'); });
+    $('#next', el)?.addEventListener('click', () => { mutate((x) => { const pp = x.projects.find((y) => y.id === p.id); pp.phase++; log(x, `a fait passer « ${pp.name} » en phase ${PHASES[pp.phase].name}`); }); view.project(p.id, 'overview'); });
+    $('#prev', el)?.addEventListener('click', () => { mutate((x) => { x.projects.find((y) => y.id === p.id).phase--; }); view.project(p.id, 'overview'); });
+    $$('[data-ms]', el).forEach((c) => c.onchange = () => { mutate((x) => { x.projects.find((y) => y.id === p.id).milestones.find((m) => m.id === c.dataset.ms).done = c.checked; }); });
+    $('#nm', el)?.addEventListener('click', () => modal({ title: 'Nouveau jalon', body: fInput('title', 'Intitulé', '', { req: true }) + fInput('date', 'Date', addDays(todayISO(), 14), { type: 'date' }),
+      onSubmit: (fd) => { if (!fd.title) throw new Error('Intitulé obligatoire'); mutate((x) => x.projects.find((y) => y.id === p.id).milestones.push({ id: uid(), title: fd.title, date: fd.date, done: false })); view.project(p.id, 'overview'); } }));
+  },
+
+  board(el, w, p, s) {
+    el.innerHTML = `<div class="kanban">${STATUSES.map(([k, l]) => { const ts = s.tasks.filter((t) => t.status === k);
+      return `<div class="col" data-col="${k}"><h4><span>${l}</span><span>${ts.length}</span></h4>${ts.map((t) => taskCard(t)).join('')}
+      ${can('task') ? `<button class="btn sm ghost" data-add="${k}" style="width:100%">+ Ajouter</button>` : ''}</div>`; }).join('')}</div>`;
+    $$('.tcard', el).forEach((c) => {
+      c.draggable = true;
+      c.ondragstart = (e) => e.dataTransfer.setData('text/plain', c.dataset.task);
+      c.onclick = () => taskForm(ws().tasks.find((t) => t.id === c.dataset.task));
+    });
+    $$('.col', el).forEach((col) => {
+      col.ondragover = (e) => { e.preventDefault(); col.classList.add('over'); };
+      col.ondragleave = () => col.classList.remove('over');
+      col.ondrop = (e) => { e.preventDefault(); const id = e.dataTransfer.getData('text/plain'); setStatus(id, col.dataset.col); view.project(p.id, 'board'); };
+    });
+    $$('[data-add]', el).forEach((b) => b.onclick = () => taskForm(null, p.id, b.dataset.add));
+  },
+
+  list(el, w, p, s) {
+    el.innerHTML = `<div class="card">${s.tasks.length ? taskTable(s.tasks.sort((a, b) => (a.start < b.start ? -1 : 1)), w, false) : '<p class="empty">Aucune tâche.</p>'}</div>`;
+    bindTaskRows(el);
+  },
+
+  gantt(el, w, p, s) {
+    const items = s.tasks.filter((t) => t.start || t.due);
+    const dates = [p.start, p.end, ...items.map((t) => t.start), ...items.map((t) => t.due), ...p.milestones.map((m) => m.date)].filter(Boolean).sort();
+    const min = dates[0], max = dates[dates.length - 1]; const span = Math.max(1, daysBetween(min, max) + 1);
+    const pos = (d) => (daysBetween(min, d) / span) * 100;
+    const months = []; let d = new Date(min + 'T12:00:00'); d.setDate(1);
+    while (d.toISOString().slice(0, 10) <= max) { months.push(d.toISOString().slice(0, 10)); d.setMonth(d.getMonth() + 1); }
+    const todayPos = pos(todayISO());
+    el.innerHTML = `<div class="card" style="overflow-x:auto"><div style="min-width:760px">
+      <div style="display:grid;grid-template-columns:230px 1fr;border-bottom:1px solid var(--line);padding-bottom:6px"><strong>Tâche</strong><div style="position:relative;height:20px">${months.map((m) => `<small style="position:absolute;left:${Math.max(0, pos(m))}%">${new Date(m + 'T12:00:00').toLocaleDateString('fr-FR', { month: 'short', year: '2-digit' })}</small>`).join('')}</div></div>
+      ${items.map((t) => { const a = t.start || t.due, b = t.due || t.start; const late = t.status !== 'done' && t.due && t.due < todayISO();
+        return `<div style="display:grid;grid-template-columns:230px 1fr;align-items:center;border-bottom:1px solid var(--line);min-height:34px" class="click" data-task="${t.id}">
+        <div style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap;padding-right:8px;font-size:.88rem">${t.status === 'done' ? '✓ ' : ''}${esc(t.title)}</div>
+        <div style="position:relative;height:34px">${todayPos >= 0 && todayPos <= 100 ? `<i style="position:absolute;left:${todayPos}%;top:0;bottom:0;border-left:2px dashed var(--bad);opacity:.5"></i>` : ''}
+        <div title="${fmtDate(a)} → ${fmtDate(b)}" style="position:absolute;top:8px;height:18px;border-radius:5px;left:${pos(a)}%;width:${Math.max(0.8, ((daysBetween(a, b) + 1) / span) * 100)}%;background:${late ? 'var(--bad)' : p.color};opacity:${t.status === 'done' ? .45 : 1}"></div></div></div>`; }).join('')}
+      ${p.milestones.map((m) => `<div style="display:grid;grid-template-columns:230px 1fr;align-items:center;min-height:30px;border-bottom:1px solid var(--line)"><div style="font-size:.88rem">◆ ${esc(m.title)}</div><div style="position:relative;height:30px"><span style="position:absolute;left:calc(${pos(m.date)}% - 7px);top:5px;color:${m.done ? 'var(--ok)' : 'var(--warn)'};font-size:1.1rem">◆</span></div></div>`).join('')}
+      </div><p class="muted" style="margin-top:10px">Barre rouge : tâche en retard · trait pointillé : aujourd'hui · ◆ : jalon. Cliquez sur une ligne pour modifier la tâche.</p></div>`;
+    $$('[data-task]', el).forEach((r) => r.onclick = () => taskForm(ws().tasks.find((t) => t.id === r.dataset.task)));
+  },
+
+  risks(el, w, p) {
+    const cell = (pr, im) => p.risks.filter((r) => r.prob === pr && r.impact === im && r.status !== 'Clos');
+    const color = (v) => v >= 9 ? 'var(--bad-bg)' : v >= 4 ? 'var(--warn-bg)' : 'var(--ok-bg)';
+    el.innerHTML = `<div class="grid g2"><div class="card"><h3>Matrice des risques</h3><div style="display:grid;grid-template-columns:30px repeat(4,1fr);gap:4px;font-size:.8rem">
+      ${[4, 3, 2, 1].map((pr) => `<div style="display:grid;place-items:center" class="muted">P${pr}</div>${[1, 2, 3, 4].map((im) => `<div style="background:${color(pr * im)};border-radius:6px;min-height:54px;padding:4px;text-align:center"><strong>${cell(pr, im).length || ''}</strong></div>`).join('')}`).join('')}
+      <div></div>${[1, 2, 3, 4].map((i) => `<div style="text-align:center" class="muted">Impact ${i}</div>`).join('')}</div>
+      <p class="muted" style="margin-top:10px">Criticité = probabilité × impact. Rouge ≥ 9 : à traiter en priorité.</p></div>
+      <div class="card"><h3>Réponses possibles</h3><ul><li><strong>Éviter</strong> : changer le plan pour supprimer le risque.</li><li><strong>Réduire</strong> : actions préventives.</li><li><strong>Transférer</strong> : assurance, prestataire.</li><li><strong>Accepter</strong> : avec un plan de secours.</li></ul></div></div>
+      <div class="card"><div class="row between"><h3>Registre des risques</h3>${can('project') ? '<button class="btn sm primary" id="nr">+ Risque</button>' : ''}</div>
+      ${p.risks.length ? `<div class="table-wrap"><table><tr><th>Risque</th><th>P</th><th>I</th><th>Criticité</th><th>Action</th><th>Responsable</th><th>Statut</th></tr>
+      ${p.risks.sort((a, b) => b.prob * b.impact - a.prob * a.impact).map((r) => `<tr class="click" data-risk="${r.id}"><td>${esc(r.title)}</td><td>${r.prob}</td><td>${r.impact}</td><td><span class="badge ${r.prob * r.impact >= 9 ? 'bad' : r.prob * r.impact >= 4 ? 'warn' : 'ok'}">${r.prob * r.impact}</span></td><td>${esc(r.mitigation)}</td><td>${esc(userName(r.owner))}</td><td>${r.status}</td></tr>`).join('')}</table></div>` : '<p class="empty">Aucun risque déclaré.</p>'}</div>`;
+    $('#nr', el)?.addEventListener('click', () => riskForm(p));
+    $$('[data-risk]', el).forEach((r) => r.onclick = () => can('project') && riskForm(p, p.risks.find((x) => x.id === r.dataset.risk)));
+  },
+
+  budget(el, w, p, s) {
+    const cats = {}; p.expenses.forEach((e) => { cats[e.cat] = (cats[e.cat] || 0) + Number(e.amount); });
+    const hours = s.tasks.reduce((a, t) => a + (t.spent || 0), 0); const est = s.tasks.reduce((a, t) => a + (t.estimate || 0), 0);
+    el.innerHTML = `<div class="grid g3"><div class="card kpi"><span class="v">${fmtEur(p.budget)}</span><span class="l">Budget prévu</span></div>
+      <div class="card kpi"><span class="v">${fmtEur(s.spent)}</span><span class="l">Dépensé (${s.budgetPct}%) — avancement ${s.progress}%</span></div>
+      <div class="card kpi"><span class="v">${hours} / ${est} h</span><span class="l">Temps passé / estimé</span></div></div>
+      ${p.budget && s.budgetPct > s.progress + 15 ? '<div class="alert warn" style="margin-top:14px">La consommation du budget est nettement plus rapide que l\'avancement. À signaler au sponsor.</div>' : ''}
+      <div class="grid g2" style="margin-top:14px"><div class="card"><div class="row between"><h3>Dépenses</h3>${can('project') ? '<button class="btn sm primary" id="ne">+ Dépense</button>' : ''}</div>
+        ${p.expenses.length ? `<table>${p.expenses.map((e) => `<tr><td>${fmtDate(e.date)}</td><td>${esc(e.label)}<br><small>${esc(e.cat)}</small></td><td style="text-align:right">${fmtEur2(e.amount)}</td>${can('project') ? `<td><button class="btn sm ghost" data-del="${e.id}">✕</button></td>` : ''}</tr>`).join('')}</table>` : '<p class="empty">Aucune dépense.</p>'}</div>
+      <div class="card"><h3>Par catégorie</h3>${Object.entries(cats).map(([c, v]) => `<div style="margin-bottom:10px"><div class="row between"><span>${esc(c)}</span><strong>${fmtEur(v)}</strong></div>${bar(s.spent ? (v / s.spent) * 100 : 0)}</div>`).join('') || '<p class="muted">—</p>'}</div></div>`;
+    $('#ne', el)?.addEventListener('click', () => modal({ title: 'Nouvelle dépense', body: `<div class="fields">${fInput('label', 'Libellé', '', { req: true, full: true })}${fInput('amount', 'Montant (€)', '', { type: 'number', attrs: 'step="0.01" min="0"' })}${fInput('date', 'Date', todayISO(), { type: 'date' })}${fSelect('cat', 'Catégorie', ['Prestation', 'Matériel', 'Logiciel', 'Formation', 'Déplacement', 'Communication', 'Autre'], 'Prestation', { full: true })}</div>`,
+      onSubmit: (fd) => { if (!fd.label || !fd.amount) throw new Error('Libellé et montant obligatoires'); mutate((x) => x.projects.find((y) => y.id === p.id).expenses.push({ id: uid(), ...fd, amount: Number(fd.amount) })); view.project(p.id, 'budget'); } }));
+    $$('[data-del]', el).forEach((b) => b.onclick = () => { mutate((x) => { const pp = x.projects.find((y) => y.id === p.id); pp.expenses = pp.expenses.filter((e) => e.id !== b.dataset.del); }); view.project(p.id, 'budget'); });
+  },
+
+  members(el, w, p) {
+    const all = members();
+    el.innerHTML = `<div class="card"><h3>Membres du projet</h3><p class="muted">Les membres « Membre » ne voient que les projets auxquels ils sont rattachés.</p>
+      ${all.map((u) => { const n = w.tasks.filter((t) => t.projectId === p.id && t.assignee === u.id && t.status !== 'done').length;
+        return `<label class="row" style="font-weight:500;padding:8px 0;border-top:1px solid var(--line);flex-wrap:nowrap"><input type="checkbox" data-mem="${u.id}" ${p.members.includes(u.id) ? 'checked' : ''} ${can('project') ? '' : 'disabled'}><span class="avatar">${initials(u.name)}</span><span style="flex:1">${esc(u.name)} <small>· ${ROLES[u.role]}</small></span><small>${n} tâche(s) ouverte(s)</small></label>`; }).join('')}</div>`;
+    $$('[data-mem]', el).forEach((c) => c.onchange = () => mutate((x) => { const pp = x.projects.find((y) => y.id === p.id); pp.members = c.checked ? [...new Set([...pp.members, c.dataset.mem])] : pp.members.filter((m) => m !== c.dataset.mem); }));
+  },
+};
+
+/* ---------- Tâches ---------- */
+function taskCard(t) {
+  const late = t.status !== 'done' && t.due && t.due < todayISO();
+  const cl = t.checklist.length ? `☑ ${t.checklist.filter((c) => c.done).length}/${t.checklist.length}` : '';
+  return `<div class="tcard" data-task="${t.id}"><div class="t">${esc(t.title)}</div><div class="meta">
+    <span class="badge ${t.priority === 'Urgente' ? 'bad' : t.priority === 'Haute' ? 'warn' : ''}">${t.priority}</span>
+    ${t.due ? `<span style="color:${late ? 'var(--bad)' : ''}">📅 ${fmtDate(t.due)}</span>` : ''}${cl ? `<span>${cl}</span>` : ''}${t.comments.length ? `<span>💬 ${t.comments.length}</span>` : ''}
+    ${t.assignee ? `<span class="avatar" style="margin-left:auto;width:24px;height:24px;font-size:.68rem" title="${esc(userName(t.assignee))}">${initials(userName(t.assignee))}</span>` : ''}</div></div>`;
+}
+function taskTable(tasks, w, showProject) {
+  return `<div class="table-wrap"><table><tr><th>Tâche</th>${showProject ? '<th>Projet</th>' : ''}<th>Statut</th><th>Priorité</th><th>Responsable</th><th>Échéance</th></tr>
+    ${tasks.map((t) => { const p = w.projects.find((x) => x.id === t.projectId); const late = t.status !== 'done' && t.due && t.due < todayISO();
+      return `<tr class="click" data-task="${t.id}"><td>${t.status === 'done' ? '<s>' + esc(t.title) + '</s>' : esc(t.title)}</td>${showProject ? `<td><span style="color:${p?.color}">●</span> ${esc(p?.name || '')}</td>` : ''}
+      <td><span class="badge ${t.status === 'done' ? 'ok' : t.status === 'doing' ? 'info' : t.status === 'review' ? 'acc' : ''}">${STATUSES.find((s) => s[0] === t.status)[1]}</span></td><td>${t.priority}</td><td>${esc(userName(t.assignee))}</td>
+      <td style="color:${late ? 'var(--bad)' : ''};white-space:nowrap">${fmtDate(t.due)}${late ? ' ⚠' : ''}</td></tr>`; }).join('')}</table></div>`;
+}
+function bindTaskRows(el) { $$('tr[data-task]', el).forEach((r) => r.onclick = () => taskForm(ws().tasks.find((t) => t.id === r.dataset.task))); }
+function setStatus(id, status) {
+  mutate((w) => { const t = w.tasks.find((x) => x.id === id); if (t && t.status !== status) { t.status = status; log(w, `a passé « ${t.title} » en ${STATUSES.find((s) => s[0] === status)[1]}`); } });
+}
+function rerender() { router.run(); }
+
+function taskForm(t, projectId, status = 'todo') {
+  const w = ws(); const isNew = !t;
+  const pid = t?.projectId || projectId;
+  const p = w.projects.find((x) => x.id === pid);
+  const canEdit = can('project') || isNew || t.assignee === ME.id || !t.assignee;
+  const opts = [['', '— Personne —'], ...members().map((u) => [u.id, u.name])];
+  t = t || newTask(pid, { title: '', status, due: addDays(todayISO(), 7) });
+  modal({
+    title: isNew ? 'Nouvelle tâche' : 'Tâche', wide: true, submit: canEdit ? 'Enregistrer' : null, cancel: 'Fermer',
+    body: `<p class="muted"><span style="color:${p?.color}">●</span> ${esc(p?.name || '')}</p><div class="fields">
+      ${fInput('title', 'Intitulé', t.title, { req: true, full: true })}${fText('desc', 'Description', t.desc)}
+      ${fSelect('status', 'Statut', STATUSES, t.status)}${fSelect('priority', 'Priorité', PRIOS, t.priority)}
+      ${fSelect('assignee', 'Responsable', opts, t.assignee)}<div></div>
+      ${fInput('start', 'Début', t.start, { type: 'date' })}${fInput('due', 'Échéance', t.due, { type: 'date' })}
+      ${fInput('estimate', 'Temps estimé (h)', t.estimate, { type: 'number', attrs: 'min="0"' })}${fInput('spent', 'Temps passé (h)', t.spent, { type: 'number', attrs: 'min="0"' })}</div>
+      <h3>Check-list</h3><div id="cl">${t.checklist.map((c, i) => `<label class="row" style="font-weight:500;flex-wrap:nowrap"><input type="checkbox" data-ci="${i}" ${c.done ? 'checked' : ''}> ${esc(c.t)}</label>`).join('')}</div>
+      <div class="row" style="margin-top:6px;flex-wrap:nowrap"><input id="newci" placeholder="Ajouter un élément…"><button type="button" class="btn sm" id="addci">Ajouter</button></div>
+      ${isNew ? '' : `<h3 style="margin-top:16px">Commentaires</h3><div id="cm">${t.comments.map((c) => `<div style="background:var(--panel-2);border-radius:8px;padding:8px;margin-bottom:6px"><strong>${esc(userName(c.u))}</strong> <small>${new Date(c.d).toLocaleString('fr-FR', { dateStyle: 'short', timeStyle: 'short' })}</small><br>${esc(c.t)}</div>`).join('') || '<p class="muted">Aucun commentaire.</p>'}</div>
+      <div class="row" style="flex-wrap:nowrap"><input id="newcm" placeholder="Écrire un commentaire…"><button type="button" class="btn sm" id="addcm">Envoyer</button></div>`}`,
+    danger: !isNew && can('project') ? { label: 'Supprimer', onClick: async () => { if (!await ask('Supprimer cette tâche ?')) return false; mutate((x) => { x.tasks = x.tasks.filter((y) => y.id !== t.id); log(x, `a supprimé la tâche « ${t.title} »`); }); rerender(); } } : null,
+    onOpen(form) {
+      const checklist = t.checklist.map((c) => ({ ...c }));
+      form._checklist = checklist;
+      const drawCl = () => { $('#cl', form).innerHTML = checklist.map((c, i) => `<label class="row" style="font-weight:500;flex-wrap:nowrap"><input type="checkbox" data-ci="${i}" ${c.done ? 'checked' : ''}> ${esc(c.t)}</label>`).join(''); $$('[data-ci]', form).forEach((cb) => cb.onchange = () => { checklist[cb.dataset.ci].done = cb.checked; }); };
+      drawCl();
+      $('#addci', form).onclick = () => { const v = $('#newci', form).value.trim(); if (v) { checklist.push({ t: v, done: false }); $('#newci', form).value = ''; drawCl(); } };
+      $('#addcm', form)?.addEventListener('click', () => { const v = $('#newcm', form).value.trim(); if (!v) return;
+        mutate((x) => { x.tasks.find((y) => y.id === t.id).comments.push({ u: ME.id, t: v, d: new Date().toISOString() }); log(x, `a commenté « ${t.title} »`); });
+        $('#cm', form).insertAdjacentHTML('beforeend', `<div style="background:var(--panel-2);border-radius:8px;padding:8px;margin-bottom:6px"><strong>${esc(ME.name)}</strong><br>${esc(v)}</div>`); $('#newcm', form).value = ''; });
+      if (!canEdit) $$('input,select,textarea', form).forEach((i) => { if (i.id !== 'newcm') i.disabled = true; });
+    },
+    onSubmit(fd, form) {
+      if (!fd.title?.trim()) throw new Error('L\'intitulé est obligatoire');
+      if (fd.start && fd.due && fd.due < fd.start) throw new Error('L\'échéance est avant la date de début');
+      mutate((x) => {
+        const data = { title: fd.title.trim(), desc: fd.desc, status: fd.status, priority: fd.priority, assignee: fd.assignee, start: fd.start, due: fd.due, estimate: Number(fd.estimate) || 0, spent: Number(fd.spent) || 0, checklist: form._checklist };
+        if (isNew) { x.tasks.push({ ...t, ...data }); log(x, `a créé la tâche « ${data.title} »`); }
+        else { const y = x.tasks.find((z) => z.id === t.id); if (y.status !== data.status) log(x, `a passé « ${data.title} » en ${STATUSES.find((s) => s[0] === data.status)[1]}`); Object.assign(y, data); }
+      });
+      rerender();
+    },
+  });
+}
+
+function projectForm(p) {
+  const isNew = !p;
+  p = p || { name: '', code: '', desc: '', ownerId: ME.id, sponsor: '', start: todayISO(), end: addDays(todayISO(), 90), budget: 0, status: 'En cours', color: COLORS[ws().projects.length % COLORS.length] };
+  const managers = members().filter((u) => u.role !== 'member').map((u) => [u.id, u.name]);
+  modal({
+    title: isNew ? 'Nouveau projet' : 'Modifier le projet', wide: true,
+    body: `<div class="fields">${fInput('name', 'Nom du projet', p.name, { req: true })}${fInput('code', 'Code court', p.code, { attrs: 'maxlength="8"' })}
+      ${fText('desc', 'Description / objectif', p.desc)}${fSelect('ownerId', 'Chef de projet', managers, p.ownerId)}${fInput('sponsor', 'Sponsor / commanditaire', p.sponsor)}
+      ${fInput('start', 'Début', p.start, { type: 'date' })}${fInput('end', 'Fin prévue', p.end, { type: 'date' })}
+      ${fInput('budget', 'Budget (€)', p.budget, { type: 'number', attrs: 'min="0"' })}${fSelect('status', 'Statut', PROJ_STATUS, p.status)}
+      ${isNew ? fSelect('template', 'Partir d\'un modèle', Object.entries(TEMPLATES).map(([k, v]) => [k, v.name]), 'vide', { full: true }) : ''}
+      <div class="field full"><label>Couleur</label><div class="row">${COLORS.map((c) => `<label style="margin:0"><input type="radio" name="color" value="${c}" ${c === p.color ? 'checked' : ''}> <span style="color:${c};font-size:1.3rem">●</span></label>`).join('')}</div></div></div>`,
+    danger: !isNew && ME.role === 'admin' ? { label: 'Supprimer le projet', onClick: async () => { if (!await ask('Supprimer ce projet et toutes ses tâches ?')) return false; mutate((x) => { x.projects = x.projects.filter((y) => y.id !== p.id); x.tasks = x.tasks.filter((t) => t.projectId !== p.id); log(x, `a supprimé le projet « ${p.name} »`); }); location.hash = '#/projects'; } } : null,
+    onSubmit(fd) {
+      if (!fd.name?.trim()) throw new Error('Le nom est obligatoire');
+      if (fd.end < fd.start) throw new Error('La date de fin est avant le début');
+      let id = p.id;
+      mutate((w) => {
+        if (isNew) id = addProject(w, fd, fd.template).id;
+        else Object.assign(w.projects.find((x) => x.id === p.id), { ...fd, budget: Number(fd.budget) || 0 });
+      });
+      location.hash = '#/project/' + id; router.run();
+    },
+  });
+}
+
+function riskForm(p, r) {
+  const isNew = !r; r = r || { title: '', prob: 2, impact: 2, owner: ME.id, mitigation: '', status: 'Ouvert' };
+  const scale = [[1, '1 — Faible'], [2, '2 — Moyen'], [3, '3 — Élevé'], [4, '4 — Très élevé']];
+  modal({ title: isNew ? 'Nouveau risque' : 'Risque',
+    body: `<div class="fields">${fInput('title', 'Description du risque', r.title, { full: true, req: true })}${fSelect('prob', 'Probabilité', scale, r.prob)}${fSelect('impact', 'Impact', scale, r.impact)}
+      ${fText('mitigation', 'Action (éviter / réduire / transférer / accepter)', r.mitigation)}${fSelect('owner', 'Responsable', members().map((u) => [u.id, u.name]), r.owner)}${fSelect('status', 'Statut', ['Ouvert', 'En traitement', 'Clos'], r.status)}</div>`,
+    danger: !isNew ? { label: 'Supprimer', onClick: () => { mutate((x) => { const pp = x.projects.find((y) => y.id === p.id); pp.risks = pp.risks.filter((y) => y.id !== r.id); }); view.project(p.id, 'risks'); } } : null,
+    onSubmit(fd) {
+      if (!fd.title) throw new Error('Description obligatoire');
+      mutate((x) => { const pp = x.projects.find((y) => y.id === p.id); const data = { ...fd, prob: Number(fd.prob), impact: Number(fd.impact) };
+        if (isNew) { pp.risks.push({ id: uid(), ...data }); log(x, `a déclaré un risque sur « ${pp.name} »`); } else Object.assign(pp.risks.find((y) => y.id === r.id), data); });
+      view.project(p.id, 'risks');
+    } });
+}
+
+function userForm(u) {
+  const isNew = !u;
+  modal({ title: isNew ? 'Créer un compte' : 'Modifier le compte',
+    body: `<div class="fields">${fInput('name', 'Nom complet', u?.name || '', { req: true })}${fInput('email', 'E-mail', u?.email || '', { type: 'email', req: true, attrs: isNew ? '' : 'disabled' })}
+      ${fSelect('role', 'Rôle', Object.entries(ROLES), u?.role || 'member')}${fInput('password', isNew ? 'Mot de passe provisoire' : 'Réinitialiser le mot de passe (facultatif)', isNew ? 'Bienvenue' + Math.floor(100 + Math.random() * 900) : '')}</div>
+      <p class="muted">Rôles : <strong>Administrateur</strong> (tout), <strong>Chef de projet</strong> (projets et tâches), <strong>Membre</strong> (ses projets et tâches).</p>`,
+    danger: !isNew && u.id !== ME.id ? { label: 'Supprimer le compte', onClick: async () => { if (!await ask('Supprimer ce compte ?')) return false; auth.remove(u.id); mutate((w) => w.tasks.forEach((t) => { if (t.assignee === u.id) t.assignee = ''; })); view.team(); } } : null,
+    async onSubmit(fd) {
+      if (isNew) {
+        await auth.create({ name: fd.name, email: fd.email, password: fd.password, role: fd.role, wsId: ME.wsId, extra: { mustChange: true } });
+        mutate((w) => log(w, `a créé le compte de ${fd.name}`));
+        modal({ title: 'Compte créé ✅', body: `<p>Transmettez ces identifiants à ${esc(fd.name)} :</p><div class="callout">Adresse : <strong>${esc(location.origin + location.pathname)}</strong><br>E-mail : <strong>${esc(fd.email)}</strong><br>Mot de passe provisoire : <strong>${esc(fd.password)}</strong></div><p class="muted">À la première connexion, un nouveau mot de passe sera demandé.</p>`, submit: 'OK', cancel: null });
+      } else {
+        if (u.id === ME.id && fd.role !== 'admin' && members().filter((m) => m.role === 'admin').length === 1) throw new Error('Il doit rester au moins un administrateur.');
+        auth.update(u.id, { name: fd.name, role: fd.role });
+        if (fd.password) { await auth.setPassword(u.id, fd.password); auth.update(u.id, { mustChange: true }); }
+        if (u.id === ME.id) ME = auth.current();
+      }
+      view.team();
+    } });
+}
+
+/* ---------- Académie ---------- */
+function academyLesson(modId, idx) {
+  const m = ACADEMY.find((x) => x.id === modId); if (!m) return view.academy();
+  const res = ME.academy || { read: {}, quiz: {} };
+  const isQuiz = idx >= m.lessons.length;
+  main.innerHTML = `<div class="page-head"><div><a href="#/academy" class="muted">← Académie</a><h1 style="margin-top:6px">${m.ico} ${esc(m.title)}</h1></div></div>
+    <div class="grid" style="grid-template-columns:240px minmax(0,1fr);align-items:start" id="lay"><div class="card" style="padding:10px"><div class="nav">${m.lessons.map((l, i) => `<a href="#/academy/${m.id}/${i}" class="${i === idx ? 'active' : ''}"><span class="ico">${res.read?.[m.id + ':' + i] ? '✓' : i + 1}</span>${esc(l.t)}</a>`).join('')}
+    <a href="#/academy/${m.id}/${m.lessons.length}" class="${isQuiz ? 'active' : ''}"><span class="ico">${res.quiz?.[m.id] ? '🏅' : '❓'}</span>Quiz final</a></div></div><div class="card lesson" id="content"></div></div>`;
+  if (matchMedia('(max-width:900px)').matches) $('#lay').style.gridTemplateColumns = '1fr';
+  const c = $('#content');
+  if (!isQuiz) {
+    const l = m.lessons[idx];
+    c.innerHTML = `<small class="muted">Leçon ${idx + 1} / ${m.lessons.length}</small><h2 style="margin-top:4px">${esc(l.t)}</h2>${l.html}<hr><div class="row between">${idx > 0 ? `<a class="btn" href="#/academy/${m.id}/${idx - 1}">← Précédent</a>` : '<span></span>'}<a class="btn primary" href="#/academy/${m.id}/${idx + 1}">${idx + 1 < m.lessons.length ? 'Leçon suivante →' : 'Passer le quiz →'}</a></div>`;
+    res.read = res.read || {}; res.read[m.id + ':' + idx] = true; ME = auth.update(ME.id, { academy: res });
+    return;
+  }
+  const answers = {};
+  c.innerHTML = `<h2>Quiz — ${esc(m.title)}</h2><p class="muted">Répondez à toutes les questions. 70 % pour valider la formation.</p>
+    ${m.quiz.map((q, qi) => `<div style="margin:16px 0"><strong>${qi + 1}. ${esc(q.q)}</strong>${q.c.map((ch, ci) => `<label class="row" style="font-weight:500;padding:6px 10px;margin-top:4px;border:1px solid var(--line);border-radius:8px;flex-wrap:nowrap" data-q="${qi}" data-c="${ci}"><input type="radio" name="q${qi}" value="${ci}"> ${esc(ch)}</label>`).join('')}<div class="exp" id="e${qi}"></div></div>`).join('')}
+    <button class="btn primary" id="check">Valider mes réponses</button><div id="result" style="margin-top:14px"></div>`;
+  $$('input[type=radio]', c).forEach((r) => r.onchange = () => { answers[r.name.slice(1)] = Number(r.value); });
+  $('#check').onclick = () => {
+    if (Object.keys(answers).length < m.quiz.length) return toast('Répondez à toutes les questions.');
+    let good = 0;
+    m.quiz.forEach((q, qi) => {
+      const ok = answers[qi] === q.a; if (ok) good++;
+      $$(`[data-q="${qi}"]`, c).forEach((lab) => { const ci = Number(lab.dataset.c); if (ci === q.a) lab.style.background = 'var(--ok-bg)'; else if (ci === answers[qi]) lab.style.background = 'var(--bad-bg)'; });
+      $('#e' + qi).innerHTML = `<small>${ok ? '✅' : '❌'} ${esc(q.e)}</small>`;
+    });
+    const pct = Math.round((good / m.quiz.length) * 100);
+    if (pct >= 70) { res.quiz = res.quiz || {}; res.quiz[m.id] = Math.max(pct, res.quiz[m.id] || 0); ME = auth.update(ME.id, { academy: res }); mutate((w) => log(w, `a validé la formation « ${m.title} » (${pct} %)`)); }
+    const next = ACADEMY[ACADEMY.indexOf(m) + 1];
+    $('#result').innerHTML = `<div class="alert ${pct >= 70 ? 'ok' : 'warn'}"><strong>${pct} %</strong> — ${pct >= 70 ? 'Formation validée ! 🎉' : 'Pas encore validée : relisez les leçons et réessayez.'}</div>
+      <div class="row">${pct < 70 ? `<a class="btn" href="#/academy/${m.id}/0">Revoir les leçons</a><button class="btn" onclick="router.run()">Réessayer</button>` : ''}${next ? `<a class="btn primary" href="#/academy/${next.id}/0">Formation suivante : ${esc(next.title)} →</a>` : '<a class="btn primary" href="#/academy">Retour à l\'Académie</a>'}</div>`;
+    $('#check').disabled = true;
+  };
+}
+
+function certificate() {
+  modal({ title: 'Attestation de formation', wide: true, submit: 'Imprimer', cancel: 'Fermer',
+    body: `<div style="text-align:center;border:3px double var(--accent);border-radius:12px;padding:30px"><div style="font-size:2.5rem">🏆</div><h2>Attestation de réussite</h2><p>Pilote certifie que</p><h1>${esc(ME.name)}</h1>
+      <p>a suivi et validé l'ensemble du parcours <strong>« Gestion de projet — Académie Pilote »</strong><br>(${ACADEMY.length} formations, ${ACADEMY.reduce((s, m) => s + m.lessons.length, 0)} leçons).</p><p class="muted">Le ${new Date().toLocaleDateString('fr-FR', { dateStyle: 'long' })}</p></div>`,
+    onSubmit: () => { window.print(); return false; } });
+}
+
+const guard = (fn) => (...a) => { if (!auth.current() || !document.getElementById('main')) return; ME = auth.current(); main = $('#main'); fn(...a); };
+const router = makeRouter(Object.fromEntries(Object.entries(view).map(([k, fn]) => [k, guard(fn)])), guard(() => view.dash()));
+window.addEventListener('hashchange', () => { if (!auth.current()) boot(); });
+boot();
+
+</script>

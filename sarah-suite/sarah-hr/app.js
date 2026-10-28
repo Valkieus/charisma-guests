@@ -229,7 +229,7 @@ const view = {
     $('#pw').onsubmit = async (e) => { e.preventDefault(); try { await auth.setPassword(ME.id, e.target.p1.value); toast('Mot de passe changé'); } catch (err) { toast(err.message); } };
     $('#ex').onclick = () => download('sarah-hr-progression.json', JSON.stringify({ app: 'sarahhr', prog: P() }, null, 2));
     $('#im').onclick = async () => { try { const d = JSON.parse(await pickFile()); if (d.app !== 'sarahhr') throw new Error('fichier non reconnu'); saveP(d.prog); toast('Progression importée'); boot(); } catch (err) { toast('Import impossible : ' + err.message); } };
-    $('#rs').onclick = () => { if (confirm('Effacer toute ta progression ?')) { store.del(progKey()); boot(); } };
+    $('#rs').onclick = async () => { if (await ask('Effacer toute ta progression ?')) { store.del(progKey()); boot(); } };
   },
 };
 
@@ -299,8 +299,8 @@ function runQuiz(el, questions, { onFinish, exam = false, seconds = 0, title = '
     $$('[data-k]', el).forEach((b) => b.onclick = () => { answers[i] = Number(b.dataset.k); if (exam && i < qs.length - 1) { i++; } draw(); });
     $('#next', el)?.addEventListener('click', () => { i++; draw(); });
     $('#prev', el)?.addEventListener('click', () => { i--; draw(); });
-    $('#fin', el)?.addEventListener('click', () => { if (exam && answers.includes(null) && !confirm(`${answers.filter((a) => a === null).length} question(s) sans réponse. Terminer quand même ?`)) return; finish(); });
-    $('#end', el)?.addEventListener('click', () => { if (confirm('Terminer l\'examen maintenant ?')) finish(); });
+    $('#fin', el)?.addEventListener('click', async () => { if (exam && answers.includes(null) && !await ask(`${answers.filter((a) => a === null).length} question(s) sans réponse. Terminer quand même ?`)) return; finish(); });
+    $('#end', el)?.addEventListener('click', async () => { if (await ask('Terminer l\'examen maintenant ?')) finish(); });
   };
   draw();
 }

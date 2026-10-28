@@ -300,7 +300,7 @@ const view = {
     $('#csv').onclick = () => download('taches.csv', '﻿' + toCSV([['Projet', 'Tâche', 'Statut', 'Priorité', 'Responsable', 'Début', 'Échéance', 'Estimé (h)', 'Passé (h)'],
       ...w.tasks.map((t) => [w.projects.find((p) => p.id === t.projectId)?.name, t.title, STATUSES.find((s) => s[0] === t.status)[1], t.priority, userName(t.assignee), t.start, t.due, t.estimate, t.spent])]), 'text/csv');
     $('#demo')?.addEventListener('click', () => { mutate(seedDemo); toast('Projets de démonstration ajoutés'); });
-    $('#wipe')?.addEventListener('click', () => { if (confirm('Effacer définitivement tous les projets et tâches de cet espace ?')) { mutate((x) => { x.projects = []; x.tasks = []; log(x, 'a effacé toutes les données'); }); toast('Données effacées'); } });
+    $('#wipe')?.addEventListener('click', async () => { if (await ask('Effacer définitivement tous les projets et tâches de cet espace ?')) { mutate((x) => { x.projects = []; x.tasks = []; log(x, 'a effacé toutes les données'); }); toast('Données effacées'); } });
   },
 };
 
@@ -455,7 +455,7 @@ function taskForm(t, projectId, status = 'todo') {
       <div class="row" style="margin-top:6px;flex-wrap:nowrap"><input id="newci" placeholder="Ajouter un élément…"><button type="button" class="btn sm" id="addci">Ajouter</button></div>
       ${isNew ? '' : `<h3 style="margin-top:16px">Commentaires</h3><div id="cm">${t.comments.map((c) => `<div style="background:var(--panel-2);border-radius:8px;padding:8px;margin-bottom:6px"><strong>${esc(userName(c.u))}</strong> <small>${new Date(c.d).toLocaleString('fr-FR', { dateStyle: 'short', timeStyle: 'short' })}</small><br>${esc(c.t)}</div>`).join('') || '<p class="muted">Aucun commentaire.</p>'}</div>
       <div class="row" style="flex-wrap:nowrap"><input id="newcm" placeholder="Écrire un commentaire…"><button type="button" class="btn sm" id="addcm">Envoyer</button></div>`}`,
-    danger: !isNew && can('project') ? { label: 'Supprimer', onClick: () => { if (!confirm('Supprimer cette tâche ?')) return false; mutate((x) => { x.tasks = x.tasks.filter((y) => y.id !== t.id); log(x, `a supprimé la tâche « ${t.title} »`); }); rerender(); } } : null,
+    danger: !isNew && can('project') ? { label: 'Supprimer', onClick: async () => { if (!await ask('Supprimer cette tâche ?')) return false; mutate((x) => { x.tasks = x.tasks.filter((y) => y.id !== t.id); log(x, `a supprimé la tâche « ${t.title} »`); }); rerender(); } } : null,
     onOpen(form) {
       const checklist = t.checklist.map((c) => ({ ...c }));
       form._checklist = checklist;
@@ -492,7 +492,7 @@ function projectForm(p) {
       ${fInput('budget', 'Budget (€)', p.budget, { type: 'number', attrs: 'min="0"' })}${fSelect('status', 'Statut', PROJ_STATUS, p.status)}
       ${isNew ? fSelect('template', 'Partir d\'un modèle', Object.entries(TEMPLATES).map(([k, v]) => [k, v.name]), 'vide', { full: true }) : ''}
       <div class="field full"><label>Couleur</label><div class="row">${COLORS.map((c) => `<label style="margin:0"><input type="radio" name="color" value="${c}" ${c === p.color ? 'checked' : ''}> <span style="color:${c};font-size:1.3rem">●</span></label>`).join('')}</div></div></div>`,
-    danger: !isNew && ME.role === 'admin' ? { label: 'Supprimer le projet', onClick: () => { if (!confirm('Supprimer ce projet et toutes ses tâches ?')) return false; mutate((x) => { x.projects = x.projects.filter((y) => y.id !== p.id); x.tasks = x.tasks.filter((t) => t.projectId !== p.id); log(x, `a supprimé le projet « ${p.name} »`); }); location.hash = '#/projects'; } } : null,
+    danger: !isNew && ME.role === 'admin' ? { label: 'Supprimer le projet', onClick: async () => { if (!await ask('Supprimer ce projet et toutes ses tâches ?')) return false; mutate((x) => { x.projects = x.projects.filter((y) => y.id !== p.id); x.tasks = x.tasks.filter((t) => t.projectId !== p.id); log(x, `a supprimé le projet « ${p.name} »`); }); location.hash = '#/projects'; } } : null,
     onSubmit(fd) {
       if (!fd.name?.trim()) throw new Error('Le nom est obligatoire');
       if (fd.end < fd.start) throw new Error('La date de fin est avant le début');
@@ -527,7 +527,7 @@ function userForm(u) {
     body: `<div class="fields">${fInput('name', 'Nom complet', u?.name || '', { req: true })}${fInput('email', 'E-mail', u?.email || '', { type: 'email', req: true, attrs: isNew ? '' : 'disabled' })}
       ${fSelect('role', 'Rôle', Object.entries(ROLES), u?.role || 'member')}${fInput('password', isNew ? 'Mot de passe provisoire' : 'Réinitialiser le mot de passe (facultatif)', isNew ? 'Bienvenue' + Math.floor(100 + Math.random() * 900) : '')}</div>
       <p class="muted">Rôles : <strong>Administrateur</strong> (tout), <strong>Chef de projet</strong> (projets et tâches), <strong>Membre</strong> (ses projets et tâches).</p>`,
-    danger: !isNew && u.id !== ME.id ? { label: 'Supprimer le compte', onClick: () => { if (!confirm('Supprimer ce compte ?')) return false; auth.remove(u.id); mutate((w) => w.tasks.forEach((t) => { if (t.assignee === u.id) t.assignee = ''; })); view.team(); } } : null,
+    danger: !isNew && u.id !== ME.id ? { label: 'Supprimer le compte', onClick: async () => { if (!await ask('Supprimer ce compte ?')) return false; auth.remove(u.id); mutate((w) => w.tasks.forEach((t) => { if (t.assignee === u.id) t.assignee = ''; })); view.team(); } } : null,
     async onSubmit(fd) {
       if (isNew) {
         await auth.create({ name: fd.name, email: fd.email, password: fd.password, role: fd.role, wsId: ME.wsId, extra: { mustChange: true } });

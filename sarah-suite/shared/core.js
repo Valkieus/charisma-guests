@@ -113,7 +113,17 @@ function modal({ title, body, submit = 'Enregistrer', cancel = 'Annuler', wide =
   form.querySelector('input:not([type=hidden]),select,textarea')?.focus();
   return { close, form };
 }
-const confirmBox = (title, text) => new Promise((res) => modal({ title, body: `<p>${esc(text)}</p>`, submit: 'Confirmer', onSubmit: () => res(true) }) && null);
+/* Confirmation intégrée à la page (les boîtes natives sont bloquées dans certains lecteurs). */
+function ask(text, ok = 'Confirmer') {
+  return new Promise((res) => {
+    const bg = document.createElement('div'); bg.className = 'modal-bg'; bg.style.zIndex = 70;
+    bg.innerHTML = `<div class="modal" role="alertdialog" style="width:min(440px,100%)"><p style="font-weight:600;margin:0">${esc(text)}</p><div class="actions"><button type="button" class="btn" data-no>Annuler</button><button type="button" class="btn primary" data-yes>${esc(ok)}</button></div></div>`;
+    const done = (v) => { bg.remove(); res(v); };
+    bg.querySelector('[data-no]').onclick = () => done(false);
+    bg.querySelector('[data-yes]').onclick = () => done(true);
+    document.body.appendChild(bg); bg.querySelector('[data-yes]').focus();
+  });
+}
 
 /* Champs de formulaire */
 function fInput(name, label, value = '', { type = 'text', full = false, req = false, attrs = '' } = {}) {
