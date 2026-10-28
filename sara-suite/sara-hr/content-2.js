@@ -1,4 +1,4 @@
-/* Sarah HR — modules de formation (2/3) */
+/* Sara HR — modules de formation (2/3) */
 
 MODULES.push({
   id: 'sante', ico: '🩺', title: 'Maladie, accidents et inaptitude', tag: 'commun', level: 'Intermédiaire',

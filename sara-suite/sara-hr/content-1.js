@@ -1,4 +1,4 @@
-/* Sarah HR — modules de formation (1/3) */
+/* Sara HR — modules de formation (1/3) */
 const MODULES = [];
 
 MODULES.push({

@@ -1,4 +1,4 @@
-/* Données des jeux de Sarah HR */
+/* Données des jeux de Sara HR */
 
 /* « Privé, public ou les deux ? » — [affirmation, réponse, explication] */
 const PRIVE_PUBLIC = [

@@ -10,10 +10,10 @@ const APPS = {
     title: 'RH Studio', description: 'Logiciel RH complet (privé et fonction publique) avec un parcours de simulation pour s\'entraîner.',
     accent: '#0f766e', icon: '🗂️', css: ['shared/base.css'], js: ['shared/core.js', 'rh-studio/data.js', 'rh-studio/missions.js', 'rh-studio/app.js'],
   },
-  'sarah-hr': {
-    title: 'Sarah HR', description: 'Plateforme de formation RH : cours, flashcards, quiz, jeux et évaluations, privé et public.',
-    accent: '#be185d', icon: '🎓', css: ['shared/base.css', 'sarah-hr/style.css'],
-    js: ['shared/core.js', 'sarah-hr/content-1.js', 'sarah-hr/content-2.js', 'sarah-hr/content-3.js', 'sarah-hr/glossary.js', 'sarah-hr/games.js', 'sarah-hr/app.js'],
+  'sara-hr': {
+    title: 'Sara HR', description: 'Plateforme de formation RH : cours, flashcards, quiz, jeux et évaluations, privé et public.',
+    accent: '#be185d', icon: '🎓', css: ['shared/base.css', 'sara-hr/style.css'],
+    js: ['shared/core.js', 'sara-hr/content-1.js', 'sara-hr/content-2.js', 'sara-hr/content-3.js', 'sara-hr/glossary.js', 'sara-hr/games.js', 'sara-hr/app.js'],
   },
   parking: {
     title: 'Garé Gratuit', description: 'Trouver des places de parking gratuites en Île-de-France autour d\'une adresse ou de sa position.',
@@ -51,7 +51,7 @@ ${js.replace(/<\/script/gi, '<\\/script')}
 `;
   mkdirSync(`dist/${id}`, { recursive: true });
   writeFileSync(`dist/${id}/index.html`, html);
-  // Netlify : publier ce dossier tel quel (dossier de base = sarah-suite/dist/<app>)
+  // Netlify : publier ce dossier tel quel (dossier de base = sara-suite/dist/<app>)
   writeFileSync(`dist/${id}/netlify.toml`, '[build]\n  command = "echo static"\n  publish = "."\n');
   // Variante pour une page claude.ai (le squelette html/head/body est ajouté à la publication)
   mkdirSync('dist/artifacts', { recursive: true });

@@ -1,4 +1,4 @@
-/* Sarah HR — modules de formation (3/3) + parcours */
+/* Sara HR — modules de formation (3/3) + parcours */
 
 MODULES.push({
   id: 'formation', ico: '📚', title: 'Formation et développement des compétences', tag: 'commun', level: 'Intermédiaire',
@@ -246,7 +246,7 @@ MODULES.push({
 
 /* Parcours recommandés */
 const PATHS = [
-  { id: 'public', ico: '🏛️', title: 'Je viens du privé et je découvre le public', desc: 'Le parcours prioritaire de Sarah : comprendre la logique statutaire et les sujets du quotidien.', modules: ['passerelle', 'organisation', 'statut', 'carriere', 'remuneration', 'temps', 'sante', 'obligations', 'dialogue', 'formation', 'management', 'pilotage', 'projet', 'qvct', 'recrutement'] },
+  { id: 'public', ico: '🏛️', title: 'Je viens du privé et je découvre le public', desc: 'Le parcours prioritaire de Sara : comprendre la logique statutaire et les sujets du quotidien.', modules: ['passerelle', 'organisation', 'statut', 'carriere', 'remuneration', 'temps', 'sante', 'obligations', 'dialogue', 'formation', 'management', 'pilotage', 'projet', 'qvct', 'recrutement'] },
   { id: 'prive', ico: '🏢', title: 'Consolider les bases du privé', desc: 'Réviser le droit du travail et la paie privée.', modules: ['droitprive', 'remuneration', 'temps', 'sante', 'dialogue', 'formation', 'recrutement', 'qvct'] },
   { id: 'manager', ico: '🧭', title: 'Responsable d\'équipe RH', desc: 'Encadrer, piloter, conduire des projets.', modules: ['management', 'pilotage', 'projet', 'qvct', 'recrutement'] },
 ];

@@ -1,4 +1,4 @@
-/* Styles propres à Sarah HR */
+/* Styles propres à Sara HR */
 .hero { background: linear-gradient(135deg, var(--accent), #7c3aed); color: #fff; border-radius: 16px; padding: 22px; margin-bottom: 14px; }
 .hero h1 { color: #fff; margin-bottom: 4px; }
 .hero .progress { background: rgba(255,255,255,.25); }

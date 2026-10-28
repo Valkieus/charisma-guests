@@ -1,6 +1,3 @@
-<!doctype html>
-<html lang="fr">
-<head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>RH Studio</title>
@@ -180,8 +177,6 @@ tr.click { cursor: pointer; } tr.click:hover td { background: var(--panel-2); }
 
 :root{--accent:#0f766e}
 </style>
-</head>
-<body>
 <noscript>Cette application nécessite JavaScript.</noscript>
 <script>
 /* ---- shared/core.js ---- */
@@ -352,9 +347,9 @@ function toCSV(rows) {
 
 /* Liens entre les trois applications de la suite */
 const SUITE = [
-  { id: 'pilote', name: 'Pilote — Projets', url: 'https://pilote-projets-sarah.netlify.app', ico: '📋' },
-  { id: 'rh', name: 'RH Studio', url: 'https://rh-studio-sarah.netlify.app', ico: '🗂️' },
-  { id: 'sarah', name: 'Sarah HR — Formation', url: 'https://sarah-hr.netlify.app', ico: '🎓' },
+  { id: 'pilote', name: 'Pilote — Projets', url: 'https://pilote-projets-sara.netlify.app', ico: '📋' },
+  { id: 'rh', name: 'RH Studio', url: 'https://rh-studio-sara.netlify.app', ico: '🗂️' },
+  { id: 'sara', name: 'Sara HR — Formation', url: 'https://sara-hr.netlify.app', ico: '🎓' },
   { id: 'parking', name: 'Garé Gratuit IDF', url: 'https://gare-gratuit-idf.netlify.app', ico: '🅿️' },
 ];
 function suiteLinks(current) {
@@ -1703,5 +1698,3 @@ window.addEventListener('hashchange', () => { if (!auth.current()) boot(); });
 boot();
 
 </script>
-</body>
-</html>

@@ -1,4 +1,4 @@
-/* Sarah HR — plateforme de formation RH */
+/* Sara HR — plateforme de formation RH */
 const store = makeStore('sarahhr:');
 const auth = makeAuth(store);
 const toggleTheme = themeToggle(store);
@@ -47,9 +47,9 @@ function allQuestions(filter) { const out = []; MODULES.forEach((m) => { if (!fi
 function authPage(signup) {
   const users = auth.users();
   document.body.innerHTML = `<div class="auth"><div class="box" style="width:min(460px,100%)">
-    <div class="hero" style="text-align:center"><div style="font-size:2.6rem">🎓</div><h1>Sarah HR</h1><p class="muted" style="margin:0">Ta plateforme pour maîtriser les RH, du privé au public.</p></div>
+    <div class="hero" style="text-align:center"><div style="font-size:2.6rem">🎓</div><h1>Sara HR</h1><p class="muted" style="margin:0">Ta plateforme pour maîtriser les RH, du privé au public.</p></div>
     <form class="card" id="f"><h2>${signup ? 'Créer mon profil' : 'Me connecter'}</h2>
-    ${fInput('name', 'Prénom', signup ? 'Sarah' : (users[0]?.name || ''), { req: true })}${fInput('password', 'Mot de passe', '', { type: 'password', req: true })}
+    ${fInput('name', 'Prénom', signup ? 'Sara' : (users[0]?.name || ''), { req: true })}${fInput('password', 'Mot de passe', '', { type: 'password', req: true })}
     <button class="btn primary big-btn" style="width:100%;justify-content:center">${signup ? 'Commencer ma formation' : 'Entrer'}</button>
     <p class="muted" style="text-align:center;margin-top:12px">${signup ? (users.length ? '<a href="#/login">J\'ai déjà un profil</a>' : '') : '<a href="#/signup">Créer un nouveau profil</a>'}</p></form></div></div>`;
   $('#f').onsubmit = async (e) => {
@@ -69,7 +69,7 @@ function boot() {
   ME = auth.current();
   if (!ME) return authPage(!auth.users().length || location.hash.includes('signup'));
   const p = P(); const due = dueCards(p, allCards()).length;
-  main = shell({ brand: 'Sarah HR', logo: '🎓', current: 'sarah',
+  main = shell({ brand: 'Sara HR', logo: '🎓', current: 'sara',
     nav: navLink('home', '🏠', 'Accueil') + navLink('paths', '🧭', 'Mes parcours') + navLink('modules', '📚', 'Tous les modules') +
       '<div class="sec">S\'entraîner</div>' + navLink('review', '🃏', 'Révisions', due ? ` <span class="badge acc" style="margin-left:auto">${due}</span>` : '') + navLink('games', '🎮', 'Jeux') + navLink('cases', '🧩', 'Cas pratiques') + navLink('exams', '📝', 'Évaluations') +
       '<div class="sec">Ressources</div>' + navLink('glossary', '🔤', 'Glossaire des sigles') + navLink('memos', '📌', 'Fiches mémo') + navLink('resources', '🔗', 'Sources officielles') + navLink('notes', '✏️', 'Mon carnet') + navLink('profile', '👤', 'Mon profil'),
@@ -175,7 +175,7 @@ const view = {
       <div class="grid g3">
         <div class="card"><h3>🏛️ Examen blanc — Fonction publique</h3><p class="muted">20 questions · 20 minutes · banque de ${nPub} questions</p><a class="btn primary" href="#/exams/public">Commencer</a></div>
         <div class="card"><h3>🏢 Examen blanc — Secteur privé</h3><p class="muted">20 questions · 20 minutes · banque de ${nPriv} questions</p><a class="btn primary" href="#/exams/prive">Commencer</a></div>
-        <div class="card" style="border:2px solid var(--accent)"><h3>🎓 Examen final Sarah HR</h3><p class="muted">40 questions · 40 minutes · tous modules. 70 % pour obtenir l'attestation.</p><a class="btn primary" href="#/exams/final">Commencer</a></div>
+        <div class="card" style="border:2px solid var(--accent)"><h3>🎓 Examen final Sara HR</h3><p class="muted">40 questions · 40 minutes · tous modules. 70 % pour obtenir l'attestation.</p><a class="btn primary" href="#/exams/final">Commencer</a></div>
       </div>
       <div class="card"><h3>Mes résultats</h3>${p.exams.length ? `<div class="table-wrap"><table><tr><th>Date</th><th>Examen</th><th>Score</th><th>Durée</th><th></th></tr>${p.exams.slice().reverse().map((x, i) => `<tr><td>${fmtDate(x.date)}</td><td>${esc(x.title)}</td><td><span class="badge ${x.pct >= 70 ? 'ok' : 'warn'}">${x.score} / ${x.total} (${x.pct} %)</span></td><td>${Math.round(x.dur / 60)} min</td><td>${x.kind === 'final' && x.pct >= 70 ? `<button class="btn sm" data-cert="${p.exams.length - 1 - i}">Attestation</button>` : ''}</td></tr>`).join('')}</table></div>` : '<p class="muted">Aucun examen passé.</p>'}</div>`;
     $$('[data-cert]').forEach((b) => b.onclick = () => certificate(P().exams[b.dataset.cert]));
@@ -209,8 +209,8 @@ const view = {
       ['Santé et prévention', [['INRS', 'https://www.inrs.fr', 'Prévention des risques professionnels, DUERP, RPS.'], ['Défenseur des droits', 'https://www.defenseurdesdroits.fr', 'Discriminations, lanceurs d\'alerte.']]],
     ];
     main.innerHTML = `<div class="page-head"><div><h1>Sources officielles</h1><p>Les règles évoluent : vérifie toujours une règle importante sur ces sites avant de l'appliquer.</p></div></div>` + links.map(([t, l]) => `<div class="card"><h3>${t}</h3>${l.map(([n, u, d]) => `<div style="padding:8px 0;border-top:1px solid var(--line)"><a href="${u}" target="_blank" rel="noopener"><strong>${esc(n)}</strong> ↗</a><br><small class="muted">${esc(d)}</small></div>`).join('')}</div>`).join('') +
-      `<div class="card"><h3>Mes outils pour pratiquer</h3>${SUITE.filter((s) => s.id !== 'sarah').map((s) => `<p><a href="${s.url}" target="_blank" rel="noopener">${s.ico} ${esc(s.name)} ↗</a> — ${s.id === 'rh' ? 'logiciel RH complet avec simulation sur 3 ans (commune ou PME).' : 'gestion de projet avec modèles RH et académie.'}</p>`).join('')}</div>
-      <div class="alert warn">Le contenu de Sarah HR est une synthèse pédagogique arrêtée fin 2026. Il ne remplace ni les textes officiels, ni l'avis de ton CDG / service juridique.</div>`;
+      `<div class="card"><h3>Mes outils pour pratiquer</h3>${SUITE.filter((s) => s.id !== 'sara').map((s) => `<p><a href="${s.url}" target="_blank" rel="noopener">${s.ico} ${esc(s.name)} ↗</a> — ${s.id === 'rh' ? 'logiciel RH complet avec simulation sur 3 ans (commune ou PME).' : 'gestion de projet avec modèles RH et académie.'}</p>`).join('')}</div>
+      <div class="alert warn">Le contenu de Sara HR est une synthèse pédagogique arrêtée fin 2026. Il ne remplace ni les textes officiels, ni l'avis de ton CDG / service juridique.</div>`;
   },
 
   notes() {
@@ -227,7 +227,7 @@ const view = {
       <form id="pw">${fInput('p1', 'Nouveau mot de passe', '', { type: 'password' })}<button class="btn">Changer</button></form></div>
       <div class="card"><h3>Sauvegarde</h3><p class="muted">Ta progression est enregistrée dans ce navigateur. Exporte-la pour la retrouver sur un autre appareil.</p><div class="row"><button class="btn" id="ex">⬇️ Exporter</button><button class="btn" id="im">⬆️ Importer</button><button class="btn danger" id="rs">Réinitialiser</button></div></div></div>`;
     $('#pw').onsubmit = async (e) => { e.preventDefault(); try { await auth.setPassword(ME.id, e.target.p1.value); toast('Mot de passe changé'); } catch (err) { toast(err.message); } };
-    $('#ex').onclick = () => download('sarah-hr-progression.json', JSON.stringify({ app: 'sarahhr', prog: P() }, null, 2));
+    $('#ex').onclick = () => download('sara-hr-progression.json', JSON.stringify({ app: 'sarahhr', prog: P() }, null, 2));
     $('#im').onclick = async () => { try { const d = JSON.parse(await pickFile()); if (d.app !== 'sarahhr') throw new Error('fichier non reconnu'); saveP(d.prog); toast('Progression importée'); boot(); } catch (err) { toast('Import impossible : ' + err.message); } };
     $('#rs').onclick = async () => { if (await ask('Effacer toute ta progression ?')) { store.del(progKey()); boot(); } };
   },
@@ -334,7 +334,7 @@ function casesView(el, list, showMod) {
 
 /* ---------- Évaluations ---------- */
 function examRun(kind) {
-  const cfg = { public: ['Examen blanc — Fonction publique', 20, 1200, (m) => m.tag !== 'prive'], prive: ['Examen blanc — Secteur privé', 20, 1200, (m) => m.tag !== 'public'], final: ['Examen final Sarah HR', 40, 2400, null] }[kind];
+  const cfg = { public: ['Examen blanc — Fonction publique', 20, 1200, (m) => m.tag !== 'prive'], prive: ['Examen blanc — Secteur privé', 20, 1200, (m) => m.tag !== 'public'], final: ['Examen final Sara HR', 40, 2400, null] }[kind];
   if (!cfg) return view.exams();
   const [title, n, secs, filter] = cfg;
   main.innerHTML = `<div class="page-head"><div><a href="#/exams" class="muted">← Évaluations</a><h1 style="margin-top:6px">📝 ${title}</h1><p>${n} questions · ${secs / 60} minutes · correction à la fin</p></div></div><div id="ex"><div class="card" style="text-align:center"><p>Prête ? Le chronomètre démarre dès que tu cliques.</p><button class="btn primary big-btn" id="go">Démarrer l'examen</button></div></div>`;
@@ -356,7 +356,7 @@ function certificate(rec) {
     <div class="cert"><div style="font-size:3rem">🎓</div><p class="muted" style="letter-spacing:.2em;text-transform:uppercase">Attestation de réussite</p><h1 style="font-size:2.2rem">${esc(ME.name)}</h1>
     <p>a réussi l'<strong>${esc(rec.title)}</strong> avec un score de <strong>${rec.score} / ${rec.total} (${rec.pct} %)</strong></p>
     <p>couvrant ${MODULES.length} modules : statut de la fonction publique, carrière, rémunération, temps de travail, santé, discipline, dialogue social, droit du travail privé, recrutement, formation, pilotage RH, management, projets RH et prévention.</p>
-    <p class="muted">Le ${fmtDate(rec.date)} — Sarah HR</p></div>`;
+    <p class="muted">Le ${fmtDate(rec.date)} — Sara HR</p></div>`;
 }
 
 /* ---------- Jeux ---------- */
