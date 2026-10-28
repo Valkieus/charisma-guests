@@ -1,0 +1,1696 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>RH Studio</title>
+<meta name="description" content="Logiciel RH complet (privé et fonction publique) avec un parcours de simulation pour s'entraîner.">
+<link rel="icon" href="data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%20100%20100%22%3E%3Ctext%20y%3D%22.9em%22%20font-size%3D%2290%22%3E%F0%9F%97%82%EF%B8%8F%3C%2Ftext%3E%3C%2Fsvg%3E">
+<style>
+/* Socle visuel commun aux trois applications de la suite */
+:root {
+  --bg: #f6f7fb;
+  --panel: #ffffff;
+  --panel-2: #f0f2f8;
+  --line: #e2e5ee;
+  --text: #1b1f2e;
+  --muted: #646b80;
+  --accent: #4f46e5;
+  --accent-2: color-mix(in srgb, var(--accent) 13%, var(--panel));
+  --accent-text: #ffffff;
+  --ok: #15803d;
+  --ok-bg: #e7f6ec;
+  --warn: #b45309;
+  --warn-bg: #fdf3e2;
+  --bad: #b91c1c;
+  --bad-bg: #fdeaea;
+  --info: #0369a1;
+  --info-bg: #e5f3fb;
+  --shadow: 0 1px 2px rgba(20, 24, 40, .06), 0 4px 16px rgba(20, 24, 40, .05);
+  --radius: 12px;
+  --font: "Inter", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  color-scheme: light;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #0f1220; --panel: #171b2d; --panel-2: #1e2338; --line: #2a3050;
+    --text: #e8eaf3; --muted: #9aa1ba;
+    --ok-bg: #12301f; --warn-bg: #3a2a10; --bad-bg: #3b1616; --info-bg: #10283a;
+    --ok: #4ade80; --warn: #fbbf24; --bad: #f87171; --info: #38bdf8;
+    --shadow: 0 1px 2px rgba(0,0,0,.4); color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #0f1220; --panel: #171b2d; --panel-2: #1e2338; --line: #2a3050;
+  --text: #e8eaf3; --muted: #9aa1ba;
+  --ok-bg: #12301f; --warn-bg: #3a2a10; --bad-bg: #3b1616; --info-bg: #10283a;
+  --ok: #4ade80; --warn: #fbbf24; --bad: #f87171; --info: #38bdf8;
+  --shadow: 0 1px 2px rgba(0,0,0,.4); color-scheme: dark;
+}
+* { box-sizing: border-box; }
+html, body { margin: 0; padding: 0; }
+body { background: var(--bg); color: var(--text); font: 15px/1.55 var(--font); -webkit-font-smoothing: antialiased; }
+a { color: var(--accent); }
+h1, h2, h3, h4 { line-height: 1.25; margin: 0 0 .5em; }
+h1 { font-size: 1.6rem; } h2 { font-size: 1.25rem; } h3 { font-size: 1.05rem; }
+p { margin: 0 0 .8em; }
+small, .muted { color: var(--muted); }
+code { background: var(--panel-2); padding: 1px 5px; border-radius: 5px; font-size: .9em; }
+hr { border: 0; border-top: 1px solid var(--line); margin: 1rem 0; }
+
+/* Mise en page */
+.app { display: grid; grid-template-columns: 248px 1fr; min-height: 100vh; }
+.app > div { min-width: 0; }
+.side { background: var(--panel); border-right: 1px solid var(--line); padding: 18px 12px; position: sticky; top: 0; height: 100vh; overflow-y: auto; display: flex; flex-direction: column; gap: 4px; }
+.brand { display: flex; align-items: center; gap: 10px; font-weight: 800; font-size: 1.1rem; padding: 4px 10px 14px; }
+.brand .logo { width: 32px; height: 32px; border-radius: 9px; background: var(--accent); color: var(--accent-text); display: grid; place-items: center; font-size: .95rem; }
+.nav a { display: flex; align-items: center; gap: 10px; padding: 8px 10px; border-radius: 8px; color: var(--text); text-decoration: none; font-weight: 500; }
+.nav a:hover { background: var(--panel-2); }
+.nav a.active { background: var(--accent-2); color: var(--accent); font-weight: 650; }
+.nav .sec { font-size: .72rem; text-transform: uppercase; letter-spacing: .06em; color: var(--muted); padding: 14px 10px 4px; font-weight: 700; }
+.nav .ico { width: 20px; text-align: center; }
+.side .foot { margin-top: auto; padding: 10px; font-size: .85rem; color: var(--muted); border-top: 1px solid var(--line); }
+.main { padding: 26px 32px 60px; max-width: 1280px; width: 100%; min-width: 0; }
+.topbar { display: none; }
+.page-head { display: flex; align-items: flex-start; justify-content: space-between; gap: 16px; margin-bottom: 18px; flex-wrap: wrap; }
+.page-head p { margin: 0; color: var(--muted); }
+
+/* Composants */
+.card { background: var(--panel); border: 1px solid var(--line); border-radius: var(--radius); padding: 18px; box-shadow: var(--shadow); min-width: 0; }
+.card + .card { margin-top: 14px; }
+.card h3 { margin-bottom: .6em; }
+.grid { display: grid; gap: 14px; }
+.g2 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+.g3 { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+.g4 { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+.row { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
+.between { justify-content: space-between; }
+.stack > * + * { margin-top: 10px; }
+.kpi { display: flex; flex-direction: column; gap: 2px; }
+.kpi .v { font-size: 1.8rem; font-weight: 800; letter-spacing: -.02em; }
+.kpi .l { color: var(--muted); font-size: .85rem; }
+
+.btn { display: inline-flex; align-items: center; gap: 6px; border: 1px solid var(--line); background: var(--panel); color: var(--text); padding: 8px 14px; border-radius: 9px; font: inherit; font-weight: 600; cursor: pointer; text-decoration: none; white-space: nowrap; }
+.btn:hover { background: var(--panel-2); }
+.btn.primary { background: var(--accent); border-color: var(--accent); color: var(--accent-text); }
+.btn.primary:hover { filter: brightness(1.08); }
+.btn.danger { color: var(--bad); }
+.btn.sm { padding: 4px 10px; font-size: .85rem; border-radius: 7px; }
+.btn.ghost { border-color: transparent; background: transparent; }
+.btn:disabled { opacity: .5; cursor: not-allowed; }
+
+label { display: block; font-weight: 600; font-size: .88rem; margin-bottom: 4px; }
+input, select, textarea { width: 100%; font: inherit; color: var(--text); background: var(--panel); border: 1px solid var(--line); border-radius: 8px; padding: 8px 10px; }
+input:focus, select:focus, textarea:focus { outline: 2px solid var(--accent); outline-offset: -1px; border-color: transparent; }
+input[type=checkbox], input[type=radio] { width: auto; accent-color: var(--accent); }
+textarea { min-height: 80px; resize: vertical; }
+.field { margin-bottom: 12px; }
+.fields { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 0 12px; }
+.fields .full { grid-column: 1 / -1; }
+
+.badge { display: inline-flex; align-items: center; gap: 4px; padding: 2px 9px; border-radius: 99px; font-size: .78rem; font-weight: 650; background: var(--panel-2); color: var(--muted); white-space: nowrap; }
+.badge.ok { background: var(--ok-bg); color: var(--ok); }
+.badge.warn { background: var(--warn-bg); color: var(--warn); }
+.badge.bad { background: var(--bad-bg); color: var(--bad); }
+.badge.info { background: var(--info-bg); color: var(--info); }
+.badge.acc { background: var(--accent-2); color: var(--accent); }
+
+.table-wrap { overflow-x: auto; border: 1px solid var(--line); border-radius: var(--radius); background: var(--panel); }
+table { width: 100%; border-collapse: collapse; font-size: .92rem; }
+th, td { text-align: left; padding: 10px 12px; border-bottom: 1px solid var(--line); vertical-align: top; }
+th { font-size: .78rem; text-transform: uppercase; letter-spacing: .04em; color: var(--muted); background: var(--panel-2); }
+tr:last-child td { border-bottom: 0; }
+tr.click { cursor: pointer; } tr.click:hover td { background: var(--panel-2); }
+
+.progress { height: 8px; background: var(--panel-2); border-radius: 99px; overflow: hidden; }
+.progress > i { display: block; height: 100%; background: var(--accent); border-radius: 99px; }
+.tabs { display: flex; gap: 4px; border-bottom: 1px solid var(--line); margin-bottom: 16px; overflow-x: auto; }
+.tabs a, .tabs button { padding: 9px 14px; border: 0; background: none; font: inherit; font-weight: 600; color: var(--muted); cursor: pointer; border-bottom: 2px solid transparent; text-decoration: none; white-space: nowrap; }
+.tabs .active { color: var(--accent); border-bottom-color: var(--accent); }
+
+.alert { padding: 12px 14px; border-radius: 10px; background: var(--info-bg); color: var(--text); border-left: 4px solid var(--info); margin-bottom: 12px; }
+.alert.ok { background: var(--ok-bg); border-color: var(--ok); }
+.alert.warn { background: var(--warn-bg); border-color: var(--warn); }
+.alert.bad { background: var(--bad-bg); border-color: var(--bad); }
+.empty { text-align: center; padding: 34px 16px; color: var(--muted); }
+
+/* Kanban */
+.kanban { display: grid; grid-auto-flow: column; grid-auto-columns: minmax(250px, 1fr); gap: 12px; overflow-x: auto; padding-bottom: 8px; }
+.col { background: var(--panel-2); border-radius: var(--radius); padding: 10px; min-height: 200px; }
+.col h4 { display: flex; justify-content: space-between; font-size: .85rem; text-transform: uppercase; letter-spacing: .04em; color: var(--muted); margin: 4px 4px 10px; }
+.col.over { outline: 2px dashed var(--accent); }
+.tcard { background: var(--panel); border: 1px solid var(--line); border-radius: 10px; padding: 10px; margin-bottom: 8px; cursor: grab; box-shadow: var(--shadow); }
+.tcard .t { font-weight: 600; margin-bottom: 6px; }
+.tcard .meta { display: flex; gap: 6px; flex-wrap: wrap; font-size: .8rem; color: var(--muted); align-items: center; }
+
+/* Modale & toast */
+.modal-bg { position: fixed; inset: 0; background: rgba(10, 12, 24, .5); display: grid; place-items: center; z-index: 50; padding: 16px; }
+.modal { background: var(--panel); border-radius: 14px; width: min(640px, 100%); max-height: 90vh; overflow-y: auto; padding: 22px; box-shadow: 0 20px 60px rgba(0,0,0,.3); }
+.modal.wide { width: min(900px, 100%); }
+.modal .actions { display: flex; justify-content: flex-end; gap: 8px; margin-top: 16px; }
+.toast { position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); background: var(--text); color: var(--bg); padding: 10px 18px; border-radius: 10px; z-index: 60; font-weight: 600; box-shadow: var(--shadow); max-width: calc(100% - 32px); }
+
+/* Authentification */
+.auth { min-height: 100vh; display: grid; place-items: center; padding: 16px; }
+.auth .box { width: min(440px, 100%); }
+.avatar { width: 30px; height: 30px; border-radius: 50%; background: var(--accent-2); color: var(--accent); display: inline-grid; place-items: center; font-weight: 700; font-size: .78rem; flex: none; }
+.lesson { max-width: 780px; }
+.lesson h2 { margin-top: 1.2em; }
+.lesson ul, .lesson ol { padding-left: 1.3em; }
+.lesson li { margin-bottom: .3em; }
+.lesson table { margin: .8em 0; border: 1px solid var(--line); }
+.callout { background: var(--accent-2); border-radius: 10px; padding: 12px 14px; margin: 12px 0; }
+.callout.tip::before { content: "💡 "; } .callout.warn::before { content: "⚠️ "; }
+
+@media (max-width: 900px) {
+  .app { grid-template-columns: 1fr; }
+  .side { position: fixed; inset: 0 auto 0 0; width: 270px; z-index: 40; transform: translateX(-100%); transition: transform .2s; }
+  .side.open { transform: none; box-shadow: 0 0 40px rgba(0,0,0,.3); }
+  .topbar { display: flex; align-items: center; gap: 10px; padding: 10px 16px; background: var(--panel); border-bottom: 1px solid var(--line); position: sticky; top: 0; z-index: 30; }
+  .main { padding: 18px 16px 60px; }
+  .g2, .g3, .g4 { grid-template-columns: 1fr; }
+  .g4.kpis { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .fields { grid-template-columns: 1fr; }
+}
+@media print {
+  .side, .topbar, .no-print { display: none !important; }
+  .app { display: block; } .main { padding: 0; }
+  .card { box-shadow: none; }
+}
+
+:root{--accent:#0f766e}
+</style>
+</head>
+<body>
+<noscript>Cette application nécessite JavaScript.</noscript>
+<script>
+/* ---- shared/core.js ---- */
+/* Outils communs aux trois applications : stockage, comptes, routage, modales. */
+'use strict';
+
+const $ = (s, r = document) => r.querySelector(s);
+const $$ = (s, r = document) => [...r.querySelectorAll(s)];
+const esc = (v) => String(v ?? '').replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+const uid = () => Date.now().toString(36) + Math.random().toString(36).slice(2, 8);
+const todayISO = () => new Date().toISOString().slice(0, 10);
+const addDays = (iso, n) => { const d = new Date(iso + 'T12:00:00'); d.setDate(d.getDate() + n); return d.toISOString().slice(0, 10); };
+const daysBetween = (a, b) => Math.round((new Date(b + 'T12:00:00') - new Date(a + 'T12:00:00')) / 86400000);
+const fmtDate = (iso) => iso ? new Date(iso + 'T12:00:00').toLocaleDateString('fr-FR', { day: '2-digit', month: 'short', year: 'numeric' }) : '—';
+const fmtEur = (n) => (Number(n) || 0).toLocaleString('fr-FR', { style: 'currency', currency: 'EUR', maximumFractionDigits: 0 });
+const fmtEur2 = (n) => (Number(n) || 0).toLocaleString('fr-FR', { style: 'currency', currency: 'EUR' });
+const initials = (name) => String(name || '?').split(/\s+/).map((p) => p[0]).join('').slice(0, 2).toUpperCase();
+const shuffle = (a) => { const b = [...a]; for (let i = b.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [b[i], b[j]] = [b[j], b[i]]; } return b; };
+const pick = (a, n) => shuffle(a).slice(0, n);
+const clamp = (v, a, b) => Math.max(a, Math.min(b, v));
+
+/* Stockage local, isolé par application (préfixe). */
+function makeStore(prefix) {
+  const mem = {};
+  return {
+    get(key, def) {
+      try { const raw = localStorage.getItem(prefix + key); return raw == null ? (key in mem ? mem[key] : def) : JSON.parse(raw); }
+      catch { return key in mem ? mem[key] : def; }
+    },
+    set(key, val) {
+      mem[key] = val;
+      try { localStorage.setItem(prefix + key, JSON.stringify(val)); } catch { /* stockage indisponible : on garde en mémoire */ }
+    },
+    del(key) { delete mem[key]; try { localStorage.removeItem(prefix + key); } catch { } },
+    dump() {
+      const out = {};
+      try { for (let i = 0; i < localStorage.length; i++) { const k = localStorage.key(i); if (k.startsWith(prefix)) out[k.slice(prefix.length)] = JSON.parse(localStorage.getItem(k)); } }
+      catch { Object.assign(out, mem); }
+      return out;
+    },
+    load(obj) { Object.entries(obj).forEach(([k, v]) => this.set(k, v)); },
+    clear() { Object.keys(this.dump()).forEach((k) => this.del(k)); },
+  };
+}
+
+async function hashPassword(pw, salt) {
+  const data = new TextEncoder().encode(salt + '::' + pw);
+  if (window.crypto && crypto.subtle) {
+    const buf = await crypto.subtle.digest('SHA-256', data);
+    return [...new Uint8Array(buf)].map((b) => b.toString(16).padStart(2, '0')).join('');
+  }
+  let h = 5381; for (const b of data) h = ((h << 5) + h + b) >>> 0; return 'x' + h.toString(16);
+}
+
+/* Comptes utilisateurs (locaux au navigateur). */
+function makeAuth(store) {
+  return {
+    users() { return store.get('users', []); },
+    saveUsers(list) { store.set('users', list); },
+    current() { const id = store.get('session', null); return this.users().find((u) => u.id === id) || null; },
+    async create({ name, email, password, role = 'member', wsId, extra = {} }) {
+      email = String(email).trim().toLowerCase();
+      if (!name || !email || !password) throw new Error('Nom, e-mail et mot de passe sont obligatoires.');
+      if (password.length < 6) throw new Error('Le mot de passe doit faire au moins 6 caractères.');
+      if (this.users().some((u) => u.email === email)) throw new Error('Un compte existe déjà avec cet e-mail.');
+      const salt = uid();
+      const user = { id: uid(), name: name.trim(), email, salt, pw: await hashPassword(password, salt), role, wsId, created: todayISO(), ...extra };
+      this.saveUsers([...this.users(), user]);
+      return user;
+    },
+    async login(email, password) {
+      email = String(email).trim().toLowerCase();
+      const u = this.users().find((x) => x.email === email);
+      if (!u || u.pw !== await hashPassword(password, u.salt)) throw new Error('E-mail ou mot de passe incorrect.');
+      store.set('session', u.id);
+      return u;
+    },
+    async setPassword(userId, password) {
+      if (password.length < 6) throw new Error('Le mot de passe doit faire au moins 6 caractères.');
+      const list = this.users(); const u = list.find((x) => x.id === userId); if (!u) return;
+      u.salt = uid(); u.pw = await hashPassword(password, u.salt); u.mustChange = false; this.saveUsers(list);
+    },
+    update(userId, patch) { const list = this.users(); const u = list.find((x) => x.id === userId); if (u) Object.assign(u, patch); this.saveUsers(list); return u; },
+    remove(userId) { this.saveUsers(this.users().filter((u) => u.id !== userId)); },
+    logout() { store.del('session'); },
+  };
+}
+
+function toast(msg, ms = 2600) {
+  const t = document.createElement('div'); t.className = 'toast'; t.textContent = msg; document.body.appendChild(t);
+  setTimeout(() => t.remove(), ms);
+}
+
+/* Modale générique. body = HTML ; onSubmit(formData, el) peut renvoyer false pour garder ouvert. */
+function modal({ title, body, submit = 'Enregistrer', cancel = 'Annuler', wide = false, onSubmit, onOpen, danger }) {
+  const bg = document.createElement('div'); bg.className = 'modal-bg';
+  bg.innerHTML = `<form class="modal ${wide ? 'wide' : ''}" novalidate><h2>${esc(title)}</h2><div class="mbody">${body}</div>
+    <div class="actions">${danger ? `<button type="button" class="btn danger" data-danger style="margin-right:auto">${esc(danger.label)}</button>` : ''}
+    ${cancel ? `<button type="button" class="btn" data-cancel>${esc(cancel)}</button>` : ''}${submit ? `<button class="btn primary">${esc(submit)}</button>` : ''}</div></form>`;
+  const form = bg.querySelector('form');
+  const close = () => { bg.remove(); document.removeEventListener('keydown', onKey); };
+  const onKey = (e) => { if (e.key === 'Escape') close(); };
+  document.addEventListener('keydown', onKey);
+  bg.addEventListener('mousedown', (e) => { if (e.target === bg) close(); });
+  form.querySelector('[data-cancel]')?.addEventListener('click', close);
+  form.querySelector('[data-danger]')?.addEventListener('click', async () => { if (await danger.onClick() !== false) close(); });
+  form.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const fd = Object.fromEntries(new FormData(form).entries());
+    $$('input[type=checkbox]', form).forEach((c) => { if (c.name) fd[c.name] = c.checked; });
+    try { if (!onSubmit || await onSubmit(fd, form) !== false) close(); }
+    catch (err) { toast(err.message || String(err)); }
+  });
+  document.body.appendChild(bg);
+  onOpen?.(form);
+  form.querySelector('input:not([type=hidden]),select,textarea')?.focus();
+  return { close, form };
+}
+const confirmBox = (title, text) => new Promise((res) => modal({ title, body: `<p>${esc(text)}</p>`, submit: 'Confirmer', onSubmit: () => res(true) }) && null);
+
+/* Champs de formulaire */
+function fInput(name, label, value = '', { type = 'text', full = false, req = false, attrs = '' } = {}) {
+  return `<div class="field ${full ? 'full' : ''}"><label>${esc(label)}${req ? ' *' : ''}</label><input name="${name}" type="${type}" value="${esc(value)}" ${req ? 'required' : ''} ${attrs}></div>`;
+}
+function fSelect(name, label, options, value = '', { full = false } = {}) {
+  const opts = options.map((o) => (typeof o === 'string' ? [o, o] : o)).map(([v, l]) => `<option value="${esc(v)}" ${String(v) === String(value) ? 'selected' : ''}>${esc(l)}</option>`).join('');
+  return `<div class="field ${full ? 'full' : ''}"><label>${esc(label)}</label><select name="${name}">${opts}</select></div>`;
+}
+function fText(name, label, value = '', { full = true } = {}) {
+  return `<div class="field ${full ? 'full' : ''}"><label>${esc(label)}</label><textarea name="${name}">${esc(value)}</textarea></div>`;
+}
+
+/* Routeur par hash : #/route/param */
+function makeRouter(routes, fallback) {
+  const run = () => {
+    $$('.modal-bg').forEach((m) => m.remove());
+    const parts = (location.hash.replace(/^#\/?/, '') || '').split('/').map(decodeURIComponent);
+    const fn = routes[parts[0]] || fallback;
+    fn(...parts.slice(1));
+    $$('.nav a').forEach((a) => a.classList.toggle('active', a.getAttribute('href') === '#/' + parts[0]));
+    $('.side')?.classList.remove('open');
+    window.scrollTo(0, 0);
+  };
+  window.addEventListener('hashchange', run);
+  return { run, go: (h) => { if (location.hash === h) run(); else location.hash = h; } };
+}
+
+function download(filename, content, type = 'application/json') {
+  const blob = new Blob([content], { type }); const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob); a.download = filename; a.click(); setTimeout(() => URL.revokeObjectURL(a.href), 1000);
+}
+function pickFile(accept = '.json') {
+  return new Promise((res) => { const i = document.createElement('input'); i.type = 'file'; i.accept = accept; i.onchange = () => { const f = i.files[0]; if (!f) return; const r = new FileReader(); r.onload = () => res(r.result); r.readAsText(f); }; i.click(); });
+}
+function toCSV(rows) {
+  return rows.map((r) => r.map((c) => `"${String(c ?? '').replace(/"/g, '""')}"`).join(';')).join('\n');
+}
+
+/* Liens entre les trois applications de la suite */
+const SUITE = [
+  { id: 'pilote', name: 'Pilote — Projets', url: 'https://pilote-projets-sarah.netlify.app', ico: '📋' },
+  { id: 'rh', name: 'RH Studio', url: 'https://rh-studio-sarah.netlify.app', ico: '🗂️' },
+  { id: 'sarah', name: 'Sarah HR — Formation', url: 'https://sarah-hr.netlify.app', ico: '🎓' },
+];
+function suiteLinks(current) {
+  return `<div class="nav"><div class="sec">La suite</div>${SUITE.filter((s) => s.id !== current).map((s) => `<a href="${s.url}" target="_blank" rel="noopener"><span class="ico">${s.ico}</span>${esc(s.name)}</a>`).join('')}</div>`;
+}
+
+function themeToggle(store) {
+  const t = store.get('theme', null); if (t) document.documentElement.dataset.theme = t;
+  return () => { const cur = document.documentElement.dataset.theme || (matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light'); const n = cur === 'dark' ? 'light' : 'dark'; document.documentElement.dataset.theme = n; store.set('theme', n); };
+}
+
+/* Coquille : barre latérale + zone principale */
+function shell({ brand, logo, nav, foot, current }) {
+  document.body.innerHTML = `<div class="app"><aside class="side"><div class="brand"><span class="logo">${logo}</span>${esc(brand)}</div>
+    <nav class="nav">${nav}</nav>${suiteLinks(current)}<div class="foot">${foot}</div></aside>
+    <div><div class="topbar"><button class="btn sm" id="menuBtn" aria-label="Menu">☰</button><strong>${esc(brand)}</strong></div><main class="main" id="main"></main></div></div>`;
+  $('#menuBtn').onclick = () => $('.side').classList.toggle('open');
+  return $('#main');
+}
+function navLink(route, ico, label, extra = '') { return `<a href="#/${route}"><span class="ico">${ico}</span>${esc(label)}${extra}</a>`; }
+function bar(pct, color) { return `<div class="progress"><i style="width:${clamp(pct, 0, 100)}%;${color ? 'background:' + color : ''}"></i></div>`; }
+
+/* ---- rh-studio/data.js ---- */
+/* Référentiels RH : vocabulaire, statuts, absences, obligations, modèles de documents.
+   Valeurs réglementaires indicatives (fin 2026) : toujours vérifier sur service-public.fr / legifrance.gouv.fr. */
+
+const DEFAULT_SETTINGS = { point: 4.92278, smicH: 12.02, ir: 0, cpRef: 'juin' };
+
+const SECTORS = {
+  prive: {
+    label: 'Secteur privé', emp: 'salarié', emps: 'salariés', Emp: 'Salarié', Emps: 'Salariés',
+    statuts: ['CDI', 'CDD', 'Apprentissage', 'Contrat de professionnalisation', 'Stage', 'Intérim'],
+    categories: ['Ouvrier', 'Employé', 'Technicien / agent de maîtrise', 'Cadre'],
+    motifsCDD: ['Remplacement d\'un salarié absent', 'Accroissement temporaire d\'activité', 'Emploi saisonnier', 'CDD d\'usage', 'Attente de l\'arrivée d\'un salarié en CDI'],
+    absences: ['Congés payés', 'RTT', 'Maladie', 'Accident du travail / maladie pro.', 'Maternité', 'Paternité et accueil de l\'enfant', 'Événement familial', 'Formation', 'Congé sans solde', 'Absence injustifiée'],
+    maladie: ['Maladie', 'Accident du travail / maladie pro.'],
+    cp: 'Congés payés', rtt: 'RTT',
+    reviewTypes: ['Entretien professionnel', 'Entretien annuel d\'évaluation', 'État des lieux récapitulatif (6 ans)'],
+    trainingTypes: ['Obligatoire / adaptation au poste', 'Développement des compétences', 'CPF', 'Alternance / Pro-A', 'Bilan de compétences / VAE'],
+    instance: 'CSE',
+  },
+  public: {
+    label: 'Fonction publique', emp: 'agent', emps: 'agents', Emp: 'Agent', Emps: 'Agents',
+    statuts: ['Fonctionnaire titulaire', 'Fonctionnaire stagiaire', 'Contractuel CDD', 'Contractuel CDI', 'Contrat de projet', 'Apprenti', 'Vacataire'],
+    categories: ['A', 'B', 'C'],
+    motifsCDD: ['Remplacement d\'un agent indisponible (L332-13)', 'Vacance temporaire d\'emploi (L332-14)', 'Accroissement temporaire d\'activité (L332-23 1°)', 'Accroissement saisonnier (L332-23 2°)', 'Emploi permanent — besoins du service / pas de fonctionnaire (L332-8)', 'Contrat de projet (L332-24)'],
+    absences: ['Congés annuels', 'ARTT', 'CMO (maladie ordinaire)', 'CLM (longue maladie)', 'CLD (longue durée)', 'CITIS (accident de service / maladie pro.)', 'Maternité', 'Paternité et accueil de l\'enfant', 'ASA (autorisation spéciale d\'absence)', 'Formation', 'CET', 'Grève', 'Absence injustifiée (service non fait)'],
+    maladie: ['CMO (maladie ordinaire)', 'CLM (longue maladie)', 'CLD (longue durée)', 'CITIS (accident de service / maladie pro.)'],
+    cp: 'Congés annuels', rtt: 'ARTT',
+    reviewTypes: ['Entretien professionnel annuel', 'Entretien de formation', 'Entretien de fin de stage (titularisation)'],
+    trainingTypes: ['Intégration', 'Professionnalisation', 'Perfectionnement', 'Préparation aux concours et examens', 'CPF', 'Hygiène et sécurité (obligatoire)'],
+    instance: 'CST / CSA',
+  },
+};
+const VERSANTS = { FPT: 'Territoriale (communes, départements, régions…)', FPE: 'État (ministères, services déconcentrés)', FPH: 'Hospitalière (hôpitaux, EHPAD publics…)' };
+const GRADES_FPT = ['Adjoint administratif', 'Adjoint administratif principal de 2e classe', 'Adjoint administratif principal de 1re classe', 'Rédacteur', 'Rédacteur principal de 2e classe', 'Rédacteur principal de 1re classe', 'Attaché', 'Attaché principal', 'Attaché hors classe',
+  'Adjoint technique', 'Adjoint technique principal de 2e classe', 'Adjoint technique principal de 1re classe', 'Agent de maîtrise', 'Agent de maîtrise principal', 'Technicien', 'Technicien principal de 2e classe', 'Technicien principal de 1re classe', 'Ingénieur', 'Ingénieur principal',
+  'ATSEM principal de 2e classe', 'Adjoint d\'animation', 'Animateur', 'Auxiliaire de puériculture', 'Éducateur de jeunes enfants', 'Gardien-brigadier de police municipale', 'Adjoint du patrimoine', 'Assistant de conservation'];
+const STAGES = ['Candidature', 'Présélection', 'Entretien', 'Proposition', 'Recruté', 'Refusé'];
+const RECRUT_PUBLIC = ['Mutation (fonctionnaire)', 'Lauréat de concours (liste d\'aptitude)', 'Détachement', 'Contractuel', 'Recrutement direct (sans concours, cat. C)', 'Apprentissage'];
+
+const ONBOARDING = {
+  prive: ['DPAE effectuée (avant l\'embauche)', 'Contrat de travail signé', 'Inscription au registre unique du personnel', 'Affiliation mutuelle / prévoyance', 'Visite d\'information et de prévention (dans les 3 mois)', 'Poste, matériel et accès informatiques prêts', 'Livret d\'accueil et règlement intérieur remis', 'Parrain / marraine désigné(e)', 'Point d\'étape à 1 mois', 'Bilan avant fin de période d\'essai'],
+  public: ['Arrêté de nomination ou contrat signé', 'Procès-verbal d\'installation', 'Dossier administratif complet (pièces, diplômes, casier)', 'Affiliation caisse de retraite (CNRACL / SRE / IRCANTEC)', 'Visite médicale d\'embauche', 'Fiche de poste remise', 'Poste, matériel et accès prêts', 'Livret d\'accueil remis', 'Inscription à la formation d\'intégration (CNFPT)', 'Entretien d\'étape à 3 mois', 'Préparer l\'avis de fin de stage (titularisation)'],
+};
+
+/* Obligations RH par seuil d'effectif. min = effectif à partir duquel l'obligation s'applique. */
+const OBLIGATIONS = {
+  prive: [
+    { k: 'duerp', min: 1, t: 'Document unique d\'évaluation des risques (DUERP)', p: 'Mise à jour au moins annuelle dès 11 salariés, et à chaque changement important', d: 'Recense les risques professionnels et le plan de prévention. À conserver 40 ans dans ses versions successives.' },
+    { k: 'registre', min: 1, t: 'Registre unique du personnel', p: 'À chaque entrée / sortie', d: 'Mentions obligatoires : identité, emploi, qualification, dates d\'entrée et de sortie, type de contrat.' },
+    { k: 'affichage', min: 1, t: 'Affichages obligatoires', p: 'Permanent', d: 'Inspection du travail, médecine du travail, horaires, convention collective, harcèlement, égalité de rémunération, consignes incendie…' },
+    { k: 'dpae', min: 1, t: 'DPAE avant chaque embauche', p: 'À chaque embauche', d: 'Déclaration préalable à l\'embauche auprès de l\'URSSAF, au plus tôt 8 jours avant.' },
+    { k: 'mutuelle', min: 1, t: 'Complémentaire santé collective', p: 'Permanent', d: 'Financée au moins à 50 % par l\'employeur.' },
+    { k: 'entretien_pro', min: 1, t: 'Entretiens professionnels', p: 'Tous les 2 ans + état des lieux tous les 6 ans (réforme 2025 : vérifier la nouvelle périodicité)', d: 'Porte sur les perspectives d\'évolution, pas sur l\'évaluation. Sanction (abondement CPF) dès 50 salariés en cas de manquement.' },
+    { k: 'cse', min: 11, t: 'Mise en place du CSE', p: 'Élections tous les 4 ans (par défaut)', d: 'Obligatoire quand l\'effectif atteint 11 salariés pendant 12 mois consécutifs. Procès-verbal de carence si aucun candidat.' },
+    { k: 'oeth', min: 20, t: 'Déclaration d\'emploi des travailleurs handicapés (DOETH)', p: 'Annuelle via la DSN', d: 'Obligation d\'emploi de 6 % de travailleurs handicapés, ou contribution.' },
+    { k: 'ri', min: 50, t: 'Règlement intérieur', p: 'Dès 50 salariés (12 mois consécutifs)', d: 'Hygiène, sécurité, discipline. Soumis au CSE puis à l\'inspection du travail.' },
+    { k: 'index', min: 50, t: 'Index de l\'égalité professionnelle femmes-hommes', p: 'Publication chaque année avant le 1er mars', d: 'À faire évoluer avec la transposition de la directive européenne sur la transparence salariale.' },
+    { k: 'bdese', min: 50, t: 'Base de données économiques, sociales et environnementales (BDESE)', p: 'Permanente, mise à jour', d: 'Support des consultations récurrentes du CSE.' },
+    { k: 'participation', min: 50, t: 'Accord de participation', p: 'Dès 50 salariés pendant 5 années civiles consécutives', d: 'Redistribution d\'une partie des bénéfices.' },
+    { k: 'referent', min: 250, t: 'Référent harcèlement sexuel côté employeur', p: 'Dès 250 salariés', d: 'En plus du référent désigné par le CSE (obligatoire dans tout CSE).' },
+    { k: 'cssct', min: 300, t: 'Commission santé, sécurité et conditions de travail (CSSCT)', p: 'Dès 300 salariés', d: 'Commission du CSE.' },
+  ],
+  public: [
+    { k: 'duerp', min: 1, t: 'Document unique d\'évaluation des risques (DUERP)', p: 'Mise à jour annuelle', d: 'Obligation identique au privé. Présenté à la formation spécialisée (F3SCT) ou au CST/CSA.' },
+    { k: 'tableau', min: 1, t: 'Tableau des emplois à jour (FPT)', p: 'À chaque création / suppression de poste', d: 'Les emplois sont créés par délibération de l\'organe délibérant (conseil municipal…).' },
+    { k: 'vacance', min: 1, t: 'Déclaration de vacance d\'emploi / publicité', p: 'Avant tout recrutement sur emploi permanent', d: 'Publication sur la Place de l\'emploi public (et au CDG en FPT).' },
+    { k: 'rsu', min: 1, t: 'Rapport social unique (RSU)', p: 'Chaque année', d: 'Données sociales de l\'année précédente, présenté au CST / CSA. Base de données sociales.' },
+    { k: 'ldg', min: 1, t: 'Lignes directrices de gestion (LDG)', p: 'Pluriannuelles (6 ans max.), révisables', d: 'Stratégie RH, orientations en matière de promotion et de valorisation des parcours. Avis du CST / CSA.' },
+    { k: 'plan_formation', min: 1, t: 'Plan de formation', p: 'Annuel ou pluriannuel', d: 'Obligatoire. En FPT, il est transmis au CNFPT.' },
+    { k: 'entretien', min: 1, t: 'Entretiens professionnels annuels', p: 'Chaque année', d: 'Conduits par le supérieur hiérarchique direct, compte rendu notifié à l\'agent, recours possible.' },
+    { k: 'signalement', min: 1, t: 'Dispositif de signalement des violences, harcèlement, discriminations', p: 'Permanent', d: 'Obligatoire pour tous les employeurs publics depuis 2020.' },
+    { k: 'deonto', min: 1, t: 'Référent déontologue et référent laïcité', p: 'Permanent', d: 'Chaque agent doit pouvoir les saisir.' },
+    { k: 'oeth', min: 20, t: 'Déclaration FIPHFP (emploi des travailleurs handicapés)', p: 'Annuelle', d: 'Obligation de 6 % pour les employeurs de 20 ETP et plus.' },
+    { k: 'cst', min: 50, t: 'Comité social territorial / d\'administration propre', p: 'Dès 50 agents (sinon CST placé auprès du CDG en FPT)', d: 'Consulté sur l\'organisation, les LDG, le RSU, les orientations de formation…' },
+    { k: 'egalite', min: 1, t: 'Plan d\'action égalité professionnelle', p: 'Pluriannuel (3 ans max.)', d: 'Obligatoire pour l\'État, les collectivités de plus de 20 000 habitants et les établissements de la FPH de plus de 50 agents.' },
+    { k: 'f3sct', min: 200, t: 'Formation spécialisée en santé, sécurité et conditions de travail (F3SCT)', p: 'Dès 200 agents (FPT)', d: 'Remplace l\'ancien CHSCT depuis le renouvellement des instances de décembre 2022.' },
+    { k: 'elections', min: 1, t: 'Élections professionnelles (CAP, CCP, CST / CSA)', p: 'Tous les 4 ans — prochaines : décembre 2026', d: 'Organisation des listes électorales, du vote (souvent électronique), des résultats.' },
+  ],
+};
+
+/* Projets RH types */
+const HR_PROJECTS = {
+  entretiens: ['Campagne d\'entretiens annuels', ['Mettre à jour le support', 'Former les managers', 'Communiquer le calendrier', 'Réaliser les entretiens', 'Collecter les comptes rendus', 'Traiter les recours', 'Exploiter les besoins de formation']],
+  plan_formation: ['Plan de formation', ['Recenser les besoins (entretiens)', 'Prioriser selon le budget', 'Présenter aux instances', 'Valider le plan', 'Inscrire les agents / salariés', 'Évaluer les formations']],
+  gpec: ['Démarche GPEEC / GEPP', ['Cartographier les métiers et compétences', 'Pyramide des âges et départs prévisibles', 'Identifier les métiers sensibles', 'Plan d\'actions (recrutement, formation, mobilité)', 'Suivi des indicateurs']],
+  elections: ['Élections professionnelles', ['Fixer le calendrier et la date du scrutin', 'Déterminer les effectifs par instance', 'Établir et afficher les listes électorales', 'Réceptionner et contrôler les candidatures', 'Organiser le vote (électronique ou urne)', 'Dépouillement et proclamation des résultats', 'Installer les nouvelles instances']],
+  duerp: ['Mise à jour du DUERP', ['Constituer le groupe de travail', 'Visiter les unités de travail', 'Coter les risques', 'Définir le plan d\'actions de prévention', 'Présenter aux instances', 'Diffuser et archiver']],
+  rsu: ['Rapport social unique', ['Extraire les données du SIRH', 'Contrôler les données', 'Saisir dans l\'outil national', 'Analyser les tendances', 'Présenter au CST / CSA']],
+  ldg: ['Lignes directrices de gestion', ['Diagnostic RH (RSU)', 'Définir les orientations stratégiques', 'Critères de promotion et d\'avancement', 'Avis du CST / CSA', 'Arrêté et communication aux agents']],
+  onboarding: ['Refonte du parcours d\'intégration', ['Interroger les derniers arrivants', 'Rédiger le livret d\'accueil', 'Créer la check-list d\'arrivée', 'Désigner des parrains', 'Évaluer après 6 mois']],
+};
+
+/* Modèles de documents. {{champ}} remplacé par les données. Trames pédagogiques à faire valider. */
+const DOCS = {
+  prive: [
+    { id: 'cdi', t: 'Contrat de travail à durée indéterminée (trame)', body: `CONTRAT DE TRAVAIL À DURÉE INDÉTERMINÉE
+
+Entre {{org}}, {{orgAdresse}}, représentée par {{signataire}}, ci-après « l'employeur »,
+Et {{civ}} {{prenom}} {{nom}}, ci-après « le salarié »,
+
+Article 1 — Engagement
+Le salarié est engagé à compter du {{entree}} sous réserve des résultats de la visite d'information et de prévention.
+Convention collective applicable : {{ccn}}.
+
+Article 2 — Fonctions
+Le salarié occupe le poste de {{poste}}, catégorie {{categorie}}, au sein du service {{service}}.
+
+Article 3 — Période d'essai
+Le contrat ne deviendra définitif qu'à l'issue d'une période d'essai se terminant le {{finEssai}}.
+
+Article 4 — Durée du travail
+Durée hebdomadaire : {{heures}} heures.
+
+Article 5 — Rémunération
+Rémunération mensuelle brute : {{brut}}.
+
+Article 6 — Congés payés, protection sociale
+Le salarié bénéficie des congés payés légaux et conventionnels, de la complémentaire santé et de la prévoyance en vigueur dans l'entreprise.
+
+Fait à {{ville}}, le {{date}}, en deux exemplaires.
+L'employeur                                    Le salarié (« lu et approuvé »)` },
+    { id: 'cdd', t: 'Contrat à durée déterminée (trame)', body: `CONTRAT DE TRAVAIL À DURÉE DÉTERMINÉE
+
+Entre {{org}} et {{civ}} {{prenom}} {{nom}}.
+
+Motif du recours : {{motifCDD}}.
+Date de début : {{entree}} — Date de fin : {{finContrat}}.
+Poste : {{poste}} ({{categorie}}). Période d'essai jusqu'au {{finEssai}}.
+Rémunération mensuelle brute : {{brut}}.
+À l'issue du contrat, une indemnité de fin de contrat égale à 10 % de la rémunération totale brute sera versée, sauf cas d'exclusion prévus par la loi.
+Caisse de retraite complémentaire et organisme de prévoyance : à compléter.
+
+ATTENTION : le CDD doit être écrit, comporter un motif précis et être transmis au salarié dans les 2 jours ouvrables suivant l'embauche.
+
+Fait à {{ville}}, le {{date}}.` },
+    { id: 'attestation', t: 'Attestation employeur', body: `ATTESTATION EMPLOYEUR
+
+Je soussigné(e) {{signataire}}, agissant pour le compte de {{org}}, atteste que {{civ}} {{prenom}} {{nom}} est employé(e) dans notre entreprise depuis le {{entree}}, en qualité de {{poste}}, en {{statut}}.
+
+Attestation délivrée à la demande de l'intéressé(e) pour servir et valoir ce que de droit.
+
+Fait à {{ville}}, le {{date}}.` },
+    { id: 'convocation', t: 'Convocation à entretien préalable', body: `Lettre recommandée avec AR ou remise en main propre contre décharge
+
+Objet : convocation à un entretien préalable
+
+{{civ}} {{nom}},
+
+Nous envisageons à votre égard une mesure pouvant aller jusqu'au licenciement [ou : une sanction disciplinaire].
+Nous vous prions de vous présenter le [date — au moins 5 jours ouvrables après la présentation de cette lettre] à [heure], à [lieu], pour un entretien préalable.
+Vous pouvez vous faire assister par une personne de votre choix appartenant au personnel de l'entreprise [ou, en l'absence de représentants du personnel, par un conseiller du salarié inscrit sur la liste départementale, consultable en mairie et à la DREETS].
+
+{{signataire}}, {{org}}` },
+    { id: 'avertissement', t: 'Lettre d\'avertissement', body: `Objet : avertissement
+
+{{civ}} {{nom}},
+
+Le [date], [description précise et datée des faits reprochés].
+Ces faits constituent un manquement à vos obligations professionnelles. Nous vous notifions par la présente un avertissement, qui sera versé à votre dossier.
+
+Rappel : les faits ne peuvent être sanctionnés au-delà de 2 mois après que l'employeur en a eu connaissance.
+
+{{signataire}}, {{org}}, le {{date}}` },
+    { id: 'entretien', t: 'Convocation à l\'entretien professionnel', body: `Objet : votre entretien professionnel
+
+{{civ}} {{prenom}} {{nom}},
+
+Votre entretien professionnel aura lieu le [date] à [heure] avec [manager].
+Cet entretien est consacré à vos perspectives d'évolution professionnelle (qualifications, emploi). Il ne porte pas sur l'évaluation de votre travail.
+Vous pouvez le préparer à l'aide du support joint, et être informé(e) sur la VAE, le CPF, le conseil en évolution professionnelle et l'abondement du CPF par l'employeur.
+
+{{signataire}}, le {{date}}` },
+  ],
+  public: [
+    { id: 'arrete_stagiaire', t: 'Arrêté de nomination stagiaire (trame FPT)', body: `{{org}}
+ARRÊTÉ N° ____ portant nomination stagiaire
+
+L'autorité territoriale,
+Vu le code général de la fonction publique,
+Vu le décret portant statut particulier du cadre d'emplois correspondant,
+Vu la délibération du ____ créant l'emploi au tableau des emplois,
+Vu la liste d'aptitude établie à l'issue du concours,
+Vu la déclaration de vacance d'emploi n° ____,
+
+ARRÊTE
+Article 1 : {{civ}} {{prenom}} {{nom}} est nommé(e) en qualité de {{grade}} stagiaire, catégorie {{categorie}}, à compter du {{entree}}.
+Article 2 : l'intéressé(e) est classé(e) au {{echelon}}e échelon (IB ____ / IM {{im}}).
+Article 3 : la durée du stage est fixée à un an, sous réserve de la formation d'intégration.
+Article 4 : le directeur général des services est chargé de l'exécution du présent arrêté, notifié à l'intéressé(e) et transmis au comptable et au centre de gestion.
+
+Fait à {{ville}}, le {{date}}. {{signataire}}
+Voies et délais de recours : tribunal administratif dans un délai de deux mois à compter de la notification.` },
+    { id: 'arrete_titu', t: 'Arrêté de titularisation (trame)', body: `{{org}}
+ARRÊTÉ N° ____ portant titularisation
+
+Vu le code général de la fonction publique,
+Vu l'arrêté de nomination stagiaire du ____,
+Vu l'attestation de suivi de la formation d'intégration,
+Vu le rapport sur la manière de servir établi par le supérieur hiérarchique,
+
+ARRÊTE
+Article 1 : {{civ}} {{prenom}} {{nom}}, {{grade}} stagiaire, est titularisé(e) à compter du ____.
+Article 2 : il/elle est classé(e) au {{echelon}}e échelon.
+
+Fait à {{ville}}, le {{date}}. {{signataire}}` },
+    { id: 'arrete_echelon', t: 'Arrêté d\'avancement d\'échelon (trame)', body: `{{org}}
+ARRÊTÉ N° ____ portant avancement d'échelon
+
+Vu le code général de la fonction publique,
+Vu le décret fixant l'échelonnement indiciaire du grade de {{grade}},
+Considérant que l'intéressé(e) remplit les conditions d'ancienneté requises,
+
+ARRÊTE
+Article 1 : {{civ}} {{prenom}} {{nom}}, {{grade}}, est promu(e) au ____e échelon à compter du ____ (IM ____).
+Article 2 : ancienneté conservée : ____.
+
+Fait à {{ville}}, le {{date}}. {{signataire}}
+Voies et délais de recours : tribunal administratif, 2 mois.` },
+    { id: 'contrat', t: 'Contrat de recrutement d\'un agent contractuel (trame)', body: `{{org}}
+CONTRAT À DURÉE DÉTERMINÉE
+
+Vu le code général de la fonction publique, notamment son article correspondant au motif ci-dessous,
+Vu le décret n° 88-145 du 15 février 1988 relatif aux agents contractuels de la FPT,
+
+Entre l'autorité territoriale et {{civ}} {{prenom}} {{nom}},
+Article 1 — Motif : {{motifCDD}}.
+Article 2 — Durée : du {{entree}} au {{finContrat}}. Période d'essai jusqu'au {{finEssai}}.
+Article 3 — Fonctions : {{poste}}, emploi de catégorie {{categorie}}.
+Article 4 — Rémunération : par référence à l'indice majoré {{im}}, plus le régime indemnitaire applicable.
+Article 5 — L'agent est affilié au régime général de sécurité sociale et à l'IRCANTEC.
+Article 6 — Fin de contrat : une indemnité de fin de contrat (10 %) peut être due pour certains contrats de moins d'un an.
+
+Fait à {{ville}}, le {{date}}.` },
+    { id: 'attestation', t: 'Attestation employeur', body: `{{org}}
+ATTESTATION
+
+Je soussigné(e) {{signataire}}, atteste que {{civ}} {{prenom}} {{nom}} exerce ses fonctions au sein de {{org}} depuis le {{entree}}, en qualité de {{poste}}, {{statut}}, grade de {{grade}} (catégorie {{categorie}}).
+
+Fait à {{ville}}, le {{date}}, pour servir et valoir ce que de droit.` },
+    { id: 'entretien', t: 'Convocation à l\'entretien professionnel annuel', body: `{{org}}
+Objet : entretien professionnel annuel
+
+{{civ}} {{prenom}} {{nom}},
+
+Votre entretien professionnel au titre de l'année écoulée aura lieu le [date — au moins 8 jours après cette convocation] à [heure], avec votre supérieur(e) hiérarchique direct(e).
+Vous trouverez ci-joint votre fiche de poste et la trame du compte rendu.
+L'entretien portera sur : vos résultats, vos objectifs pour l'année à venir, votre manière de servir, vos acquis de l'expérience professionnelle, vos besoins de formation et vos perspectives d'évolution.
+
+{{signataire}}, le {{date}}` },
+  ],
+};
+
+/* Jours fériés français (métropole) */
+function easter(y) {
+  const a = y % 19, b = Math.floor(y / 100), c = y % 100, d = Math.floor(b / 4), e = b % 4, f = Math.floor((b + 8) / 25), g = Math.floor((b - f + 1) / 3);
+  const h = (19 * a + b - d - g + 15) % 30, i = Math.floor(c / 4), k = c % 4, l = (32 + 2 * e + 2 * i - h - k) % 7, m = Math.floor((a + 11 * h + 22 * l) / 451);
+  const month = Math.floor((h + l - 7 * m + 114) / 31), day = ((h + l - 7 * m + 114) % 31) + 1;
+  return `${y}-${String(month).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+}
+const holidayCache = {};
+function holidays(y) {
+  if (holidayCache[y]) return holidayCache[y];
+  const e = easter(y);
+  return (holidayCache[y] = new Set([`${y}-01-01`, addDays(e, 1), `${y}-05-01`, `${y}-05-08`, addDays(e, 39), addDays(e, 50), `${y}-07-14`, `${y}-08-15`, `${y}-11-01`, `${y}-11-11`, `${y}-12-25`]));
+}
+/* Nombre de jours décomptés : ouvrés (lun–ven) ou ouvrables (lun–sam), hors fériés */
+function countDays(from, to, ouvrables = false) {
+  if (!from || !to || to < from) return 0;
+  let n = 0, d = from;
+  for (let guard = 0; d <= to && guard < 2000; guard++, d = addDays(d, 1)) {
+    const wd = new Date(d + 'T12:00:00').getDay();
+    if (wd === 0 || (!ouvrables && wd === 6)) continue;
+    if (holidays(Number(d.slice(0, 4))).has(d)) continue;
+    n++;
+  }
+  return n;
+}
+
+/* ---- rh-studio/missions.js ---- */
+/* Parcours de simulation : deux organisations fictives, trois années de missions chacune.
+   Missions « action » : vérifiées automatiquement sur les données de la simulation.
+   Missions « décision » : un choix argumenté, noté de 0 à 10. */
+
+const norm = (s) => String(s || '').toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '').trim();
+const findEmp = (o, prenom, nom) => o.employees.find((e) => norm(e.prenom) === norm(prenom) && norm(e.nom) === norm(nom));
+const activeEmps = (o) => o.employees.filter((e) => !e.sortie || e.sortie > todayISO());
+
+function E(id, civ, prenom, nom, naissance, service, poste, statut, categorie, entree, extra = {}) {
+  return { id, matricule: 'M' + id.slice(1).padStart(4, '0'), civ, prenom, nom, email: `${norm(prenom)}.${norm(nom).replace(/\s/g, '')}@exemple.fr`, naissance, service, poste, managerId: '', statut, categorie,
+    grade: '', echelon: '', im: '', nbi: 0, ifse: 0, brut: 0, heures: 35, quotite: 100, entree, finContrat: '', finEssai: '', motifCDD: '', sortie: '', motifSortie: '', rtt: 0, enfants: 0, notes: '', ...extra };
+}
+
+const SCENARIOS = {
+  lumen: {
+    id: 'lumen', sector: 'prive', title: 'Atelier Lumen — PME privée', ico: '🏭',
+    pitch: 'Vous êtes la nouvelle responsable RH d\'une PME de 42 salariés qui fabrique des luminaires. Trois années pour structurer la fonction RH.',
+    org() {
+      const y = Number(todayISO().slice(0, 4));
+      const emps = [
+        E('e1', 'M.', 'Antoine', 'Roux', '1971-03-12', 'Direction', 'Directeur général', 'CDI', 'Cadre', '2009-01-05', { brut: 6200 }),
+        E('e2', 'Mme', 'Claire', 'Fontaine', '1984-07-22', 'Administration', 'Responsable administrative et financière', 'CDI', 'Cadre', '2014-09-01', { brut: 4100, managerId: 'e1' }),
+        E('e3', 'M.', 'Karim', 'Benali', '1979-11-02', 'Production', 'Chef d\'atelier', 'CDI', 'Technicien / agent de maîtrise', '2011-04-18', { brut: 3100, managerId: 'e1' }),
+        E('e4', 'Mme', 'Sophie', 'Lambert', '1990-02-15', 'Production', 'Opératrice de montage', 'CDI', 'Ouvrier', '2017-06-12', { brut: 2050, managerId: 'e3' }),
+        E('e5', 'M.', 'Paul', 'Garnier', '1986-09-30', 'Production', 'Soudeur', 'CDI', 'Ouvrier', '2015-02-02', { brut: 2300, managerId: 'e3' }),
+        E('e6', 'M.', 'Hugo', 'Petit', '1999-05-08', 'Production', 'Opérateur de montage', 'CDI', 'Ouvrier', '2022-10-03', { brut: 1950, managerId: 'e3' }),
+        E('e7', 'Mme', 'Nadia', 'Cherif', '1993-12-01', 'Commercial', 'Chargée d\'affaires', 'CDI', 'Cadre', '2019-03-11', { brut: 3600, managerId: 'e1' }),
+        E('e8', 'M.', 'Julien', 'Moreau', '1988-08-19', 'Logistique', 'Magasinier cariste', 'CDI', 'Employé', '2016-01-04', { brut: 2100, managerId: 'e3' }),
+        E('e9', 'Mme', 'Emma', 'Girard', '2003-04-27', 'Commercial', 'Assistante commerciale (alternance)', 'Apprentissage', 'Employé', `${y - 1}-09-02`, { brut: 1100, managerId: 'e7', finContrat: `${y + 1}-08-31` }),
+        E('e10', 'M.', 'Thomas', 'Leroy', '1975-06-03', 'Production', 'Technicien de maintenance', 'CDI', 'Technicien / agent de maîtrise', '2008-05-05', { brut: 2900, managerId: 'e3', notes: 'Départ en retraite envisagé.' }),
+        E('e11', 'Mme', 'Léonie', 'Bernard', '1995-10-10', 'Administration', 'Comptable', 'CDI', 'Employé', '2020-11-16', { brut: 2400, managerId: 'e2' }),
+        E('e12', 'M.', 'Mathis', 'Fournier', '1997-01-21', 'Production', 'Opérateur de montage', 'CDD', 'Ouvrier', addDays(todayISO(), -40), { brut: 1900, managerId: 'e3', finContrat: addDays(todayISO(), 50), motifCDD: 'Accroissement temporaire d\'activité', finEssai: addDays(todayISO(), -26) }),
+      ];
+      const t = todayISO();
+      return {
+        name: 'Atelier Lumen (simulation)', sector: 'prive', versant: 'FPT', ccn: '', ville: 'Villeurbanne', adresse: '12 rue des Artisans, 69100 Villeurbanne', signataire: 'Antoine Roux, directeur général',
+        effectifDeclare: 42, services: ['Direction', 'Administration', 'Production', 'Commercial', 'Logistique'], employees: emps,
+        absences: [
+          { id: 'a1', empId: 'e4', type: 'Congés payés', debut: addDays(t, 20), fin: addDays(t, 33), statut: 'demandee', motif: 'Vacances d\'été', jours: 0 },
+          { id: 'a2', empId: 'e5', type: 'Congés payés', debut: addDays(t, 22), fin: addDays(t, 35), statut: 'demandee', motif: '', jours: 0 },
+          { id: 'a3', empId: 'e6', type: 'Congés payés', debut: addDays(t, 24), fin: addDays(t, 28), statut: 'demandee', motif: 'Mariage d\'un ami', jours: 0 },
+        ],
+        jobs: [], candidates: [], onboardings: [], campaigns: [], reviews: [], trainings: [], projects: [], compliance: {}, journal: [],
+      };
+    },
+    missions: [
+      { id: 'l1', year: 1, kind: 'action', title: 'Faire connaissance avec l\'entreprise', route: 'settings',
+        story: 'Premier jour. Le directeur vous demande : « Au fait, quelle est notre convention collective ? On ne l\'a jamais vraiment regardée. » Une PME qui fabrique des luminaires relève de la métallurgie.',
+        todo: ['Ouvrez Paramètres de l\'organisation.', 'Renseignez la convention collective : « Convention collective nationale de la métallurgie (IDCC 3248) ».'],
+        check: (o) => /metallurgie/.test(norm(o.ccn)) || /3248/.test(o.ccn),
+        debrief: 'La convention collective (CCN) complète le Code du travail : salaires minima, classifications, préavis, primes. Elle figure sur le bulletin de paie et doit être affichée. Depuis 2024, la métallurgie a une convention nationale unique (IDCC 3248).' },
+      { id: 'l2', year: 1, kind: 'action', title: 'Embaucher Léa Martin en CDD', route: 'employees',
+        story: 'Une grosse commande arrive : il faut une opératrice de montage pendant 6 mois. Vous embauchez Léa Martin à partir de la semaine prochaine.',
+        todo: ['Créez la fiche de Léa Martin (statut CDD, catégorie Ouvrier, service Production).', 'Motif : accroissement temporaire d\'activité.', 'Date de fin de contrat : environ 6 mois après l\'entrée.', 'Période d\'essai conforme : pour un CDD de 6 mois maximum, 1 jour par semaine dans la limite de 2 semaines.'],
+        check(o) {
+          const e = findEmp(o, 'Léa', 'Martin'); if (!e) return [false, 'Fiche de Léa Martin introuvable.'];
+          if (e.statut !== 'CDD') return [false, 'Le statut doit être CDD.'];
+          if (!/accroissement/.test(norm(e.motifCDD))) return [false, 'Le motif du CDD doit être l\'accroissement temporaire d\'activité.'];
+          if (!e.finContrat || !e.entree) return [false, 'Dates d\'entrée et de fin de contrat obligatoires.'];
+          const dur = daysBetween(e.entree, e.finContrat); if (dur > 200) return [false, 'Le contrat doit durer environ 6 mois.'];
+          if (!e.finEssai) return [false, 'Renseignez la fin de période d\'essai.'];
+          if (daysBetween(e.entree, e.finEssai) > 14) return [false, 'Période d\'essai trop longue : 2 semaines maximum pour un CDD de 6 mois ou moins.'];
+          return true;
+        },
+        debrief: 'Un CDD doit toujours être écrit, avec un motif précis, et remis au salarié dans les 2 jours ouvrables. Durée maximale en principe 18 mois renouvellements compris (2 renouvellements). Essai : 1 jour par semaine, plafonné à 2 semaines (CDD ≤ 6 mois) ou 1 mois (au-delà). En fin de contrat : indemnité de précarité de 10 % sauf exceptions.' },
+      { id: 'l3', year: 1, kind: 'action', title: 'Préparer l\'arrivée de Léa', route: 'onboarding',
+        story: 'Léa arrive lundi. Le chef d\'atelier vous dit : « On verra la paperasse plus tard. » Mauvaise idée : une démarche doit être faite AVANT l\'embauche.',
+        todo: ['Créez un parcours d\'intégration pour Léa Martin.', 'Cochez la DPAE comme effectuée.', 'Cochez aussi « Contrat de travail signé ».'],
+        check(o) {
+          const e = findEmp(o, 'Léa', 'Martin'); if (!e) return [false, 'Créez d\'abord la fiche de Léa (mission précédente).'];
+          const ob = o.onboardings.find((x) => x.empId === e.id); if (!ob) return [false, 'Aucun parcours d\'intégration pour Léa.'];
+          if (!ob.items.some((i) => /dpae/.test(norm(i.t)) && i.done)) return [false, 'La DPAE n\'est pas cochée.'];
+          if (!ob.items.some((i) => /contrat/.test(norm(i.t)) && i.done)) return [false, 'Le contrat n\'est pas coché.'];
+          return true;
+        },
+        debrief: 'La DPAE (déclaration préalable à l\'embauche) se fait auprès de l\'URSSAF dans les 8 jours précédant l\'embauche, au plus tard au moment de la prise de poste. Sans DPAE : risque de travail dissimulé. Pensez aussi au registre unique du personnel et à la visite d\'information et de prévention (dans les 3 mois).' },
+      { id: 'l4', year: 1, kind: 'action', title: 'Les congés d\'été', route: 'absences',
+        story: 'Trois opérateurs de production demandent des congés sur la même période. L\'atelier ne peut pas fonctionner sans au moins un monteur expérimenté.',
+        todo: ['Ouvrez Absences & congés.', 'Traitez les trois demandes en attente (validez ou refusez chacune).', 'Gardez au moins une demande refusée ou décalée pour assurer la continuité.'],
+        check(o) {
+          const pending = o.absences.filter((a) => ['a1', 'a2', 'a3'].includes(a.id) && a.statut === 'demandee'); if (pending.length) return [false, `${pending.length} demande(s) encore en attente.`];
+          const ok = o.absences.filter((a) => ['a1', 'a2', 'a3'].includes(a.id) && a.statut === 'validee').length; if (ok === 3) return [false, 'Les trois sont validées : l\'atelier serait sans monteur ! Refusez-en une (vous pourrez proposer d\'autres dates).'];
+          return true;
+        },
+        debrief: 'L\'employeur fixe la période de prise des congés (elle inclut toujours la période du 1er mai au 31 octobre) et l\'ordre des départs, après avis du CSE, en tenant compte de la situation de famille et de l\'ancienneté. Les dates ne peuvent plus être modifiées moins d\'un mois avant le départ, sauf circonstances exceptionnelles.' },
+      { id: 'l5', year: 1, kind: 'decision', title: 'Faut-il un CSE ?',
+        story: 'Le directeur : « On a 42 salariés, mais on n\'a jamais eu de délégués. On est obligés ? »',
+        options: [
+          { t: 'Non, le CSE n\'est obligatoire qu\'à partir de 50 salariés.', s: 0, fb: 'Faux : 50 est le seuil des attributions élargies du CSE, pas de sa mise en place.' },
+          { t: 'Oui : dès 11 salariés pendant 12 mois consécutifs, il faut organiser les élections du CSE. Sans candidat, on établit un procès-verbal de carence.', s: 10, fb: 'Exact. L\'absence de CSE expose l\'employeur au délit d\'entrave et empêche certaines procédures (ex. consultations obligatoires).' },
+          { t: 'Oui, mais seulement si un salarié le demande.', s: 4, fb: 'Partiellement : un salarié ou un syndicat peut demander l\'organisation des élections, mais l\'obligation existe même sans demande.' },
+        ] },
+      { id: 'l6', year: 2, kind: 'action', title: 'Remplacer le technicien de maintenance', route: 'recruitment',
+        story: 'Thomas Leroy part à la retraite dans 4 mois. Personne d\'autre ne sait réparer les machines : c\'est un métier critique.',
+        todo: ['Créez une offre « Technicien de maintenance ».', 'Ajoutez au moins 3 candidats.', 'Faites avancer un candidat jusqu\'à « Recruté » (sa fiche salarié sera créée automatiquement).'],
+        check(o) {
+          const j = o.jobs.find((x) => /maintenance/.test(norm(x.titre))); if (!j) return [false, 'Aucune offre « maintenance ».'];
+          const cs = o.candidates.filter((c) => c.jobId === j.id); if (cs.length < 3) return [false, `${cs.length} candidat(s) sur 3 minimum.`];
+          if (!cs.some((c) => c.etape === 'Recruté')) return [false, 'Aucun candidat recruté.'];
+          return true;
+        },
+        debrief: 'Anticiper les départs (pyramide des âges) est le cœur de la GEPP (gestion des emplois et des parcours professionnels). Un tuilage de quelques semaines entre l\'ancien et le nouveau technicien permet de transmettre le savoir-faire.' },
+      { id: 'l7', year: 2, kind: 'action', title: 'Campagne d\'entretiens professionnels', route: 'reviews',
+        story: 'Lors d\'un contrôle, on vous signale qu\'aucun entretien professionnel n\'a été tracé depuis des années.',
+        todo: ['Créez une campagne d\'entretiens professionnels pour l\'année.', 'Réalisez (statut « Réalisé » ou « Signé ») au moins 5 entretiens.'],
+        check(o) {
+          const n = o.reviews.filter((r) => /professionnel/.test(norm(r.type)) && ['Réalisé', 'Signé'].includes(r.statut)).length;
+          return n >= 5 ? true : [false, `${n} entretien(s) professionnel(s) réalisé(s) sur 5.`];
+        },
+        debrief: 'L\'entretien professionnel est obligatoire. Il porte sur les perspectives d\'évolution (formation, qualification), pas sur l\'évaluation de la performance, qui relève d\'un entretien annuel distinct (facultatif). La réforme de 2025 a fait évoluer sa périodicité : vérifiez le rythme applicable.' },
+      { id: 'l8', year: 2, kind: 'action', title: 'Bâtir le plan de développement des compétences', route: 'training',
+        story: 'Budget formation : 15 000 €. Les entretiens ont fait remonter des besoins. Une formation est réglementairement indispensable pour les personnes qui interviennent sur les installations électriques.',
+        todo: ['Créez au moins 3 actions de formation.', 'Dont une de type « Obligatoire / adaptation au poste » (ex. habilitation électrique).', 'Coût total ≤ 15 000 €.'],
+        check(o) {
+          if (o.trainings.length < 3) return [false, `${o.trainings.length} formation(s) sur 3.`];
+          if (!o.trainings.some((t) => /obligatoire/.test(norm(t.type)))) return [false, 'Il manque une formation obligatoire / d\'adaptation.'];
+          const cost = o.trainings.reduce((s, t) => s + Number(t.cout || 0), 0); if (cost > 15000) return [false, `Budget dépassé : ${fmtEur(cost)}.`];
+          return true;
+        },
+        debrief: 'L\'employeur a l\'obligation d\'adapter les salariés à leur poste et de veiller au maintien de leur capacité à occuper un emploi. Ces formations obligatoires se déroulent sur le temps de travail.' },
+      { id: 'l9', year: 2, kind: 'action', title: 'Arrêt maladie de Karim', route: 'absences',
+        story: 'Karim Benali, chef d\'atelier, envoie un arrêt de travail pour maladie (non professionnelle) de 65 jours.',
+        todo: ['Enregistrez une absence « Maladie » de Karim Benali d\'au moins 60 jours, statut validée.'],
+        check(o) {
+          const e = findEmp(o, 'Karim', 'Benali');
+          return o.absences.some((a) => a.empId === e?.id && a.type === 'Maladie' && a.statut === 'validee' && daysBetween(a.debut, a.fin) >= 59) ? true : [false, 'Aucun arrêt maladie de 60 jours ou plus validé pour Karim.'];
+        },
+        debrief: 'Après un arrêt pour maladie non professionnelle d\'au moins 60 jours, une visite de reprise auprès de la médecine du travail est obligatoire, au plus tard dans les 8 jours qui suivent la reprise. Un rendez-vous de liaison peut aussi être proposé pendant l\'arrêt (au-delà de 30 jours).' },
+      { id: 'l10', year: 2, kind: 'decision', title: 'Index égalité femmes-hommes',
+        story: 'Un consultant vous propose de vous accompagner pour publier l\'index égalité « obligatoire ». L\'effectif est de 42 salariés.',
+        options: [
+          { t: 'On signe : c\'est obligatoire pour toutes les entreprises.', s: 0, fb: 'Non : l\'index est obligatoire à partir de 50 salariés.' },
+          { t: 'Pas d\'obligation de publication à 42 salariés, mais on vérifie quand même l\'égalité de rémunération, qui s\'impose à tous.', s: 10, fb: 'Exact. Le principe « à travail égal, salaire égal » s\'applique dès le premier salarié ; et la directive européenne sur la transparence salariale va renforcer les obligations.' },
+          { t: 'Ce n\'est obligatoire que dans le public.', s: 0, fb: 'Non, c\'est une obligation du privé (le public a ses propres plans d\'action égalité).' },
+        ] },
+      { id: 'l11', year: 3, kind: 'decision', title: 'Paul veut partir',
+        story: 'Paul Garnier, soudeur, souhaite quitter l\'entreprise pour un projet personnel et demande « une rupture conventionnelle avec le chômage ». La direction est d\'accord.',
+        options: [
+          { t: 'On signe la convention le jour même et Paul part le lendemain.', s: 0, fb: 'Impossible : il y a un délai de rétractation de 15 jours calendaires, puis l\'homologation par l\'administration.' },
+          { t: 'Entretien(s), convention signée, 15 jours calendaires de rétractation, demande d\'homologation (DREETS) qui dispose de 15 jours ouvrables. Indemnité au moins égale à l\'indemnité légale de licenciement.', s: 10, fb: 'Parfait. La rupture ne peut intervenir qu\'au lendemain de l\'homologation (expresse ou tacite). L\'employeur verse aussi une contribution patronale sur l\'indemnité.' },
+          { t: 'On lui conseille de démissionner, c\'est plus simple.', s: 3, fb: 'Plus simple pour l\'employeur, mais une démission n\'ouvre généralement pas droit au chômage. La rupture conventionnelle est un accord : aucun ne peut l\'imposer.' },
+        ] },
+      { id: 'l12', year: 3, kind: 'action', title: 'Enregistrer le départ de Paul', route: 'employees',
+        story: 'La rupture conventionnelle de Paul Garnier est homologuée.',
+        todo: ['Ouvrez la fiche de Paul Garnier.', 'Renseignez la date de sortie et le motif « Rupture conventionnelle ».'],
+        check(o) { const e = findEmp(o, 'Paul', 'Garnier'); return e?.sortie && /rupture/.test(norm(e.motifSortie)) ? true : [false, 'Date de sortie ou motif manquant pour Paul Garnier.']; },
+        debrief: 'À la sortie : certificat de travail, attestation France Travail, solde de tout compte (reçu dénonçable 6 mois), mise à jour du registre unique du personnel, portabilité de la mutuelle.' },
+      { id: 'l13', year: 3, kind: 'action', title: 'Audit de conformité', route: 'compliance',
+        story: 'Le directeur veut savoir si l\'entreprise est en règle.',
+        todo: ['Ouvrez Obligations & conformité.', 'Marquez au moins 6 obligations comme à jour, dont le DUERP et le registre unique du personnel.'],
+        check(o) { const c = o.compliance || {}; const n = Object.values(c).filter(Boolean).length; if (!c.duerp || !c.registre) return [false, 'DUERP et registre unique doivent être à jour.']; return n >= 6 ? true : [false, `${n} obligation(s) à jour sur 6.`]; },
+        debrief: 'Le DUERP est obligatoire dès le premier salarié et sa mise à jour est au moins annuelle à partir de 11 salariés. Ne pas l\'avoir est sanctionné et aggrave la responsabilité de l\'employeur en cas d\'accident.' },
+      { id: 'l14', year: 3, kind: 'action', title: 'Lancer une démarche GEPP', route: 'projects',
+        story: 'Trois salariés partent à la retraite d\'ici 3 ans. La direction vous confie un projet de gestion prévisionnelle.',
+        todo: ['Créez un projet RH de type « Démarche GPEEC / GEPP ».', 'Il doit compter au moins 5 tâches, dont au moins une terminée.'],
+        check(o) { const p = o.projects.find((x) => /gpeec|gepp|gpec/.test(norm(x.titre))); if (!p) return [false, 'Aucun projet GEPP.']; if (p.tasks.length < 5) return [false, 'Au moins 5 tâches.']; return p.tasks.some((t) => t.done) ? true : [false, 'Terminez au moins une tâche.']; },
+        debrief: 'La GEPP (ex-GPEC) consiste à anticiper les besoins en compétences : métiers en tension, départs, évolutions technologiques. Elle est obligatoire à négocier dans les entreprises de 300 salariés et plus, mais utile partout.' },
+      { id: 'l15', year: 3, kind: 'decision', title: 'Le cap des 50 salariés',
+        story: 'L\'activité explose : l\'effectif va dépasser 50 salariés de façon durable.',
+        options: [
+          { t: 'Rien ne change.', s: 0, fb: 'Beaucoup d\'obligations apparaissent à 50.' },
+          { t: 'Règlement intérieur, index égalité, BDESE, attributions élargies du CSE et, à terme, participation aux bénéfices.', s: 10, fb: 'Exact. Depuis la loi PACTE, la plupart de ces obligations s\'appliquent après 12 mois consécutifs au-dessus du seuil (5 ans pour la participation).' },
+          { t: 'Il faut créer une CSSCT.', s: 3, fb: 'La CSSCT est obligatoire à partir de 300 salariés (ou sur décision de l\'inspection du travail).' },
+        ] },
+    ],
+  },
+
+  belval: {
+    id: 'belval', sector: 'public', title: 'Commune de Belval — fonction publique territoriale', ico: '🏛️',
+    pitch: 'Vous prenez la responsabilité du service RH d\'une commune de 9 800 habitants (118 agents). Trois années pour maîtriser la gestion statutaire.',
+    org() {
+      const y = Number(todayISO().slice(0, 4)); const t = todayISO();
+      const emps = [
+        E('e1', 'Mme', 'Hélène', 'Duval', '1972-05-14', 'Direction générale', 'Directrice générale des services', 'Fonctionnaire titulaire', 'A', '2012-03-01', { grade: 'Attaché hors classe', echelon: 3, im: 830, ifse: 1400, nbi: 0 }),
+        E('e2', 'M.', 'Bernard', 'Lefèvre', '1968-01-30', 'Services techniques', 'Responsable des services techniques', 'Fonctionnaire titulaire', 'B', '1998-09-01', { grade: 'Technicien principal de 1re classe', echelon: 5, im: 520, ifse: 520, managerId: 'e1' }),
+        E('e3', 'Mme', 'Fatima', 'Haddad', '1985-11-21', 'Ressources humaines', 'Gestionnaire carrière-paie', 'Fonctionnaire titulaire', 'C', '2010-01-01', { grade: 'Adjoint administratif principal de 1re classe', echelon: 6, im: 450, ifse: 310, managerId: 'e1' }),
+        E('e4', 'M.', 'Lucas', 'Robin', '1990-04-03', 'Services techniques', 'Agent des espaces verts', 'Fonctionnaire titulaire', 'C', '2016-04-01', { grade: 'Adjoint technique principal de 2e classe', echelon: 4, im: 395, ifse: 220, managerId: 'e2' }),
+        E('e5', 'Mme', 'Céline', 'Marchand', '1987-07-09', 'Enfance — écoles', 'ATSEM', 'Fonctionnaire titulaire', 'C', '2013-09-01', { grade: 'ATSEM principal de 2e classe', echelon: 6, im: 410, ifse: 230, managerId: 'e1' }),
+        E('e6', 'M.', 'Yanis', 'Brahimi', '1995-02-17', 'Police municipale', 'Policier municipal', 'Fonctionnaire titulaire', 'C', '2020-06-01', { grade: 'Gardien-brigadier de police municipale', echelon: 5, im: 400, ifse: 350, managerId: 'e1' }),
+        E('e7', 'Mme', 'Aurélie', 'Simon', '1983-10-26', 'Finances', 'Responsable finances', 'Fonctionnaire titulaire', 'A', '2015-01-01', { grade: 'Attaché', echelon: 7, im: 560, ifse: 650, managerId: 'e1' }),
+        E('e8', 'Mme', 'Marion', 'Perrin', '1992-08-12', 'Enfance — petite enfance', 'Auxiliaire de puériculture', 'Fonctionnaire titulaire', 'B', '2018-03-05', { grade: 'Auxiliaire de puériculture', echelon: 4, im: 410, ifse: 240, managerId: 'e1', notes: 'Congé de maternité prévu prochainement.' }),
+        E('e9', 'M.', 'Rémi', 'Gauthier', '1979-12-05', 'Services techniques', 'Agent de voirie', 'Fonctionnaire titulaire', 'C', '2005-05-01', { grade: 'Adjoint technique principal de 1re classe', echelon: 7, im: 450, ifse: 230, managerId: 'e2' }),
+        E('e10', 'Mme', 'Julie', 'Caron', '1998-06-18', 'Culture', 'Médiatrice de la médiathèque', 'Contractuel CDD', 'C', `${y - 1}-10-01`, { grade: 'Adjoint du patrimoine', im: 366, managerId: 'e1', finContrat: `${y}-12-31`, motifCDD: 'Vacance temporaire d\'emploi (L332-14)' }),
+        E('e11', 'M.', 'Olivier', 'Blanc', '1966-03-08', 'Accueil — état civil', 'Agent d\'accueil et d\'état civil', 'Fonctionnaire titulaire', 'C', '1994-02-01', { grade: 'Adjoint administratif principal de 1re classe', echelon: 10, im: 473, ifse: 260, managerId: 'e1' }),
+        E('e12', 'Mme', 'Sabrina', 'Leclerc', '1989-09-29', 'Enfance — périscolaire', 'Animatrice périscolaire', 'Contractuel CDI', 'C', '2014-09-01', { grade: 'Adjoint d\'animation', im: 380, managerId: 'e1' }),
+      ];
+      return {
+        name: 'Commune de Belval (simulation)', sector: 'public', versant: 'FPT', ccn: '', ville: 'Belval', adresse: 'Hôtel de ville, place de la République', signataire: 'Le Maire',
+        effectifDeclare: 118, services: ['Direction générale', 'Ressources humaines', 'Finances', 'Services techniques', 'Enfance — écoles', 'Enfance — petite enfance', 'Enfance — périscolaire', 'Police municipale', 'Culture', 'Accueil — état civil'], employees: emps,
+        absences: [
+          { id: 'a1', empId: 'e4', type: 'Congés annuels', debut: addDays(t, 15), fin: addDays(t, 26), statut: 'demandee', motif: '', jours: 0 },
+          { id: 'a2', empId: 'e9', type: 'Congés annuels', debut: addDays(t, 16), fin: addDays(t, 29), statut: 'demandee', motif: '', jours: 0 },
+          { id: 'a3', empId: 'e2', type: 'ARTT', debut: addDays(t, 17), fin: addDays(t, 17), statut: 'demandee', motif: '', jours: 0 },
+        ],
+        jobs: [], candidates: [], onboardings: [], campaigns: [], reviews: [], trainings: [], projects: [], compliance: {}, journal: [],
+      };
+    },
+    missions: [
+      { id: 'b1', year: 1, kind: 'decision', title: 'Qui décide ?',
+        story: 'Vous venez du privé. On vous parle sans cesse de « l\'autorité territoriale ». Dans une commune, qui est-ce ?',
+        options: [
+          { t: 'Le directeur général des services (DGS).', s: 3, fb: 'Le DGS dirige les services, mais il agit par délégation. L\'autorité territoriale, c\'est l\'exécutif élu.' },
+          { t: 'Le maire : il nomme, signe les arrêtés, prononce les sanctions. Le conseil municipal, lui, crée les emplois et vote le budget.', s: 10, fb: 'Exact. Distinction essentielle : le conseil municipal (organe délibérant) crée les postes au tableau des emplois ; le maire (autorité territoriale) gère la carrière des agents par arrêtés.' },
+          { t: 'Le préfet.', s: 0, fb: 'Le préfet exerce un contrôle de légalité sur certains actes, mais il n\'est pas l\'employeur.' },
+        ] },
+      { id: 'b2', year: 1, kind: 'action', title: 'Accueillir une lauréate de concours', route: 'employees',
+        story: 'Inès Morel a réussi le concours de rédacteur territorial. Le maire la recrute au service Ressources humaines à compter du 1er du mois prochain.',
+        todo: ['Créez la fiche d\'Inès Morel.', 'Statut : Fonctionnaire stagiaire. Catégorie B. Grade : Rédacteur. Échelon 1.', 'Renseignez un indice majoré (IM) — par exemple 366 — et la date d\'entrée.'],
+        check(o) {
+          const e = findEmp(o, 'Inès', 'Morel'); if (!e) return [false, 'Fiche d\'Inès Morel introuvable.'];
+          if (e.statut !== 'Fonctionnaire stagiaire') return [false, 'Une lauréate de concours est d\'abord nommée stagiaire.'];
+          if (e.categorie !== 'B') return [false, 'Le grade de rédacteur relève de la catégorie B.'];
+          if (!/^redacteur$/.test(norm(e.grade))) return [false, 'Grade attendu : Rédacteur.'];
+          if (Number(e.echelon) !== 1) return [false, 'Classement au 1er échelon attendu (sauf reprise d\'ancienneté).'];
+          if (!Number(e.im)) return [false, 'Indiquez l\'indice majoré.'];
+          return true;
+        },
+        debrief: 'Réussir un concours ne donne pas un emploi : le lauréat est inscrit sur une liste d\'aptitude (valable 4 ans en FPT) et doit trouver un employeur. Il est nommé stagiaire pour un an, suit une formation d\'intégration, puis est titularisé (ou non) par arrêté.' },
+      { id: 'b3', year: 1, kind: 'action', title: 'Le parcours d\'arrivée d\'Inès', route: 'onboarding',
+        story: 'Il faut que tout soit carré pour l\'arrivée d\'Inès.',
+        todo: ['Créez un parcours d\'intégration pour Inès Morel.', 'Cochez « Arrêté de nomination » et « Procès-verbal d\'installation ».', 'Vérifiez que l\'inscription à la formation d\'intégration figure dans la liste.'],
+        check(o) {
+          const e = findEmp(o, 'Inès', 'Morel'); if (!e) return [false, 'Créez d\'abord la fiche d\'Inès.'];
+          const ob = o.onboardings.find((x) => x.empId === e.id); if (!ob) return [false, 'Aucun parcours pour Inès.'];
+          if (!ob.items.some((i) => /arrete/.test(norm(i.t)) && i.done)) return [false, 'L\'arrêté de nomination n\'est pas coché.'];
+          if (!ob.items.some((i) => /installation/.test(norm(i.t)) && i.done)) return [false, 'Le PV d\'installation n\'est pas coché.'];
+          if (!ob.items.some((i) => /integration/.test(norm(i.t)))) return [false, 'La formation d\'intégration doit figurer dans la liste.'];
+          return true;
+        },
+        debrief: 'Dans le public, la relation de travail ne naît pas d\'un contrat mais d\'un acte unilatéral : l\'arrêté de nomination. L\'agent est dans une situation « statutaire et réglementaire ». La formation d\'intégration (CNFPT en FPT) conditionne la titularisation.' },
+      { id: 'b4', year: 1, kind: 'action', title: 'Congés aux services techniques', route: 'absences',
+        story: 'Deux agents de voirie et d\'espaces verts demandent des congés sur la même période, et leur responsable pose une journée d\'ARTT. Une astreinte doit rester assurée.',
+        todo: ['Traitez les trois demandes en attente.', 'Les deux agents ne peuvent pas être absents en même temps : refusez ou faites décaler une des deux demandes de congés annuels.'],
+        check(o) {
+          const pending = o.absences.filter((a) => ['a1', 'a2', 'a3'].includes(a.id) && a.statut === 'demandee'); if (pending.length) return [false, `${pending.length} demande(s) en attente.`];
+          const both = ['a1', 'a2'].every((id) => o.absences.find((a) => a.id === id)?.statut === 'validee'); return both ? [false, 'Les deux agents seraient absents en même temps.'] : true;
+        },
+        debrief: 'Les congés annuels d\'un fonctionnaire : 5 fois ses obligations hebdomadaires de service (25 jours pour 5 jours/semaine), plus 1 ou 2 jours « de fractionnement » s\'il prend des jours hors de la période du 1er mai au 31 octobre. Le calendrier est fixé par l\'autorité, dans l\'intérêt du service.' },
+      { id: 'b5', year: 1, kind: 'decision', title: 'Recruter vite… mais légalement',
+        story: 'Le directeur des services techniques veut embaucher « le neveu d\'un élu, très bien » sur un poste permanent vacant, dès lundi, sans publier d\'annonce.',
+        options: [
+          { t: 'On le recrute en contractuel, c\'est plus souple.', s: 0, fb: 'Non : un emploi permanent a vocation à être occupé par un fonctionnaire, et la vacance doit être publiée avant tout recrutement.' },
+          { t: 'Il faut d\'abord déclarer la vacance d\'emploi (CDG, Place de l\'emploi public), laisser un délai raisonnable aux candidatures, examiner les candidatures de fonctionnaires, puis seulement envisager un contractuel si les conditions légales sont réunies.', s: 10, fb: 'Exact. L\'égal accès aux emplois publics est un principe constitutionnel. Recruter sans publicité expose l\'acte à l\'annulation et l\'élu à un risque pénal (prise illégale d\'intérêts).' },
+          { t: 'On publie l\'annonce une journée pour la forme.', s: 2, fb: 'Un délai trop court peut être jugé comme une absence de publicité réelle.' },
+        ] },
+      { id: 'b6', year: 2, kind: 'action', title: 'Remplacer pendant un congé de maternité', route: 'recruitment',
+        story: 'Marion Perrin, auxiliaire de puériculture, part en congé de maternité. La crèche doit respecter des taux d\'encadrement.',
+        todo: ['Créez une offre (type de recrutement : Contractuel) pour un remplacement d\'auxiliaire de puériculture.', 'Ajoutez 2 candidats minimum et recrutez-en un.', 'Sur sa fiche : statut Contractuel CDD, motif « Remplacement d\'un agent indisponible (L332-13) », date de fin renseignée.'],
+        check(o) {
+          const j = o.jobs.find((x) => /puericulture/.test(norm(x.titre)) && x.typeRecrut === 'Contractuel'); if (!j) return [false, 'Aucune offre contractuelle « puériculture ».'];
+          const cs = o.candidates.filter((c) => c.jobId === j.id); if (cs.length < 2) return [false, 'Au moins 2 candidats.'];
+          const hired = cs.find((c) => c.etape === 'Recruté'); if (!hired) return [false, 'Aucun candidat recruté.'];
+          const e = o.employees.find((x) => x.id === hired.empId); if (!e) return [false, 'Fiche agent du candidat recruté introuvable.'];
+          if (e.statut !== 'Contractuel CDD' || !/l332-13|remplacement/.test(norm(e.motifCDD)) || !e.finContrat) return [false, 'Vérifiez statut, motif et date de fin sur la fiche de l\'agent recruté.'];
+          return true;
+        },
+        debrief: 'Le recrutement d\'un contractuel pour remplacer un agent momentanément indisponible (art. L332-13 du CGFP) est possible pour la durée de l\'absence. Le contrat doit viser précisément le motif et l\'agent remplacé.' },
+      { id: 'b7', year: 2, kind: 'action', title: 'Les entretiens professionnels annuels', route: 'reviews',
+        story: 'La campagne annuelle commence. Dans la fonction publique, l\'entretien professionnel a remplacé la notation.',
+        todo: ['Créez la campagne de l\'année.', 'Réalisez au moins 5 entretiens professionnels annuels (statut « Réalisé » ou « Signé »).'],
+        check(o) { const n = o.reviews.filter((r) => /professionnel annuel/.test(norm(r.type)) && ['Réalisé', 'Signé'].includes(r.statut)).length; return n >= 5 ? true : [false, `${n} / 5 entretiens réalisés.`]; },
+        debrief: 'L\'entretien est conduit par le supérieur hiérarchique direct. Le compte rendu porte notamment sur les résultats, les objectifs, la manière de servir, les acquis de l\'expérience, les besoins de formation, les perspectives. L\'agent peut demander la révision (à l\'autorité, puis saisine de la CAP).' },
+      { id: 'b8', year: 2, kind: 'action', title: 'Avancement d\'échelon de Bernard', route: 'employees',
+        story: 'Bernard Lefèvre remplit les conditions d\'ancienneté pour passer au 6e échelon.',
+        todo: ['Mettez à jour sa fiche : échelon 6 et nouvel indice majoré (supérieur à l\'actuel).', 'Générez ensuite l\'arrêté d\'avancement d\'échelon depuis l\'onglet Documents (facultatif mais recommandé).'],
+        check(o) { const e = findEmp(o, 'Bernard', 'Lefèvre'); return Number(e?.echelon) >= 6 && Number(e?.im) > 520 ? true : [false, 'Échelon 6 et IM supérieur à 520 attendus.']; },
+        debrief: 'L\'avancement d\'échelon est fonction de l\'ancienneté (durée unique depuis le protocole PPCR) : c\'est un droit. L\'avancement de grade, lui, se fait au choix (tableau d\'avancement, éventuellement après examen professionnel), selon les LDG et dans la limite des ratios « promus / promouvables » votés par l\'assemblée.' },
+      { id: 'b9', year: 2, kind: 'decision', title: 'Avancement de grade : les règles du jeu',
+        story: 'Un agent se plaint : « J\'ai l\'ancienneté requise, donc j\'ai droit à mon avancement de grade ! »',
+        options: [
+          { t: 'Il a raison : avec l\'ancienneté, l\'avancement de grade est automatique.', s: 0, fb: 'C\'est l\'échelon qui avance à l\'ancienneté. Le grade, non.' },
+          { t: 'L\'ancienneté le rend « promouvable ». La promotion se fait au choix de l\'autorité, par inscription au tableau annuel d\'avancement, au vu de la valeur professionnelle et des acquis de l\'expérience, conformément aux LDG et dans la limite des ratios.', s: 10, fb: 'Exact. Depuis la loi du 6 août 2019, la CAP n\'est plus consultée sur les tableaux d\'avancement : les critères sont fixés dans les LDG.' },
+          { t: 'C\'est la CAP qui décide.', s: 2, fb: 'La CAP ne donne plus d\'avis sur l\'avancement depuis 2021.' },
+        ] },
+      { id: 'b10', year: 2, kind: 'action', title: 'Arrêt maladie de Rémi', route: 'absences',
+        story: 'Rémi Gauthier, agent de voirie, envoie plusieurs arrêts consécutifs : au total 4 mois de congé de maladie ordinaire.',
+        todo: ['Enregistrez un congé « CMO (maladie ordinaire) » de Rémi Gauthier d\'au moins 100 jours, validé.'],
+        check(o) { const e = findEmp(o, 'Rémi', 'Gauthier'); return o.absences.some((a) => a.empId === e?.id && /cmo/i.test(a.type) && a.statut === 'validee' && daysBetween(a.debut, a.fin) >= 99) ? true : [false, 'CMO de 100 jours ou plus non trouvé.']; },
+        debrief: 'CMO du fonctionnaire : jusqu\'à 1 an sur une période de 12 mois. Traitement maintenu pendant 3 mois (à 90 % depuis mars 2025), puis demi-traitement pendant 9 mois. Jour de carence sur le premier jour. Au-delà de 6 mois consécutifs, le conseil médical est saisi pour une prolongation. Attention au passage à demi-traitement : prévenez l\'agent.' },
+      { id: 'b11', year: 3, kind: 'decision', title: 'Les élections professionnelles de décembre 2026',
+        story: 'Les élections professionnelles approchent dans toute la fonction publique.',
+        options: [
+          { t: 'On élit uniquement le CST.', s: 3, fb: 'Il y a aussi les CAP (fonctionnaires, une par catégorie) et la CCP (contractuels).' },
+          { t: 'On élit les représentants au CST, aux CAP (par catégorie A, B, C) et à la CCP pour les contractuels, pour 4 ans. La collectivité doit préparer listes électorales, calendrier et modalités de vote. Les instances de moins de 50 agents relèvent du CDG.', s: 10, fb: 'Exact. Ces élections déterminent aussi la représentativité syndicale, qui fixe les moyens accordés aux organisations.' },
+          { t: 'Ce sont les syndicats qui organisent tout.', s: 0, fb: 'L\'organisation matérielle incombe à l\'employeur (ou au CDG pour les collectivités affiliées).' },
+        ] },
+      { id: 'b12', year: 3, kind: 'action', title: 'Piloter le projet « Élections »', route: 'projects',
+        story: 'La DGS vous confie l\'organisation des élections pour la commune.',
+        todo: ['Créez un projet RH « Élections professionnelles » (modèle disponible).', 'Au moins 6 tâches dont 2 terminées.'],
+        check(o) { const p = o.projects.find((x) => /election/.test(norm(x.titre))); if (!p) return [false, 'Projet « Élections » introuvable.']; if (p.tasks.length < 6) return [false, 'Au moins 6 tâches.']; return p.tasks.filter((t) => t.done).length >= 2 ? true : [false, 'Terminez au moins 2 tâches.']; },
+        debrief: 'Gérer ce type d\'échéance comme un vrai projet (calendrier, responsables, jalons) évite les erreurs qui peuvent conduire à l\'annulation du scrutin.' },
+      { id: 'b13', year: 3, kind: 'action', title: 'Le plan de formation', route: 'training',
+        story: 'Le plan de formation doit être construit et présenté au CST.',
+        todo: ['Créez au moins 3 formations.', 'Dont une « Intégration » et une « Préparation aux concours et examens ».'],
+        check(o) {
+          const ts = o.trainings; if (ts.length < 3) return [false, `${ts.length} / 3 formations.`];
+          if (!ts.some((t) => t.type === 'Intégration')) return [false, 'Il manque une formation d\'intégration.'];
+          return ts.some((t) => /concours/.test(norm(t.type))) ? true : [false, 'Il manque une préparation aux concours.'];
+        },
+        debrief: 'En FPT, la formation d\'intégration et de professionnalisation est obligatoire et assurée par le CNFPT, financé par une cotisation sur la masse salariale. Le plan de formation est obligatoire et transmis au CNFPT.' },
+      { id: 'b14', year: 3, kind: 'decision', title: 'Un manquement de l\'agent d\'accueil',
+        story: 'Olivier Blanc a eu des propos déplacés envers un usager, pour la première fois en 30 ans de carrière. Le maire veut une sanction « rapide ».',
+        options: [
+          { t: 'Révocation immédiate.', s: 0, fb: 'Disproportionné, et une sanction du 4e groupe exige le conseil de discipline.' },
+          { t: 'Après avoir informé l\'agent de son droit à consulter son dossier et à se faire assister, une sanction du 1er groupe (avertissement, blâme, exclusion temporaire ≤ 3 jours) peut être prononcée sans conseil de discipline, si elle est proportionnée.', s: 10, fb: 'Exact. Les droits de la défense s\'appliquent à toute sanction. L\'action disciplinaire se prescrit par 3 ans à compter de la connaissance des faits.' },
+          { t: 'On retient 3 jours de salaire sans formalité.', s: 0, fb: 'Une retenue sur traitement n\'est pas une sanction et ne peut être utilisée ainsi. Seule l\'absence de service fait justifie une retenue.' },
+        ] },
+      { id: 'b15', year: 3, kind: 'action', title: 'Conformité de la collectivité', route: 'compliance',
+        story: 'Le centre de gestion fait le point sur vos obligations.',
+        todo: ['Marquez comme à jour : RSU, LDG, DUERP, plan de formation.'],
+        check(o) { const c = o.compliance || {}; const miss = ['rsu', 'ldg', 'duerp', 'plan_formation'].filter((k) => !c[k]); return miss.length ? [false, 'Manquant : ' + miss.join(', ').toUpperCase()] : true; },
+        debrief: 'Le RSU (rapport social unique) est annuel ; les LDG définissent la stratégie RH et les critères de promotion ; le DUERP et le plan de formation sont obligatoires comme dans le privé.' },
+      { id: 'b16', year: 3, kind: 'decision', title: 'La rupture conventionnelle dans le public',
+        story: 'Aurélie Simon, attachée titulaire, veut se reconvertir et demande une rupture conventionnelle.',
+        options: [
+          { t: 'Impossible : un fonctionnaire ne peut que démissionner.', s: 2, fb: 'La loi de 2019 a ouvert la rupture conventionnelle aux fonctionnaires (à titre expérimental à partir de 2020) et aux contractuels en CDI. Vérifiez le cadre en vigueur.' },
+          { t: 'C\'est possible si les deux parties sont d\'accord : entretien préalable, convention, délai de rétractation, indemnité spécifique de rupture conventionnelle (ISRC) au moins égale au minimum réglementaire. L\'agent doit rembourser l\'ISRC s\'il est à nouveau recruté, dans les 6 ans, par un employeur public visé par les textes (règles propres à chaque versant).', s: 10, fb: 'Exact. Aucun des deux ne peut l\'imposer ; l\'agent peut être assisté par un conseiller syndical. Comme le dispositif était expérimental pour les titulaires, vérifiez sa pérennisation.' },
+          { t: 'C\'est automatique dès que l\'agent le demande.', s: 0, fb: 'Non, c\'est un accord : l\'administration peut refuser.' },
+        ] },
+    ],
+  },
+};
+
+/* ---- rh-studio/app.js ---- */
+/* RH Studio — logiciel RH (privé / fonction publique) avec parcours de simulation. */
+const store = makeStore('rhstudio:');
+const auth = makeAuth(store);
+const toggleTheme = themeToggle(store);
+const ROLES = { admin: 'Responsable RH', gestionnaire: 'Gestionnaire RH', manager: 'Manager', salarie: 'Salarié / agent' };
+let ME = null, main = null;
+
+/* ---------- Organisation courante (réelle ou simulation) ---------- */
+const modeKey = () => 'mode:' + ME.id;
+const simKey = (sc) => `sim:${ME.id}:${sc}`;
+function mode() { return store.get(modeKey(), 'real'); }
+function inSim() { return mode() !== 'real'; }
+function orgKey() { return inSim() ? simKey(mode()) : 'org:' + ME.wsId; }
+function org() { const o = store.get(orgKey(), null); if (o) o.settings = { ...DEFAULT_SETTINGS, ...(o.settings || {}) }; return o; }
+function saveOrg(o) { store.set(orgKey(), o); }
+function mutate(fn) { const o = org(); fn(o); saveOrg(o); return o; }
+function journal(o, txt) { o.journal = o.journal || []; o.journal.unshift({ d: new Date().toISOString(), u: ME.name, txt }); o.journal = o.journal.slice(0, 300); }
+const S = (o = org()) => SECTORS[o.sector];
+const isPublic = (o = org()) => o.sector === 'public';
+const empName = (o, id) => { const e = o.employees.find((x) => x.id === id); return e ? `${e.prenom} ${e.nom}` : '—'; };
+const isActive = (e) => !e.sortie || e.sortie >= todayISO();
+const age = (iso) => iso ? Math.floor(daysBetween(iso, todayISO()) / 365.25) : null;
+const seniority = (e) => e.entree ? Math.max(0, daysBetween(e.entree, e.sortie && e.sortie < todayISO() ? e.sortie : todayISO()) / 365.25) : 0;
+const canManage = () => inSim() || ['admin', 'gestionnaire'].includes(ME.role);
+
+function blankOrg(name, sector, versant) {
+  return { id: uid(), name, sector, versant: versant || 'FPT', ccn: '', ville: '', adresse: '', signataire: '', effectifDeclare: 0, settings: { ...DEFAULT_SETTINGS },
+    services: sector === 'public' ? ['Direction générale', 'Ressources humaines', 'Finances', 'Services techniques', 'Enfance'] : ['Direction', 'Administration', 'Production', 'Commercial'],
+    employees: [], absences: [], jobs: [], candidates: [], onboardings: [], campaigns: [], reviews: [], trainings: [], projects: [], compliance: {}, journal: [] };
+}
+function newEmp(o, d) {
+  return { id: uid(), matricule: 'M' + String(o.employees.length + 1).padStart(4, '0'), civ: 'Mme', prenom: '', nom: '', email: '', naissance: '', service: o.services[0] || '', poste: '', managerId: '',
+    statut: S(o).statuts[0], categorie: S(o).categories[0], grade: '', echelon: '', im: '', nbi: 0, ifse: 0, brut: 0, heures: 35, quotite: 100, entree: todayISO(), finContrat: '', finEssai: '',
+    motifCDD: '', sortie: '', motifSortie: '', rtt: 0, enfants: 0, notes: '', ...d };
+}
+
+/* ---------- Calculs RH ---------- */
+function absenceDays(o, a) {
+  if (S(o).maladie.includes(a.type) || /maternit|paternit/i.test(a.type)) return daysBetween(a.debut, a.fin) + 1;
+  return countDays(a.debut, a.fin, !isPublic(o) && a.type === 'Congés payés');
+}
+function leaveBalance(o, e) {
+  const t = todayISO(), y = Number(t.slice(0, 4));
+  if (isPublic(o)) {
+    const start = `${y}-01-01`, from = e.entree > start ? e.entree : start;
+    const months = Math.max(0, Math.min(12, (y - Number(from.slice(0, 4))) * 12 + 12 - Number(from.slice(5, 7)) + 1));
+    const droit = Math.round(25 * (e.quotite / 100) * (months / 12) * 2) / 2;
+    const pris = o.absences.filter((a) => a.empId === e.id && a.type === 'Congés annuels' && a.statut === 'validee' && a.debut >= start).reduce((s, a) => s + absenceDays(o, a), 0);
+    const rttPris = o.absences.filter((a) => a.empId === e.id && a.type === 'ARTT' && a.statut === 'validee' && a.debut >= start).reduce((s, a) => s + absenceDays(o, a), 0);
+    return { label: 'Congés annuels ' + y, unit: 'jours ouvrés', droit, pris, reste: droit - pris, rtt: Number(e.rtt) || 0, rttPris };
+  }
+  const refStart = t.slice(5) >= '06-01' ? `${y}-06-01` : `${y - 1}-06-01`;
+  const from = e.entree > refStart ? e.entree : refStart;
+  const months = Math.max(0, Math.floor(daysBetween(from, t) / 30.4));
+  const acquis = Math.min(30, months * 2.5);
+  const prevStart = `${Number(refStart.slice(0, 4)) - 1}-06-01`;
+  const droitN1 = e.entree <= prevStart ? 30 : Math.min(30, Math.floor(Math.max(0, daysBetween(e.entree, refStart)) / 30.4) * 2.5);
+  const pris = o.absences.filter((a) => a.empId === e.id && a.type === 'Congés payés' && a.statut === 'validee' && a.debut >= refStart).reduce((s, a) => s + absenceDays(o, a), 0);
+  const rttPris = o.absences.filter((a) => a.empId === e.id && a.type === 'RTT' && a.statut === 'validee' && a.debut >= `${y}-01-01`).reduce((s, a) => s + absenceDays(o, a), 0);
+  return { label: 'Congés payés', unit: 'jours ouvrables', droit: droitN1, pris, reste: droitN1 - pris, acquis, rtt: Number(e.rtt) || 0, rttPris };
+}
+
+function payslip(o, e) {
+  const st = o.settings;
+  if (isPublic(o) && /Fonctionnaire|Contractuel|Contrat de projet/.test(e.statut) && Number(e.im)) {
+    const q = (Number(e.quotite) || 100) / 100, pt = Number(st.point);
+    const tib = Number(e.im) * pt * q, nbi = (Number(e.nbi) || 0) * pt * q, ir = tib * (Number(st.ir) || 0) / 100;
+    const n = Number(e.enfants) || 0, base = clamp(Number(e.im), 449, 717) * pt;
+    const sft = n === 0 ? 0 : n === 1 ? 2.29 : n === 2 ? 10.67 + base * 0.03 : 15.24 + base * 0.08 + (n - 3) * (4.57 + base * 0.06);
+    const ifse = Number(e.ifse) || 0; const gross = tib + nbi + ir + sft + ifse;
+    const lines = [['Traitement indiciaire brut', `IM ${e.im} × ${pt} €${q < 1 ? ' × ' + q * 100 + ' %' : ''}`, tib], ['NBI', `${e.nbi || 0} points`, nbi], ['Indemnité de résidence', `${st.ir} %`, ir], ['Supplément familial de traitement', `${n} enfant(s)`, sft], ['IFSE (RIFSEEP)', 'mensuelle', ifse]];
+    let ret;
+    if (/Fonctionnaire/.test(e.statut)) {
+      ret = [['Retraite CNRACL / SRE (11,10 %)', (tib + nbi) * 0.111], ['RAFP (5 % des primes, plafonné)', Math.min(ir + sft + ifse, tib * 0.2) * 0.05], ['CSG (9,2 % × 98,25 %)', gross * 0.9825 * 0.092], ['CRDS (0,5 % × 98,25 %)', gross * 0.9825 * 0.005]];
+    } else {
+      ret = [['Vieillesse régime général (≈ 7,3 %)', gross * 0.073], ['IRCANTEC tranche A (2,80 %)', gross * 0.028], ['CSG (9,2 % × 98,25 %)', gross * 0.9825 * 0.092], ['CRDS (0,5 % × 98,25 %)', gross * 0.9825 * 0.005]];
+    }
+    const totalRet = ret.reduce((s, r) => s + r[1], 0);
+    const cost = /Fonctionnaire/.test(e.statut) ? (tib + nbi) * 1.55 + (ir + sft + ifse) * 1.2 : gross * 1.38;
+    return { gross, net: gross - totalRet, lines, ret, cost, note: 'Estimation pédagogique : hors transfert primes/points, mutuelle, prélèvement à la source et cotisations spécifiques. Coût employeur : ordre de grandeur (le taux employeur CNRACL augmente chaque année de 2025 à 2028).' };
+  }
+  const brut = Number(e.brut) || 0; const smicM = Number(st.smicH) * 151.67;
+  const rate = /Apprentissage/.test(e.statut) ? 0.02 : e.categorie === 'Cadre' ? 0.25 : 0.22;
+  const ratio = smicM ? brut / smicM : 2; const emp = ratio <= 1 ? 0.08 : ratio < 1.6 ? 0.08 + (ratio - 1) / 0.6 * 0.34 : e.categorie === 'Cadre' ? 0.45 : 0.42;
+  return { gross: brut, net: brut * (1 - rate), lines: [['Salaire de base', `${e.heures || 35} h / semaine`, brut]], ret: [[`Cotisations salariales (≈ ${Math.round(rate * 100)} %)`, brut * rate]], cost: brut * (1 + emp),
+    note: `Estimation pédagogique : taux moyens. Près du SMIC (${fmtEur(smicM)} brut / mois pour 35 h), les allègements de cotisations patronales réduisent fortement le coût employeur. Hors prélèvement à la source.` };
+}
+
+/* ---------- Pages publiques ---------- */
+function authPage(signup) {
+  document.body.innerHTML = `<div class="auth"><div class="box" style="width:min(480px,100%)"><div class="brand" style="justify-content:center"><span class="logo">RH</span>RH Studio</div>
+    <form class="card" id="f"><h2>${signup ? 'Créer votre espace RH' : 'Connexion'}</h2>
+    ${signup ? fInput('name', 'Votre nom', '', { req: true }) + fInput('orgname', 'Nom de l\'organisation', '', { req: true }) + fSelect('sector', 'Secteur', [['public', 'Fonction publique'], ['prive', 'Secteur privé']], 'public') + fSelect('versant', 'Versant (si public)', Object.entries(VERSANTS), 'FPT') : ''}
+    ${fInput('email', 'E-mail', '', { type: 'email', req: true })}${fInput('password', 'Mot de passe', '', { type: 'password', req: true })}
+    <button class="btn primary" style="width:100%;justify-content:center">${signup ? 'Créer mon espace' : 'Se connecter'}</button>
+    <p class="muted" style="text-align:center;margin-top:12px">${signup ? 'Déjà un compte ? <a href="#/login">Se connecter</a>' : 'Pas encore de compte ? <a href="#/signup">Créer un espace</a>'}</p></form>
+    <div class="card"><h3>🎮 Ce que vous trouverez</h3><p class="muted">Dossiers ${'salariés / agents'}, congés, recrutement, intégration, entretiens, formation, paie simplifiée, documents, obligations, tableaux de bord — et un <strong>parcours de simulation sur 3 ans</strong> (PME privée ou commune) pour s'entraîner sans risque.</p></div></div></div>`;
+  $('#f').onsubmit = async (ev) => {
+    ev.preventDefault(); const fd = Object.fromEntries(new FormData(ev.target).entries());
+    try {
+      if (signup) {
+        const wsId = uid(); await auth.create({ name: fd.name, email: fd.email, password: fd.password, role: 'admin', wsId });
+        const o = blankOrg(fd.orgname, fd.sector, fd.versant); store.set('org:' + wsId, o);
+      }
+      await auth.login(fd.email, fd.password); location.hash = signup ? '#/simulation' : '#/dash'; boot();
+    } catch (err) { toast(err.message); }
+  };
+}
+
+function forcePassword() {
+  document.body.innerHTML = `<div class="auth"><form class="card box" id="f"><h2>Choisissez votre mot de passe</h2><p class="muted">Bienvenue ${esc(ME.name)}.</p>${fInput('p1', 'Nouveau mot de passe', '', { type: 'password' })}<button class="btn primary">Valider</button></form></div>`;
+  $('#f').onsubmit = async (e) => { e.preventDefault(); try { await auth.setPassword(ME.id, e.target.p1.value); boot(); } catch (err) { toast(err.message); } };
+}
+
+/* ---------- Coquille ---------- */
+function boot() {
+  ME = auth.current();
+  if (!ME) return authPage(location.hash.includes('signup'));
+  if (ME.mustChange) return forcePassword();
+  if (ME.role === 'salarie' && inSim()) store.set(modeKey(), 'real');
+  const o = org();
+  const pending = o.absences.filter((a) => a.statut === 'demandee').length;
+  const sim = inSim() ? SCENARIOS[mode()] : null;
+  const V = S(o);
+  const nav = ME.role === 'salarie' && !sim
+    ? navLink('me', '🙂', 'Mon espace') + navLink('absences', '🌴', 'Mes congés')
+    : navLink('dash', '🏠', 'Tableau de bord') + '<div class="sec">Gestion</div>' + navLink('employees', '👤', V.Emps) + navLink('orgchart', '🌳', 'Organigramme') +
+      navLink('absences', '🌴', 'Absences & congés', pending ? ` <span class="badge warn" style="margin-left:auto">${pending}</span>` : '') + navLink('recruitment', '📣', 'Recrutement') + navLink('onboarding', '🧳', 'Intégration') +
+      '<div class="sec">Développement</div>' + navLink('reviews', '💬', 'Entretiens') + navLink('training', '📚', 'Formation') + navLink('projects', '🧩', 'Projets RH') +
+      '<div class="sec">Pilotage</div>' + navLink('payroll', '💶', 'Paie & masse salariale') + navLink('documents', '📄', 'Documents') + navLink('compliance', '✅', 'Obligations') + navLink('reports', '📊', 'Rapports') +
+      '<div class="sec">S\'entraîner</div>' + navLink('simulation', '🎮', 'Parcours de simulation') + '<div class="sec">Administration</div>' + navLink('settings', '⚙️', 'Paramètres') + (ME.role === 'admin' && !sim ? navLink('accounts', '🔑', 'Comptes') : '');
+  main = shell({ brand: 'RH Studio', logo: 'RH', current: 'rh', nav,
+    foot: `${sim ? `<div class="alert warn" style="margin:0 0 10px;padding:8px 10px"><strong>Mode simulation</strong><br>${esc(sim.title)}<br><button class="btn sm" id="exitSim" style="margin-top:6px">Revenir à mon organisation</button></div>` : ''}
+      <div class="row"><span class="avatar">${initials(ME.name)}</span><div style="min-width:0"><div style="font-weight:600;color:var(--text)">${esc(ME.name)}</div><div>${ROLES[ME.role]}</div><div>${esc(o.name)} · ${V.label}</div></div></div>
+      <div class="row" style="margin-top:8px"><button class="btn sm" id="th">🌓</button><button class="btn sm" id="lo">Déconnexion</button></div>` });
+  $('#lo').onclick = () => { auth.logout(); location.hash = '#/login'; boot(); };
+  $('#th').onclick = toggleTheme;
+  $('#exitSim')?.addEventListener('click', () => { store.set(modeKey(), 'real'); location.hash = '#/dash'; boot(); });
+  router.run();
+}
+
+function missionBar() {
+  if (!inSim()) return '';
+  const sc = SCENARIOS[mode()]; const o = org(); const active = o.sim?.active; const m = sc.missions.find((x) => x.id === active);
+  if (!m || o.sim?.done?.[m.id]) return '';
+  return `<div class="alert warn no-print" style="display:flex;gap:10px;align-items:center;flex-wrap:wrap"><span style="flex:1;min-width:200px">🎯 <strong>Mission en cours :</strong> ${esc(m.title)}</span><a class="btn sm" href="#/simulation/${m.id}">Voir les consignes</a>${m.kind === 'action' ? `<button class="btn sm primary" data-checkm="${m.id}">Vérifier ma mission</button>` : ''}</div>`;
+}
+function page(title, sub, actions = '') {
+  return `${missionBar()}<div class="page-head"><div><h1>${title}</h1>${sub ? `<p>${sub}</p>` : ''}</div><div class="row">${actions}</div></div>`;
+}
+function after() { $$('[data-checkm]', main).forEach((b) => b.onclick = () => checkMission(b.dataset.checkm)); }
+
+/* ---------- Vues ---------- */
+const view = {
+  dash() {
+    const o = org(), V = S(o); const act = o.employees.filter(isActive);
+    const etp = act.reduce((s, e) => s + (Number(e.quotite) || 100) / 100, 0);
+    const pending = o.absences.filter((a) => a.statut === 'demandee');
+    const t = todayISO(), in60 = addDays(t, 60);
+    const alerts = [];
+    act.forEach((e) => {
+      if (e.finContrat && e.finContrat >= t && e.finContrat <= in60) alerts.push(['warn', `Fin de contrat de ${e.prenom} ${e.nom} le ${fmtDate(e.finContrat)}`, `#/employee/${e.id}`]);
+      if (e.finEssai && e.finEssai >= t && e.finEssai <= addDays(t, 21)) alerts.push(['info', `Fin de période d'essai de ${e.prenom} ${e.nom} le ${fmtDate(e.finEssai)}`, `#/employee/${e.id}`]);
+      if (e.statut === 'Fonctionnaire stagiaire' && e.entree && daysBetween(e.entree, t) > 300) alerts.push(['warn', `Titularisation de ${e.prenom} ${e.nom} à préparer (stage d'un an)`, `#/employee/${e.id}`]);
+      if (age(e.naissance) >= 62) alerts.push(['info', `${e.prenom} ${e.nom} a ${age(e.naissance)} ans : anticiper un départ en retraite`, `#/employee/${e.id}`]);
+    });
+    o.absences.filter((a) => a.statut === 'validee' && S(o).maladie.includes(a.type) && a.fin >= t).forEach((a) => {
+      const d = daysBetween(a.debut, a.fin) + 1;
+      if (!isPublic(o) && d >= 60) alerts.push(['warn', `Arrêt de ${empName(o, a.empId)} ≥ 60 jours : visite de reprise obligatoire au retour`, '#/absences']);
+      if (isPublic(o) && /CMO/.test(a.type) && d > 90) alerts.push(['warn', `CMO de ${empName(o, a.empId)} > 3 mois : passage à demi-traitement`, '#/absences']);
+    });
+    const ob = o.onboardings.filter((x) => x.items.some((i) => !i.done));
+    main.innerHTML = page(`${o.name}`, `${V.label}${isPublic(o) ? ' · ' + o.versant : ''} · ${new Date().toLocaleDateString('fr-FR', { dateStyle: 'full' })}`, canManage() ? `<a class="btn primary" href="#/employee/new">+ ${V.Emp}</a>` : '') + `
+      ${!o.employees.length ? `<div class="alert">Votre organisation est vide. Ajoutez vos ${V.emps}, ou entraînez-vous d'abord avec le <a href="#/simulation">parcours de simulation</a> (données fictives déjà prêtes).</div>` : ''}
+      <div class="grid g4 kpis"><div class="card kpi"><span class="v">${act.length}</span><span class="l">${V.Emps} présents${o.effectifDeclare ? ` (effectif déclaré : ${o.effectifDeclare})` : ''}</span></div>
+      <div class="card kpi"><span class="v">${etp.toFixed(1)}</span><span class="l">ETP</span></div>
+      <div class="card kpi"><span class="v" style="color:${pending.length ? 'var(--warn)' : ''}">${pending.length}</span><span class="l">Demandes d'absence à traiter</span></div>
+      <div class="card kpi"><span class="v">${o.jobs.filter((j) => j.statut === 'Ouvert').length}</span><span class="l">Recrutements en cours</span></div></div>
+      <div class="grid g2" style="margin-top:14px"><div class="card"><h3>⚠️ Alertes & échéances</h3>${alerts.length ? alerts.slice(0, 10).map(([k, txt, l]) => `<a href="${l}" class="alert ${k}" style="display:block;text-decoration:none;color:inherit;margin-bottom:6px">${esc(txt)}</a>`).join('') : '<p class="muted">Aucune échéance proche.</p>'}</div>
+      <div class="card"><h3>Absents aujourd'hui</h3>${(() => { const abs = o.absences.filter((a) => a.statut === 'validee' && a.debut <= t && a.fin >= t); return abs.length ? abs.map((a) => `<div class="row" style="margin-bottom:6px"><span class="avatar">${initials(empName(o, a.empId))}</span><span style="flex:1">${esc(empName(o, a.empId))}</span><span class="badge">${esc(a.type)}</span><small>→ ${fmtDate(a.fin)}</small></div>`).join('') : '<p class="muted">Tout le monde est là.</p>'; })()}
+      <h3 style="margin-top:16px">Intégrations en cours</h3>${ob.length ? ob.map((x) => { const d = x.items.filter((i) => i.done).length; return `<div style="margin-bottom:8px"><div class="row between"><span>${esc(empName(o, x.empId))}</span><small>${d}/${x.items.length}</small></div>${bar((d / x.items.length) * 100)}</div>`; }).join('') : '<p class="muted">Aucune.</p>'}</div></div>
+      <div class="card"><h3>Journal</h3>${(o.journal || []).slice(0, 8).map((j) => `<div style="padding:4px 0;border-top:1px solid var(--line)"><small>${new Date(j.d).toLocaleString('fr-FR', { dateStyle: 'short', timeStyle: 'short' })} · ${esc(j.u)}</small> — ${esc(j.txt)}</div>`).join('') || '<p class="muted">Rien pour l\'instant.</p>'}</div>`;
+    after();
+  },
+
+  employees() {
+    const o = org(), V = S(o);
+    const q = store.get('empFilter', { q: '', statut: '', service: '', actifs: true });
+    main.innerHTML = page(V.Emps, `${o.employees.filter(isActive).length} présent(s) · ${o.employees.length} dossier(s)`, canManage() ? `<button class="btn" id="csv">Registre (CSV)</button><a class="btn primary" href="#/employee/new">+ ${V.Emp}</a>` : '') + `
+      <div class="card" style="margin-bottom:14px"><div class="row"><input id="fq" placeholder="Rechercher un nom, un poste…" value="${esc(q.q)}" style="flex:2;min-width:180px">
+      <select id="fs" style="flex:1;min-width:140px"><option value="">Tous statuts</option>${V.statuts.map((s) => `<option ${q.statut === s ? 'selected' : ''}>${s}</option>`).join('')}</select>
+      <select id="fv" style="flex:1;min-width:140px"><option value="">Tous services</option>${o.services.map((s) => `<option ${q.service === s ? 'selected' : ''}>${esc(s)}</option>`).join('')}</select>
+      <label class="row" style="margin:0;font-weight:500"><input type="checkbox" id="fa" ${q.actifs ? 'checked' : ''}> Présents uniquement</label></div></div><div id="list"></div>`;
+    const draw = () => {
+      const f = { q: $('#fq').value, statut: $('#fs').value, service: $('#fv').value, actifs: $('#fa').checked }; store.set('empFilter', f);
+      const list = o.employees.filter((e) => (!f.actifs || isActive(e)) && (!f.statut || e.statut === f.statut) && (!f.service || e.service === f.service) && (!f.q || norm(`${e.prenom} ${e.nom} ${e.poste} ${e.grade}`).includes(norm(f.q))))
+        .sort((a, b) => a.nom.localeCompare(b.nom));
+      $('#list').innerHTML = list.length ? `<div class="table-wrap"><table><tr><th>Nom</th><th>Poste</th><th>Service</th><th>Statut</th><th>${isPublic(o) ? 'Cat. / grade' : 'Catégorie'}</th><th>Entrée</th></tr>
+        ${list.map((e) => `<tr class="click" data-e="${e.id}"><td><div class="row" style="flex-wrap:nowrap"><span class="avatar">${initials(e.prenom + ' ' + e.nom)}</span><div><strong>${esc(e.nom.toUpperCase())}</strong> ${esc(e.prenom)}<br><small>${esc(e.matricule)}</small></div></div></td>
+        <td>${esc(e.poste)}</td><td>${esc(e.service)}</td><td><span class="badge ${/CDD|stagiaire|Apprent|Stage|Intérim|projet|Vacat/.test(e.statut) ? 'warn' : 'ok'}">${esc(e.statut)}</span>${!isActive(e) ? ' <span class="badge bad">Sorti</span>' : ''}</td>
+        <td>${esc(e.categorie)}${e.grade ? `<br><small>${esc(e.grade)}${e.echelon ? ', éch. ' + e.echelon : ''}</small>` : ''}</td><td>${fmtDate(e.entree)}</td></tr>`).join('')}</table></div>` : '<div class="card empty">Aucun résultat.</div>';
+      $$('[data-e]').forEach((r) => r.onclick = () => location.hash = '#/employee/' + r.dataset.e);
+    };
+    ['#fq', '#fs', '#fv', '#fa'].forEach((s) => $(s).addEventListener('input', draw));
+    draw();
+    $('#csv')?.addEventListener('click', () => download('registre-unique-du-personnel.csv', '﻿' + toCSV([['Matricule', 'Nom', 'Prénom', 'Civilité', 'Date de naissance', 'Emploi / poste', 'Statut / contrat', 'Catégorie', 'Grade', 'Date d\'entrée', 'Date de sortie', 'Motif de sortie'],
+      ...o.employees.map((e) => [e.matricule, e.nom, e.prenom, e.civ, e.naissance, e.poste, e.statut, e.categorie, e.grade, e.entree, e.sortie, e.motifSortie])]), 'text/csv'));
+    after();
+  },
+
+  employee(id, tab = 'infos') {
+    const o = org(), V = S(o); const isNew = id === 'new';
+    const e = isNew ? newEmp(o, {}) : o.employees.find((x) => x.id === id);
+    if (!e) { main.innerHTML = '<div class="empty">Dossier introuvable.</div>'; return; }
+    if (isNew) return employeeForm(o, e, true);
+    const tabs = [['infos', 'Dossier'], ['absences', 'Absences'], ['reviews', 'Entretiens'], ['training', 'Formations'], ['pay', 'Rémunération'], ['docs', 'Documents']];
+    main.innerHTML = page(`${esc(e.prenom)} ${esc(e.nom.toUpperCase())}`, `${esc(e.poste)} · ${esc(e.service)} · ${esc(e.statut)}${!isActive(e) ? ' · <span class="badge bad">sorti le ' + fmtDate(e.sortie) + '</span>' : ''}`,
+      `<a class="btn" href="#/employees">← Liste</a>${canManage() ? '<button class="btn primary" id="ed">Modifier</button>' : ''}`) +
+      `<div class="tabs">${tabs.map(([k, l]) => `<a href="#/employee/${e.id}/${k}" class="${k === tab ? 'active' : ''}">${l}</a>`).join('')}</div><div id="tab"></div>`;
+    $('#ed')?.addEventListener('click', () => employeeForm(o, e, false));
+    const el = $('#tab');
+    if (tab === 'infos') {
+      const row = (l, v) => v || v === 0 ? `<tr><td class="muted" style="width:42%">${l}</td><td>${v}</td></tr>` : '';
+      el.innerHTML = `<div class="grid g2"><div class="card"><h3>Identité</h3><table>${row('Matricule', esc(e.matricule))}${row('Civilité', esc(e.civ))}${row('Date de naissance', e.naissance ? fmtDate(e.naissance) + ` (${age(e.naissance)} ans)` : '')}${row('E-mail', esc(e.email))}${row('Enfants à charge', e.enfants)}</table></div>
+        <div class="card"><h3>${isPublic(o) ? 'Situation statutaire' : 'Contrat'}</h3><table>${row('Statut', esc(e.statut))}${row('Catégorie', esc(e.categorie))}${row('Grade', esc(e.grade))}${row('Échelon', esc(e.echelon))}${row('Indice majoré', esc(e.im))}
+          ${row('Date d\'entrée', fmtDate(e.entree) + ` · ancienneté ${seniority(e).toFixed(1)} ans`)}${row('Fin de période d\'essai', e.finEssai ? fmtDate(e.finEssai) : '')}${row('Fin de contrat', e.finContrat ? fmtDate(e.finContrat) : '')}${row('Motif du contrat', esc(e.motifCDD))}
+          ${row('Temps de travail', `${e.quotite} %${isPublic(o) ? '' : ' · ' + e.heures + ' h / sem.'}`)}${row('Responsable', esc(empName(o, e.managerId)))}${row('Sortie', e.sortie ? fmtDate(e.sortie) + ' — ' + esc(e.motifSortie) : '')}</table></div></div>
+        ${e.notes ? `<div class="card"><h3>Notes</h3><p>${esc(e.notes)}</p></div>` : ''}`;
+    } else if (tab === 'absences') {
+      const b = leaveBalance(o, e); const list = o.absences.filter((a) => a.empId === e.id).sort((a, c) => a.debut < c.debut ? 1 : -1);
+      el.innerHTML = `<div class="grid g3"><div class="card kpi"><span class="v">${b.reste}</span><span class="l">${b.label} : restant (${b.unit}) — droit ${b.droit}, pris ${b.pris}</span></div>
+        ${b.acquis !== undefined ? `<div class="card kpi"><span class="v">${b.acquis}</span><span class="l">En cours d'acquisition (2,5 j / mois)</span></div>` : ''}<div class="card kpi"><span class="v">${b.rtt - b.rttPris}</span><span class="l">${V.rtt} restants (${b.rtt} / an)</span></div></div>
+        <div class="card"><div class="row between"><h3>Historique</h3><button class="btn sm primary" id="na">+ Absence</button></div>${absTable(o, list, false)}</div>`;
+      $('#na').onclick = () => absenceForm(o, null, e.id);
+    } else if (tab === 'reviews') {
+      const list = o.reviews.filter((r) => r.empId === e.id);
+      el.innerHTML = `<div class="card">${list.length ? list.map((r) => `<div class="row between" style="padding:8px 0;border-top:1px solid var(--line)"><span>${esc(r.type)} ${esc(r.annee)}</span><span class="badge">${esc(r.statut)}</span><button class="btn sm" data-r="${r.id}">Ouvrir</button></div>`).join('') : '<p class="muted">Aucun entretien.</p>'}</div>`;
+      $$('[data-r]', el).forEach((b) => b.onclick = () => reviewForm(o, o.reviews.find((r) => r.id === b.dataset.r)));
+    } else if (tab === 'training') {
+      const list = o.trainings.filter((t) => (t.participants || []).includes(e.id));
+      el.innerHTML = `<div class="card">${list.length ? list.map((t) => `<div class="row between" style="padding:8px 0;border-top:1px solid var(--line)"><span>${esc(t.intitule)}</span><small>${esc(t.type)} · ${fmtDate(t.date)}</small><span class="badge">${esc(t.statut)}</span></div>`).join('') : '<p class="muted">Aucune formation.</p>'}</div>`;
+    } else if (tab === 'pay') {
+      el.innerHTML = payslipHTML(o, e);
+    } else if (tab === 'docs') {
+      el.innerHTML = `<div class="card"><h3>Générer un document</h3><div class="grid g2">${DOCS[o.sector].map((d) => `<button class="btn" data-doc="${d.id}" style="justify-content:flex-start;white-space:normal">📄 ${esc(d.t)}</button>`).join('')}</div></div>`;
+      $$('[data-doc]', el).forEach((b) => b.onclick = () => docModal(o, b.dataset.doc, e.id));
+    }
+    bindAbs(el); after();
+  },
+
+  orgchart() {
+    const o = org(); const act = o.employees.filter(isActive);
+    const ids = new Set(act.map((e) => e.id));
+    const node = (e, depth = 0) => { const kids = act.filter((k) => k.managerId === e.id); if (depth > 12) return '';
+      return `<li><a href="#/employee/${e.id}" class="card" style="display:inline-block;padding:8px 12px;text-decoration:none;color:inherit;margin:4px 0"><div class="row" style="flex-wrap:nowrap"><span class="avatar">${initials(e.prenom + ' ' + e.nom)}</span><div><strong>${esc(e.prenom)} ${esc(e.nom)}</strong><br><small>${esc(e.poste)}${isPublic(o) && e.categorie ? ' · cat. ' + e.categorie : ''}</small></div></div></a>${kids.length ? `<ul>${kids.map((k) => node(k, depth + 1)).join('')}</ul>` : ''}</li>`; };
+    const roots = act.filter((e) => !e.managerId || !ids.has(e.managerId));
+    main.innerHTML = page('Organigramme', 'Construit à partir du champ « Responsable » de chaque dossier.') + `<div class="card" style="overflow-x:auto"><style>.tree ul{list-style:none;padding-left:28px;border-left:2px solid var(--line);margin-left:14px}.tree{list-style:none;padding:0}</style>
+      <ul class="tree">${roots.map((r) => node(r)).join('') || '<p class="muted">Aucun dossier.</p>'}</ul></div>
+      <div class="card"><h3>Par service</h3><div class="grid g3">${o.services.map((s) => { const n = act.filter((e) => e.service === s); return `<div style="background:var(--panel-2);border-radius:10px;padding:12px"><strong>${esc(s)}</strong> <span class="badge">${n.length}</span><div style="margin-top:6px;font-size:.88rem">${n.map((e) => esc(e.prenom + ' ' + e.nom)).join(', ') || '<span class="muted">—</span>'}</div></div>`; }).join('')}</div></div>`;
+    after();
+  },
+
+  absences(sub = 'list') {
+    const o = org(), V = S(o);
+    const self = ME.role === 'salarie' && !inSim();
+    const mine = self ? o.absences.filter((a) => a.empId === ME.empId) : o.absences;
+    const pending = mine.filter((a) => a.statut === 'demandee');
+    main.innerHTML = page(self ? 'Mes congés' : 'Absences & congés', self ? '' : `Décompte : ${isPublic(o) ? 'jours ouvrés' : 'congés payés en jours ouvrables, autres absences en jours ouvrés'} · jours fériés exclus`, '<button class="btn primary" id="na">+ Demande / absence</button>') + `
+      ${self ? '' : `<div class="tabs"><a href="#/absences/list" class="${sub === 'list' ? 'active' : ''}">Demandes & historique</a><a href="#/absences/planning" class="${sub === 'planning' ? 'active' : ''}">Planning du mois</a><a href="#/absences/soldes" class="${sub === 'soldes' ? 'active' : ''}">Soldes</a><a href="#/absences/regles" class="${sub === 'regles' ? 'active' : ''}">Règles à connaître</a></div>`}<div id="abs"></div>`;
+    const el = $('#abs');
+    if (sub === 'list' || self) {
+      el.innerHTML = `${pending.length ? `<div class="card"><h3>À traiter (${pending.length})</h3>${absTable(o, pending, !self)}</div>` : ''}<div class="card"><h3>Toutes les absences</h3>${absTable(o, mine.filter((a) => a.statut !== 'demandee').sort((a, b) => a.debut < b.debut ? 1 : -1).slice(0, 80), false)}</div>`;
+    } else if (sub === 'planning') {
+      const m = store.get('planMonth', todayISO().slice(0, 7)); const [y, mo] = m.split('-').map(Number); const nDays = new Date(y, mo, 0).getDate();
+      const days = Array.from({ length: nDays }, (_, i) => `${m}-${String(i + 1).padStart(2, '0')}`);
+      const rows = o.employees.filter(isActive).filter((e) => o.absences.some((a) => a.empId === e.id && a.statut !== 'refusee' && a.debut <= days[nDays - 1] && a.fin >= days[0]));
+      const col = (a) => a.statut === 'demandee' ? 'var(--warn)' : S(o).maladie.includes(a.type) ? 'var(--bad)' : 'var(--accent)';
+      el.innerHTML = `<div class="card" style="overflow-x:auto"><div class="row between" style="margin-bottom:10px"><button class="btn sm" id="pm">←</button><strong>${new Date(y, mo - 1, 1).toLocaleDateString('fr-FR', { month: 'long', year: 'numeric' })}</strong><button class="btn sm" id="nm">→</button></div>
+        <table style="font-size:.75rem;min-width:900px"><tr><th style="min-width:140px">${V.Emp}</th>${days.map((d) => { const wd = new Date(d + 'T12:00:00').getDay(); return `<th style="padding:4px 2px;text-align:center;${wd === 0 || wd === 6 || holidays(y).has(d) ? 'opacity:.45' : ''}">${Number(d.slice(8))}</th>`; }).join('')}</tr>
+        ${rows.map((e) => `<tr><td>${esc(e.prenom + ' ' + e.nom)}</td>${days.map((d) => { const a = o.absences.find((x) => x.empId === e.id && x.statut !== 'refusee' && x.debut <= d && x.fin >= d); return `<td style="padding:0;height:26px;${a ? 'background:' + col(a) : ''}" title="${a ? esc(a.type) : ''}"></td>`; }).join('')}</tr>`).join('') || `<tr><td colspan="${nDays + 1}" class="empty">Aucune absence ce mois-ci.</td></tr>`}</table>
+        <p class="muted" style="margin-top:8px"><span style="color:var(--accent)">■</span> validée · <span style="color:var(--warn)">■</span> en attente · <span style="color:var(--bad)">■</span> maladie / accident</p></div>`;
+      const shift = (n) => { const d = new Date(y, mo - 1 + n, 1); store.set('planMonth', `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`); view.absences('planning'); };
+      $('#pm').onclick = () => shift(-1); $('#nm').onclick = () => shift(1);
+    } else if (sub === 'soldes') {
+      el.innerHTML = `<div class="table-wrap"><table><tr><th>${V.Emp}</th><th>Droit</th><th>Pris</th><th>Restant</th>${isPublic(o) ? '' : '<th>En cours d\'acquisition</th>'}<th>${V.rtt} restants</th></tr>
+        ${o.employees.filter(isActive).map((e) => { const b = leaveBalance(o, e); return `<tr><td>${esc(e.prenom + ' ' + e.nom)}</td><td>${b.droit}</td><td>${b.pris}</td><td><strong>${b.reste}</strong></td>${isPublic(o) ? '' : `<td>${b.acquis}</td>`}<td>${b.rtt - b.rttPris} / ${b.rtt}</td></tr>`; }).join('')}</table></div>
+        <p class="muted" style="margin-top:8px">${isPublic(o) ? 'Droit annuel : 25 jours ouvrés pour un temps plein (5 × obligations hebdomadaires), au prorata de la quotité et de la date d\'arrivée. Jours de fractionnement non inclus.' : 'Droit : 30 jours ouvrables (2,5 j par mois) acquis sur la période de référence précédente (1er juin – 31 mai). Le nombre de jours de RTT se règle dans chaque dossier.'}</p>`;
+    } else {
+      el.innerHTML = `<div class="card lesson">${isPublic(o) ? `
+        <h3>Fonction publique — l'essentiel</h3><ul><li><strong>Congés annuels</strong> : 5 fois les obligations hebdomadaires de service (25 jours pour 5 jours / semaine). +1 jour de fractionnement si 5 à 7 jours pris hors 1er mai – 31 octobre, +2 jours si 8 jours ou plus. Absence de service de plus de 31 jours consécutifs interdite sauf exceptions.</li>
+        <li><strong>ARTT</strong> : jours de réduction du temps de travail si le cycle dépasse 35 h (référence 1 607 h / an).</li><li><strong>CET</strong> (compte épargne-temps) : épargne de congés et ARTT non pris, au-delà de 20 jours de congés pris dans l'année.</li>
+        <li><strong>CMO</strong> : jusqu'à 1 an sur 12 mois glissants ; 3 mois à plein traitement (90 % depuis mars 2025) puis 9 mois à demi-traitement ; 1 jour de carence.</li><li><strong>CLM</strong> : jusqu'à 3 ans (1 an plein traitement, 2 ans demi). <strong>CLD</strong> : jusqu'à 5 ans (3 ans plein, 2 ans demi). Sur avis du <strong>conseil médical</strong>.</li>
+        <li><strong>CITIS</strong> : accident de service ou maladie professionnelle, plein traitement jusqu'à la reprise ou la retraite, frais médicaux pris en charge.</li><li><strong>ASA</strong> : autorisations spéciales d'absence (événements familiaux, mandats syndicaux, examens médicaux…), selon les règles de l'employeur.</li></ul>` : `
+        <h3>Secteur privé — l'essentiel</h3><ul><li><strong>Congés payés</strong> : 2,5 jours ouvrables par mois de travail effectif, soit 30 jours (5 semaines) par an. Depuis 2024, les arrêts maladie non professionnels ouvrent aussi des droits (2 jours ouvrables par mois, dans la limite de 24 jours par an).</li>
+        <li>L'employeur fixe la période de prise des congés et l'ordre des départs après avis du CSE ; le congé principal est d'au moins 12 jours ouvrables continus entre le 1er mai et le 31 octobre.</li><li><strong>Arrêt maladie</strong> : délai de carence de 3 jours pour les indemnités journalières de la Sécurité sociale ; maintien de salaire par l'employeur après 1 an d'ancienneté (selon la loi ou la convention collective).</li>
+        <li><strong>Visite de reprise</strong> obligatoire après un congé de maternité, une maladie professionnelle, un accident du travail d'au moins 30 jours, ou une maladie non professionnelle d'au moins 60 jours.</li><li><strong>Événements familiaux</strong> : mariage / PACS 4 jours, naissance 3 jours, décès d'un enfant 5 à 14 jours selon les cas… (minima légaux, souvent améliorés par la convention collective).</li></ul>`}
+        <p class="muted">Repères indicatifs : vérifiez toujours sur service-public.fr et dans vos accords locaux.</p></div>`;
+    }
+    $('#na').onclick = () => absenceForm(o, null, self ? ME.empId : '');
+    bindAbs(el); after();
+  },
+
+  recruitment(jobId) {
+    const o = org();
+    if (jobId) return jobPipeline(o, jobId);
+    main.innerHTML = page('Recrutement', 'Offres, candidats et processus de sélection', canManage() ? '<button class="btn primary" id="nj">+ Offre</button>' : '') + `
+      ${isPublic(o) ? '<div class="alert">Rappel : avant de recruter sur un emploi permanent, déclarez la vacance d\'emploi (CDG, Place de l\'emploi public) et laissez un délai raisonnable aux candidatures.</div>' : ''}
+      <div class="grid g3">${o.jobs.map((j) => { const cs = o.candidates.filter((c) => c.jobId === j.id); return `<a class="card" href="#/recruitment/${j.id}" style="text-decoration:none;color:inherit"><div class="row between"><span class="badge ${j.statut === 'Ouvert' ? 'ok' : ''}">${j.statut}</span><small>${fmtDate(j.ouvert)}</small></div><h3 style="margin-top:8px">${esc(j.titre)}</h3><p class="muted">${esc(j.service)} · ${esc(j.contrat)}${j.typeRecrut ? ' · ' + esc(j.typeRecrut) : ''}</p>
+        <div class="row" style="gap:4px">${STAGES.map((s) => `<span class="badge" title="${s}">${s.slice(0, 4)}. ${cs.filter((c) => c.etape === s).length}</span>`).join('')}</div></a>`; }).join('') || '<div class="card empty">Aucune offre. Créez-en une.</div>'}</div>
+      <div class="card"><h3>Les étapes d'un recrutement réussi</h3><ol><li>Analyser le besoin (remplacement ? création ? ${isPublic(o) ? 'poste au tableau des emplois et budget' : 'budget'})</li><li>Rédiger la fiche de poste (missions, compétences, ${isPublic(o) ? 'cadre d\'emplois, catégorie' : 'classification'})</li><li>Publier ${isPublic(o) ? '(déclaration de vacance obligatoire)' : '(sans mention discriminatoire)'}</li><li>Trier selon des critères objectifs définis à l'avance</li><li>Entretiens structurés, mêmes questions pour tous</li><li>Décision, proposition, réponses aux candidats non retenus</li><li>Préparer l'intégration</li></ol>
+      <p class="muted">25+ critères de discrimination sont interdits (âge, sexe, origine, état de santé, handicap, situation de famille, grossesse, opinions, activités syndicales, lieu de résidence, apparence physique…).</p></div>`;
+    $('#nj')?.addEventListener('click', () => jobForm(o));
+    after();
+  },
+
+  onboarding() {
+    const o = org();
+    main.innerHTML = page('Intégration', 'Check-lists d\'arrivée : rien n\'est oublié, de la veille de l\'arrivée à la fin de la période d\'essai / du stage.', canManage() ? '<button class="btn primary" id="no">+ Parcours d\'intégration</button>' : '') + `
+      <div class="grid g2">${o.onboardings.map((x) => { const d = x.items.filter((i) => i.done).length; return `<div class="card"><div class="row between"><h3>${esc(empName(o, x.empId))}</h3><small>${d}/${x.items.length}</small></div>${bar((d / x.items.length) * 100)}
+        <div style="margin-top:10px">${x.items.map((i, k) => `<label class="row" style="font-weight:500;padding:3px 0;flex-wrap:nowrap"><input type="checkbox" data-ob="${x.id}" data-k="${k}" ${i.done ? 'checked' : ''}> <span style="${i.done ? 'text-decoration:line-through;opacity:.6' : ''}">${esc(i.t)}</span></label>`).join('')}</div>
+        <div class="row" style="margin-top:8px;flex-wrap:nowrap"><input placeholder="Ajouter une étape…" data-add="${x.id}"><button class="btn sm danger" data-delob="${x.id}">Supprimer</button></div></div>`; }).join('') || '<div class="card empty">Aucun parcours. Un parcours est créé automatiquement quand vous recrutez un candidat.</div>'}</div>`;
+    $('#no')?.addEventListener('click', () => {
+      const without = o.employees.filter((e) => isActive(e) && !o.onboardings.some((x) => x.empId === e.id));
+      if (!without.length) return toast('Tous les dossiers ont déjà un parcours.');
+      modal({ title: 'Nouveau parcours d\'intégration', body: fSelect('empId', S(o).Emp, without.map((e) => [e.id, e.prenom + ' ' + e.nom])) + `<p class="muted">La check-list type « ${S(o).label} » sera utilisée. Vous pourrez ajouter des étapes.</p>`,
+        onSubmit: (fd) => { mutate((x) => { x.onboardings.push({ id: uid(), empId: fd.empId, items: ONBOARDING[x.sector].map((t) => ({ t, done: false })) }); journal(x, `Parcours d'intégration créé pour ${empName(x, fd.empId)}`); }); view.onboarding(); } });
+    });
+    $$('[data-ob]').forEach((c) => c.onchange = () => { mutate((x) => { x.onboardings.find((y) => y.id === c.dataset.ob).items[c.dataset.k].done = c.checked; }); view.onboarding(); });
+    $$('[data-add]').forEach((i) => i.onkeydown = (ev) => { if (ev.key === 'Enter' && i.value.trim()) { mutate((x) => x.onboardings.find((y) => y.id === i.dataset.add).items.push({ t: i.value.trim(), done: false })); view.onboarding(); } });
+    $$('[data-delob]').forEach((b) => b.onclick = () => { if (confirm('Supprimer ce parcours ?')) { mutate((x) => { x.onboardings = x.onboardings.filter((y) => y.id !== b.dataset.delob); }); view.onboarding(); } });
+    after();
+  },
+
+  reviews() {
+    const o = org(), V = S(o); const y = String(new Date().getFullYear());
+    const camp = o.campaigns.slice().sort((a, b) => b.annee - a.annee);
+    main.innerHTML = page('Entretiens', isPublic(o) ? 'Entretien professionnel annuel (il a remplacé la notation), conduit par le supérieur hiérarchique direct.' : 'Entretien professionnel obligatoire (perspectives d\'évolution) et entretien annuel d\'évaluation (facultatif).', canManage() ? '<button class="btn primary" id="nc">+ Campagne</button>' : '') + `
+      ${camp.map((c) => { const rs = o.reviews.filter((r) => r.campaignId === c.id); const done = rs.filter((r) => ['Réalisé', 'Signé'].includes(r.statut)).length;
+        return `<div class="card"><div class="row between"><h3>${esc(c.type)} ${esc(c.annee)}</h3><span>${done} / ${rs.length} réalisés</span></div>${bar(rs.length ? (done / rs.length) * 100 : 0)}
+        <div class="table-wrap" style="margin-top:10px"><table><tr><th>${V.Emp}</th><th>Évaluateur</th><th>Date</th><th>Statut</th><th></th></tr>${rs.map((r) => `<tr><td>${esc(empName(o, r.empId))}</td><td>${esc(empName(o, r.managerId))}</td><td>${fmtDate(r.date)}</td>
+        <td><span class="badge ${r.statut === 'Signé' ? 'ok' : r.statut === 'Réalisé' ? 'info' : r.statut === 'Recours' ? 'bad' : ''}">${esc(r.statut)}</span></td><td><button class="btn sm" data-r="${r.id}">Ouvrir</button></td></tr>`).join('')}</table></div></div>`; }).join('') || '<div class="card empty">Aucune campagne. Lancez-en une : un entretien sera créé pour chaque personne présente.</div>'}
+      <div class="card lesson"><h3>Bien mener un entretien</h3><ul><li>Convoquer à l'avance (au moins 8 jours dans la fonction publique) avec la fiche de poste et le support.</li><li>Parler de faits, d'exemples, de résultats — pas de la personnalité.</li><li>Fixer 3 à 5 objectifs SMART.</li><li>Recueillir les besoins de formation et les souhaits d'évolution.</li><li>${isPublic(o) ? 'Notifier le compte rendu à l\'agent, qui peut y porter ses observations et demander une révision (puis saisir la CAP).' : 'Remettre une copie écrite au salarié.'}</li></ul></div>`;
+    $('#nc')?.addEventListener('click', () => modal({ title: 'Nouvelle campagne', body: fInput('annee', 'Année', y) + fSelect('type', 'Type', V.reviewTypes),
+      onSubmit: (fd) => { mutate((x) => { const c = { id: uid(), annee: fd.annee, type: fd.type }; x.campaigns.push(c);
+        x.employees.filter(isActive).forEach((e) => x.reviews.push({ id: uid(), campaignId: c.id, type: fd.type, annee: fd.annee, empId: e.id, managerId: e.managerId, date: '', statut: 'À planifier', bilan: '', objectifs: '', formation: '', evolution: '', avisAgent: '' }));
+        journal(x, `Campagne « ${fd.type} ${fd.annee} » lancée`); }); view.reviews(); } }));
+    $$('[data-r]').forEach((b) => b.onclick = () => reviewForm(o, o.reviews.find((r) => r.id === b.dataset.r)));
+    after();
+  },
+
+  training() {
+    const o = org(), V = S(o); const budget = Number(o.settings.trainingBudget) || 0;
+    const cost = o.trainings.reduce((s, t) => s + Number(t.cout || 0), 0);
+    main.innerHTML = page(isPublic(o) ? 'Plan de formation' : 'Plan de développement des compétences', `${o.trainings.length} action(s) · coût total ${fmtEur(cost)}${budget ? ' / budget ' + fmtEur(budget) : ''}`, canManage() ? '<button class="btn" id="bud">Budget</button><button class="btn primary" id="nt">+ Formation</button>' : '') + `
+      ${budget && cost > budget ? '<div class="alert bad">Budget formation dépassé.</div>' : ''}
+      ${o.trainings.length ? `<div class="table-wrap"><table><tr><th>Intitulé</th><th>Type</th><th>Organisme</th><th>Date</th><th>Durée</th><th>Coût</th><th>Participants</th><th>Statut</th></tr>${o.trainings.map((t) => `<tr class="click" data-t="${t.id}"><td>${esc(t.intitule)}</td><td><span class="badge">${esc(t.type)}</span></td><td>${esc(t.organisme)}</td><td>${fmtDate(t.date)}</td><td>${esc(t.duree)} h</td><td>${fmtEur(t.cout)}</td><td>${(t.participants || []).length}</td><td>${esc(t.statut)}</td></tr>`).join('')}</table></div>` : '<div class="card empty">Aucune formation.</div>'}
+      <div class="card lesson"><h3>Repères</h3>${isPublic(o) ? '<ul><li><strong>Formations statutaires obligatoires</strong> (FPT) : intégration (avant titularisation) et professionnalisation (au 1er emploi, tout au long de la carrière, prise de poste à responsabilité).</li><li><strong>CPF</strong> : 25 h par an, plafond 150 h (davantage pour les agents de catégorie C sans diplôme de niveau 4).</li><li>Préparation aux concours, congé de formation professionnelle, bilan de compétences, VAE.</li><li>En FPT, le <strong>CNFPT</strong> est financé par une cotisation sur la masse salariale.</li></ul>' : '<ul><li><strong>Obligation d\'adaptation</strong> au poste et de maintien dans l\'emploi : formations sur le temps de travail.</li><li><strong>CPF</strong> en euros : 500 € par an (800 € pour les moins qualifiés), plafond 5 000 € (8 000 €), avec un reste à charge forfaitaire pour le salarié.</li><li>Entretien professionnel : recense les besoins.</li><li>Alternance, Pro-A, VAE, bilan de compétences, projet de transition professionnelle.</li></ul>'}</div>`;
+    $('#nt')?.addEventListener('click', () => trainingForm(o));
+    $('#bud')?.addEventListener('click', () => modal({ title: 'Budget formation annuel', body: fInput('b', 'Montant (€)', budget, { type: 'number' }), onSubmit: (fd) => { mutate((x) => { x.settings.trainingBudget = Number(fd.b) || 0; }); view.training(); } }));
+    $$('[data-t]').forEach((r) => r.onclick = () => trainingForm(o, o.trainings.find((t) => t.id === r.dataset.t)));
+    after();
+  },
+
+  projects() {
+    const o = org();
+    main.innerHTML = page('Projets RH', 'Pilotez vos chantiers RH. Pour un suivi complet (Kanban, Gantt, risques, budget), utilisez Pilote.', canManage() ? '<button class="btn primary" id="np">+ Projet RH</button>' : '') + `
+      <div class="grid g2">${o.projects.map((p) => { const d = p.tasks.filter((t) => t.done).length; const late = p.echeance && p.echeance < todayISO() && d < p.tasks.length;
+        return `<div class="card"><div class="row between"><h3>${esc(p.titre)}</h3><span class="badge ${late ? 'bad' : d === p.tasks.length && p.tasks.length ? 'ok' : ''}">${late ? 'En retard' : d === p.tasks.length && p.tasks.length ? 'Terminé' : 'En cours'}</span></div><small>Échéance : ${fmtDate(p.echeance)} · Pilote : ${esc(p.pilote || '—')}</small>
+        <div style="margin:8px 0">${bar(p.tasks.length ? (d / p.tasks.length) * 100 : 0)}</div>${p.tasks.map((t, k) => `<label class="row" style="font-weight:500;padding:3px 0;flex-wrap:nowrap"><input type="checkbox" data-p="${p.id}" data-k="${k}" ${t.done ? 'checked' : ''}><span style="flex:1;${t.done ? 'text-decoration:line-through;opacity:.6' : ''}">${esc(t.t)}</span>${t.due ? `<small>${fmtDate(t.due)}</small>` : ''}</label>`).join('')}
+        <div class="row" style="margin-top:8px;flex-wrap:nowrap"><input placeholder="Nouvelle tâche (Entrée)…" data-addp="${p.id}"><button class="btn sm danger" data-delp="${p.id}">✕</button></div></div>`; }).join('') || '<div class="card empty">Aucun projet RH.</div>'}</div>
+      <div class="card"><h3>Gestion de projet avancée</h3><p>Pour un projet RH important (réorganisation, nouveau SIRH, élections), créez-le dans <a href="${SUITE[0].url}" target="_blank" rel="noopener">Pilote</a> : tableau Kanban, planning de Gantt, risques, budget et formation à la gestion de projet.</p></div>`;
+    $('#np')?.addEventListener('click', () => modal({ title: 'Nouveau projet RH', body: fSelect('tpl', 'Modèle', [['', 'Projet vide'], ...Object.entries(HR_PROJECTS).map(([k, v]) => [k, v[0]])]) + fInput('titre', 'Titre (laisser vide pour reprendre le modèle)') + fInput('pilote', 'Pilote du projet', ME.name) + fInput('echeance', 'Échéance', addDays(todayISO(), 90), { type: 'date' }),
+      onSubmit: (fd) => { const tpl = HR_PROJECTS[fd.tpl]; const titre = fd.titre || tpl?.[0]; if (!titre) throw new Error('Donnez un titre'); const n = tpl ? tpl[1].length : 0;
+        mutate((x) => { x.projects.push({ id: uid(), titre, pilote: fd.pilote, echeance: fd.echeance, tasks: (tpl?.[1] || []).map((t, i) => ({ t, done: false, due: addDays(todayISO(), Math.round(((i + 1) / n) * daysBetween(todayISO(), fd.echeance))) })) }); journal(x, `Projet RH « ${titre} » créé`); }); view.projects(); } }));
+    $$('[data-p]').forEach((c) => c.onchange = () => { mutate((x) => { x.projects.find((p) => p.id === c.dataset.p).tasks[c.dataset.k].done = c.checked; }); view.projects(); });
+    $$('[data-addp]').forEach((i) => i.onkeydown = (ev) => { if (ev.key === 'Enter' && i.value.trim()) { mutate((x) => x.projects.find((p) => p.id === i.dataset.addp).tasks.push({ t: i.value.trim(), done: false, due: '' })); view.projects(); } });
+    $$('[data-delp]').forEach((b) => b.onclick = () => { if (confirm('Supprimer ce projet ?')) { mutate((x) => { x.projects = x.projects.filter((p) => p.id !== b.dataset.delp); }); view.projects(); } });
+    after();
+  },
+
+  payroll(sub = 'mass') {
+    const o = org(), V = S(o); const act = o.employees.filter(isActive);
+    const rows = act.map((e) => ({ e, p: payslip(o, e) }));
+    const tot = rows.reduce((s, r) => ({ g: s.g + r.p.gross, n: s.n + r.p.net, c: s.c + r.p.cost }), { g: 0, n: 0, c: 0 });
+    main.innerHTML = page('Paie & masse salariale', 'Estimations pédagogiques pour comprendre la construction d\'une rémunération.') + `
+      <div class="tabs"><a href="#/payroll/mass" class="${sub === 'mass' ? 'active' : ''}">Masse salariale</a><a href="#/payroll/sim" class="${sub === 'sim' ? 'active' : ''}">Simulateur</a><a href="#/payroll/learn" class="${sub === 'learn' ? 'active' : ''}">Comprendre ${isPublic(o) ? 'la rémunération publique' : 'le bulletin'}</a></div><div id="pay"></div>`;
+    const el = $('#pay');
+    if (sub === 'mass') {
+      el.innerHTML = `<div class="grid g3"><div class="card kpi"><span class="v">${fmtEur(tot.g)}</span><span class="l">Brut mensuel total</span></div><div class="card kpi"><span class="v">${fmtEur(tot.c * 12)}</span><span class="l">Coût employeur annuel estimé</span></div><div class="card kpi"><span class="v">${fmtEur(tot.n)}</span><span class="l">Net mensuel total estimé</span></div></div>
+        <div class="table-wrap" style="margin-top:14px"><table><tr><th>${V.Emp}</th><th>Statut</th>${isPublic(o) ? '<th>IM</th>' : ''}<th>Brut mensuel</th><th>Net estimé</th><th>Coût employeur / an</th></tr>${rows.map(({ e, p }) => `<tr class="click" data-pe="${e.id}"><td>${esc(e.prenom + ' ' + e.nom)}</td><td>${esc(e.statut)}</td>${isPublic(o) ? `<td>${esc(e.im)}</td>` : ''}<td>${fmtEur(p.gross)}</td><td>${fmtEur(p.net)}</td><td>${fmtEur(p.cost * 12)}</td></tr>`).join('')}</table></div>
+        ${isPublic(o) ? '<div class="alert" style="margin-top:14px"><strong>GVT</strong> (glissement vieillesse-technicité) : la masse salariale augmente chaque année même à effectif constant, à cause des avancements d\'échelon et de grade. À intégrer dans le budget primitif.</div>' : ''}`;
+      $$('[data-pe]').forEach((r) => r.onclick = () => location.hash = `#/employee/${r.dataset.pe}/pay`);
+    } else if (sub === 'sim') {
+      el.innerHTML = `<div class="grid g2"><form class="card" id="sf"><h3>Paramètres</h3><div class="fields">${isPublic(o)
+        ? fSelect('statut', 'Statut', ['Fonctionnaire titulaire', 'Contractuel CDD']) + fInput('im', 'Indice majoré', 400, { type: 'number' }) + fInput('nbi', 'NBI (points)', 0, { type: 'number' }) + fInput('ifse', 'IFSE mensuelle (€)', 250, { type: 'number' }) + fInput('enfants', 'Enfants à charge', 0, { type: 'number' }) + fInput('quotite', 'Quotité (%)', 100, { type: 'number' })
+        : fSelect('categorie', 'Catégorie', V.categories) + fSelect('statut', 'Contrat', ['CDI', 'Apprentissage']) + fInput('brut', 'Salaire brut mensuel (€)', 2200, { type: 'number' }) + fInput('heures', 'Heures / semaine', 35, { type: 'number' })}</div></form><div id="sr"></div></div>`;
+      const run = () => { const fd = Object.fromEntries(new FormData($('#sf')).entries()); $('#sr').innerHTML = payslipHTML(o, newEmp(o, { ...fd, quotite: Number(fd.quotite) || 100 })); };
+      $('#sf').addEventListener('input', run); run();
+    } else {
+      el.innerHTML = `<div class="card lesson">${isPublic(o) ? `<h3>La rémunération d'un fonctionnaire</h3>
+        <p>Elle comprend obligatoirement (article L712-1 du CGFP) : le <strong>traitement</strong>, l'<strong>indemnité de résidence</strong>, le <strong>supplément familial de traitement</strong>, et les <strong>primes et indemnités</strong> instituées par un texte.</p>
+        <ul><li><strong>Grille indiciaire</strong> : chaque grade comporte des échelons. Chaque échelon correspond à un <strong>indice brut (IB)</strong>, qui donne un <strong>indice majoré (IM)</strong>.</li><li><strong>Traitement brut mensuel = IM × valeur du point</strong>. Valeur mensuelle du point : ${o.settings.point} € (modifiable dans les paramètres).</li>
+        <li><strong>NBI</strong> (nouvelle bonification indiciaire) : points d'indice supplémentaires liés à certaines fonctions (encadrement, accueil du public…).</li><li><strong>RIFSEEP</strong> : <strong>IFSE</strong> (indemnité de fonctions, de sujétions et d'expertise, mensuelle, selon le groupe de fonctions) + <strong>CIA</strong> (complément indemnitaire annuel, facultatif, lié à l'engagement et à la manière de servir). Mis en place par délibération en FPT.</li>
+        <li><strong>Cotisations</strong> du titulaire : retraite CNRACL (FPT, FPH) ou pension civile (État) à 11,10 % du traitement + NBI ; RAFP (retraite additionnelle) sur les primes ; CSG / CRDS. Le contractuel cotise au régime général et à l'IRCANTEC.</li></ul>` : `<h3>Lire un bulletin de paie</h3>
+        <ul><li><strong>Salaire de base</strong> : horaire × heures mensualisées (35 h = 151,67 h / mois). Il ne peut être inférieur au SMIC ni au minimum conventionnel.</li><li><strong>Heures supplémentaires</strong> : +25 % de la 36e à la 43e heure, +50 % au-delà (sauf accord, minimum 10 %).</li><li><strong>Primes</strong> : ancienneté, 13e mois… selon la convention collective ou l'usage.</li>
+        <li><strong>Cotisations salariales</strong> : environ 22 % (non-cadre) à 25 % (cadre) du brut — santé, retraite de base et complémentaire (AGIRC-ARRCO), chômage côté employeur, CSG/CRDS.</li><li><strong>Net à payer avant impôt</strong>, puis <strong>prélèvement à la source</strong>.</li><li><strong>Net social</strong> : montant à déclarer pour les prestations sociales (obligatoire sur le bulletin depuis 2024).</li></ul>`}</div>`;
+    }
+    after();
+  },
+
+  documents() {
+    const o = org();
+    main.innerHTML = page('Documents', 'Trames pré-remplies avec les données des dossiers. À relire et adapter avant signature.') + `<div class="grid g2">${DOCS[o.sector].map((d) => `<div class="card"><h3>📄 ${esc(d.t)}</h3><div class="row" style="flex-wrap:nowrap"><select data-sel="${d.id}">${o.employees.filter(isActive).map((e) => `<option value="${e.id}">${esc(e.prenom + ' ' + e.nom)}</option>`).join('')}</select><button class="btn primary" data-doc="${d.id}">Générer</button></div></div>`).join('')}</div>`;
+    $$('[data-doc]').forEach((b) => b.onclick = () => { const empId = $(`[data-sel="${b.dataset.doc}"]`).value; if (!empId) return toast('Aucun dossier.'); docModal(o, b.dataset.doc, empId); });
+    after();
+  },
+
+  compliance() {
+    const o = org(); const eff = Math.max(o.effectifDeclare || 0, o.employees.filter(isActive).length);
+    const list = OBLIGATIONS[o.sector]; const appl = list.filter((x) => eff >= x.min), future = list.filter((x) => eff < x.min);
+    const done = appl.filter((x) => o.compliance?.[x.k]).length;
+    main.innerHTML = page('Obligations & conformité', `Effectif pris en compte : ${eff}. ${done} / ${appl.length} obligations marquées à jour.`) + `${bar((done / Math.max(1, appl.length)) * 100)}
+      <div class="card" style="margin-top:14px"><h3>Obligations applicables</h3>${appl.map((x) => `<div style="padding:10px 0;border-top:1px solid var(--line)"><label class="row" style="flex-wrap:nowrap;margin:0"><input type="checkbox" data-c="${x.k}" ${o.compliance?.[x.k] ? 'checked' : ''}><span style="flex:1">${esc(x.t)}</span>${o.compliance?.[x.k] ? `<span class="badge ok">à jour · ${fmtDate(o.compliance[x.k])}</span>` : '<span class="badge warn">à vérifier</span>'}</label><small class="muted" style="display:block;padding-left:26px">${esc(x.p)} — ${esc(x.d)}</small></div>`).join('')}</div>
+      ${future.length ? `<div class="card"><h3>Seuils à venir</h3>${future.map((x) => `<div style="padding:6px 0;border-top:1px solid var(--line)"><span class="badge">≥ ${x.min}</span> ${esc(x.t)} <small class="muted">— ${esc(x.d)}</small></div>`).join('')}</div>` : ''}`;
+    $$('[data-c]').forEach((c) => c.onchange = () => { mutate((x) => { x.compliance = x.compliance || {}; x.compliance[c.dataset.c] = c.checked ? todayISO() : ''; }); view.compliance(); });
+    after();
+  },
+
+  reports() {
+    const o = org(), V = S(o); const t = todayISO(), y1 = addDays(t, -365);
+    const act = o.employees.filter(isActive);
+    const group = (fn) => { const g = {}; act.forEach((e) => { const k = fn(e) || '—'; g[k] = (g[k] || 0) + 1; }); return Object.entries(g).sort((a, b) => b[1] - a[1]); };
+    const exits = o.employees.filter((e) => e.sortie && e.sortie >= y1 && e.sortie <= t).length;
+    const entries = o.employees.filter((e) => e.entree >= y1 && e.entree <= t).length;
+    const turnover = act.length ? (((exits + entries) / 2) / act.length) * 100 : 0;
+    const sickDays = o.absences.filter((a) => a.statut === 'validee' && S(o).maladie.includes(a.type)).reduce((s, a) => { const from = a.debut > y1 ? a.debut : y1, to = a.fin < t ? a.fin : t; return s + Math.max(0, daysBetween(from, to) + 1); }, 0);
+    const absRate = act.length ? (sickDays / (act.length * 365)) * 100 : 0;
+    const avgSen = act.length ? act.reduce((s, e) => s + seniority(e), 0) / act.length : 0;
+    const avgAge = act.filter((e) => e.naissance).length ? act.filter((e) => e.naissance).reduce((s, e) => s + age(e.naissance), 0) / act.filter((e) => e.naissance).length : 0;
+    const bands = ['< 30', '30-39', '40-49', '50-59', '60 +'], bandOf = (a) => a < 30 ? 0 : a < 40 ? 1 : a < 50 ? 2 : a < 60 ? 3 : 4;
+    const pyr = bands.map(() => ({ f: 0, h: 0 })); act.filter((e) => e.naissance).forEach((e) => { pyr[bandOf(age(e.naissance))][e.civ === 'M.' ? 'h' : 'f']++; });
+    const maxP = Math.max(1, ...pyr.map((p) => Math.max(p.f, p.h)));
+    const dist = (title, data) => `<div class="card"><h3>${title}</h3>${data.map(([k, v]) => `<div style="margin-bottom:8px"><div class="row between"><span>${esc(k)}</span><strong>${v} <small class="muted">(${Math.round((v / act.length) * 100)} %)</small></strong></div>${bar((v / act.length) * 100)}</div>`).join('') || '<p class="muted">—</p>'}</div>`;
+    main.innerHTML = page('Rapports', isPublic(o) ? 'Ces indicateurs alimentent le rapport social unique (RSU).' : 'Indicateurs sociaux clés (utiles pour la BDESE).', '<button class="btn" onclick="window.print()">🖨️ Imprimer</button>') + `
+      <div class="grid g4 kpis"><div class="card kpi"><span class="v">${act.length}</span><span class="l">Effectif physique</span></div><div class="card kpi"><span class="v">${turnover.toFixed(1)} %</span><span class="l">Turnover 12 mois ((entrées + sorties) / 2 / effectif)</span></div>
+      <div class="card kpi"><span class="v">${absRate.toFixed(1)} %</span><span class="l">Absentéisme maladie 12 mois</span></div><div class="card kpi"><span class="v">${avgAge.toFixed(0)} ans</span><span class="l">Âge moyen · ancienneté ${avgSen.toFixed(1)} ans</span></div></div>
+      <div class="card" style="margin-top:14px"><h3>Pyramide des âges</h3><div style="max-width:560px;margin:auto">${bands.map((b, i) => `<div style="display:grid;grid-template-columns:1fr 60px 1fr;align-items:center;gap:6px;margin-bottom:6px"><div style="display:flex;justify-content:flex-end"><div style="height:18px;width:${(pyr[i].f / maxP) * 100}%;background:var(--accent);border-radius:4px 0 0 4px;min-width:${pyr[i].f ? 4 : 0}px"></div></div><small style="text-align:center">${b} · ${pyr[i].f}/${pyr[i].h}</small><div><div style="height:18px;width:${(pyr[i].h / maxP) * 100}%;background:var(--info);border-radius:0 4px 4px 0;min-width:${pyr[i].h ? 4 : 0}px"></div></div></div>`).join('')}
+      <p class="muted" style="text-align:center"><span style="color:var(--accent)">■</span> Femmes · <span style="color:var(--info)">■</span> Hommes</p></div></div>
+      <div class="grid g3">${dist('Par statut', group((e) => e.statut))}${dist(isPublic(o) ? 'Par catégorie' : 'Par catégorie socioprofessionnelle', group((e) => e.categorie))}${dist('Par service', group((e) => e.service))}</div>
+      <div class="card"><h3>Mouvements sur 12 mois</h3><p>${entries} entrée(s), ${exits} sortie(s).</p>${o.employees.filter((e) => e.sortie && e.sortie >= y1).map((e) => `<div>↘ ${esc(e.prenom + ' ' + e.nom)} — ${fmtDate(e.sortie)} — ${esc(e.motifSortie)}</div>`).join('')}</div>`;
+    after();
+  },
+
+  simulation(missionId) {
+    const cur = mode();
+    if (missionId && inSim()) return missionView(missionId);
+    main.innerHTML = page('Parcours de simulation', 'Entraînez-vous dans une organisation fictive : chaque mission se réalise dans le vrai logiciel et se vérifie automatiquement.') + `
+      <div class="grid g2">${Object.values(SCENARIOS).map((sc) => { const so = store.get(simKey(sc.id), null); const done = so ? Object.keys(so.sim?.done || {}).length : 0; const score = so ? Object.values(so.sim?.done || {}).reduce((s, d) => s + d.score, 0) : 0;
+        return `<div class="card" style="${cur === sc.id ? 'border:2px solid var(--accent)' : ''}"><div style="font-size:2rem">${sc.ico}</div><h3>${esc(sc.title)}</h3><p class="muted">${esc(sc.pitch)}</p>
+        <p>${sc.missions.length} missions sur 3 ans · ${done} réalisée(s) · score ${score} / ${sc.missions.length * 10}</p>${bar((done / sc.missions.length) * 100)}
+        <div class="row" style="margin-top:12px">${cur === sc.id ? '<span class="badge acc">Simulation active</span>' : `<button class="btn primary" data-start="${sc.id}">${so ? 'Reprendre' : 'Commencer'}</button>`}${so ? `<button class="btn sm danger" data-reset="${sc.id}">Recommencer à zéro</button>` : ''}</div></div>`; }).join('')}</div>
+      ${inSim() ? missionsList() : '<div class="alert">En mode simulation, tout le logiciel fonctionne sur les données fictives : votre organisation réelle n\'est pas touchée. Un bandeau rappelle la mission en cours.</div>'}`;
+    $$('[data-start]').forEach((b) => b.onclick = () => {
+      const sc = SCENARIOS[b.dataset.start];
+      if (!store.get(simKey(sc.id), null)) { const o = { id: uid(), ...sc.org(), settings: { ...DEFAULT_SETTINGS } }; o.sim = { done: {}, active: sc.missions[0].id }; store.set(simKey(sc.id), o); }
+      store.set(modeKey(), sc.id); location.hash = '#/simulation'; boot();
+    });
+    $$('[data-reset]').forEach((b) => b.onclick = () => { if (!confirm('Effacer toute la progression de ce scénario ?')) return; store.del(simKey(b.dataset.reset)); if (mode() === b.dataset.reset) store.set(modeKey(), 'real'); boot(); });
+    $$('[data-m]').forEach((b) => b.onclick = () => location.hash = '#/simulation/' + b.dataset.m);
+    after();
+  },
+
+  settings() {
+    const o = org();
+    main.innerHTML = page('Paramètres', inSim() ? 'Paramètres de l\'organisation fictive.' : '') + `<form class="card" id="sf"><h3>Organisation</h3><div class="fields">
+      ${fInput('name', 'Nom', o.name)}${fSelect('sector', 'Secteur', [['public', 'Fonction publique'], ['prive', 'Secteur privé']], o.sector)}
+      ${fSelect('versant', 'Versant (public)', Object.entries(VERSANTS), o.versant)}${fInput('ccn', 'Convention collective (privé)', o.ccn)}
+      ${fInput('adresse', 'Adresse', o.adresse)}${fInput('ville', 'Ville', o.ville)}${fInput('signataire', 'Signataire des documents', o.signataire)}${fInput('effectifDeclare', 'Effectif total (si tous les dossiers ne sont pas saisis)', o.effectifDeclare, { type: 'number' })}
+      ${fInput('services', 'Services (séparés par des virgules)', o.services.join(', '), { full: true })}</div>
+      <h3>Paramètres de paie</h3><div class="fields">${fInput('point', 'Valeur mensuelle du point d\'indice (€)', o.settings.point, { type: 'number', attrs: 'step="0.00001"' })}${fInput('smicH', 'SMIC horaire brut (€)', o.settings.smicH, { type: 'number', attrs: 'step="0.01"' })}
+      ${fSelect('ir', 'Zone d\'indemnité de résidence', [[0, 'Zone 3 — 0 %'], [1, 'Zone 2 — 1 %'], [3, 'Zone 1 — 3 %']], o.settings.ir)}</div>
+      <p class="muted">Valeurs par défaut indicatives : vérifiez-les et mettez-les à jour lors de chaque revalorisation.</p><button class="btn primary">Enregistrer</button></form>
+      ${inSim() ? '' : `<div class="card"><h3>Sauvegarde</h3><div class="row"><button class="btn" id="exp">⬇️ Exporter</button><button class="btn" id="imp">⬆️ Importer</button></div><p class="muted">Les données sont stockées dans ce navigateur. Exportez régulièrement.</p></div>`}`;
+    $('#sf').onsubmit = (ev) => { ev.preventDefault(); const fd = Object.fromEntries(new FormData(ev.target).entries());
+      mutate((x) => { Object.assign(x, { name: fd.name, sector: fd.sector, versant: fd.versant, ccn: fd.ccn, adresse: fd.adresse, ville: fd.ville, signataire: fd.signataire, effectifDeclare: Number(fd.effectifDeclare) || 0, services: fd.services.split(',').map((s) => s.trim()).filter(Boolean) });
+        x.settings = { ...x.settings, point: Number(fd.point), smicH: Number(fd.smicH), ir: Number(fd.ir) }; journal(x, 'Paramètres mis à jour'); });
+      toast('Enregistré'); boot(); };
+    $('#exp')?.addEventListener('click', () => download('rh-studio-sauvegarde.json', JSON.stringify({ app: 'rhstudio', org: org(), users: auth.users().filter((u) => u.wsId === ME.wsId) }, null, 2)));
+    $('#imp')?.addEventListener('click', async () => { try { const d = JSON.parse(await pickFile()); if (d.app !== 'rhstudio') throw new Error('fichier non reconnu'); store.set('org:' + ME.wsId, d.org);
+      const keep = auth.users().filter((u) => !d.users.some((x) => x.email === u.email)); auth.saveUsers([...keep, ...d.users.map((u) => ({ ...u, wsId: ME.wsId }))]); toast('Import réussi'); boot(); } catch (err) { toast('Import impossible : ' + err.message); } });
+    after();
+  },
+
+  accounts() {
+    const o = org(); const list = auth.users().filter((u) => u.wsId === ME.wsId);
+    main.innerHTML = page('Comptes', 'Créez les accès de votre équipe. Un compte « Salarié / agent » relié à un dossier donne accès à son espace personnel (congés, informations).', '<button class="btn primary" id="nu">+ Compte</button>') + `
+      <div class="table-wrap"><table><tr><th>Nom</th><th>E-mail</th><th>Rôle</th><th>Dossier lié</th><th></th></tr>${list.map((u) => `<tr><td>${esc(u.name)}${u.mustChange ? ' <span class="badge warn">provisoire</span>' : ''}</td><td>${esc(u.email)}</td><td>${ROLES[u.role]}</td><td>${esc(empName(o, u.empId))}</td><td>${u.id !== ME.id ? `<button class="btn sm danger" data-del="${u.id}">Supprimer</button>` : ''}</td></tr>`).join('')}</table></div>`;
+    $('#nu').onclick = () => modal({ title: 'Nouveau compte', body: `<div class="fields">${fInput('name', 'Nom', '', { req: true })}${fInput('email', 'E-mail', '', { type: 'email', req: true })}${fSelect('role', 'Rôle', Object.entries(ROLES), 'salarie')}${fSelect('empId', 'Dossier lié', [['', '—'], ...o.employees.filter(isActive).map((e) => [e.id, e.prenom + ' ' + e.nom])])}${fInput('password', 'Mot de passe provisoire', 'Bienvenue' + Math.floor(100 + Math.random() * 900), { full: true })}</div>`,
+      async onSubmit(fd) { await auth.create({ name: fd.name, email: fd.email, password: fd.password, role: fd.role, wsId: ME.wsId, extra: { empId: fd.empId, mustChange: true } }); toast(`Compte créé — mot de passe provisoire : ${fd.password}`, 6000); view.accounts(); } });
+    $$('[data-del]').forEach((b) => b.onclick = () => { if (confirm('Supprimer ce compte ?')) { auth.remove(b.dataset.del); view.accounts(); } });
+  },
+
+  me() {
+    const o = org(); const e = o.employees.find((x) => x.id === ME.empId);
+    if (!e) { main.innerHTML = page('Mon espace') + '<div class="alert warn">Votre compte n\'est relié à aucun dossier. Contactez le service RH.</div>'; return; }
+    const b = leaveBalance(o, e);
+    main.innerHTML = page(`Bonjour ${esc(e.prenom)}`, `${esc(e.poste)} · ${esc(e.service)}`, '<a class="btn primary" href="#/absences">Demander un congé</a>') + `<div class="grid g3"><div class="card kpi"><span class="v">${b.reste}</span><span class="l">${b.label} restants (${b.unit})</span></div><div class="card kpi"><span class="v">${b.rtt - b.rttPris}</span><span class="l">${S(o).rtt} restants</span></div><div class="card kpi"><span class="v">${seniority(e).toFixed(1)} ans</span><span class="l">Ancienneté</span></div></div>
+      <div class="card"><h3>Mes informations</h3><table><tr><td class="muted">Statut</td><td>${esc(e.statut)}</td></tr><tr><td class="muted">Catégorie</td><td>${esc(e.categorie)}</td></tr>${e.grade ? `<tr><td class="muted">Grade / échelon</td><td>${esc(e.grade)} — ${esc(e.echelon)}</td></tr>` : ''}<tr><td class="muted">Responsable</td><td>${esc(empName(o, e.managerId))}</td></tr></table></div>`;
+  },
+};
+
+/* ---------- Formulaires ---------- */
+function employeeForm(o, e, isNew) {
+  const V = S(o); const pub = isPublic(o);
+  const managers = [['', '— Aucun —'], ...o.employees.filter((x) => isActive(x) && x.id !== e.id).map((x) => [x.id, x.prenom + ' ' + x.nom])];
+  const html = `<div class="fields">${fSelect('civ', 'Civilité', ['Mme', 'M.'], e.civ)}${fInput('matricule', 'Matricule', e.matricule)}${fInput('prenom', 'Prénom', e.prenom, { req: true })}${fInput('nom', 'Nom', e.nom, { req: true })}
+    ${fInput('naissance', 'Date de naissance', e.naissance, { type: 'date' })}${fInput('email', 'E-mail', e.email, { type: 'email' })}
+    ${fSelect('service', 'Service', o.services, e.service)}${fInput('poste', 'Poste / emploi', e.poste)}${fSelect('managerId', 'Responsable hiérarchique', managers, e.managerId)}${fSelect('statut', pub ? 'Statut' : 'Type de contrat', V.statuts, e.statut)}
+    ${fSelect('categorie', 'Catégorie', V.categories, e.categorie)}${pub ? `<div class="field"><label>Grade</label><input name="grade" list="grades" value="${esc(e.grade)}"><datalist id="grades">${GRADES_FPT.map((g) => `<option value="${esc(g)}">`).join('')}</datalist></div>` + fInput('echelon', 'Échelon', e.echelon, { type: 'number' }) + fInput('im', 'Indice majoré', e.im, { type: 'number' }) + fInput('nbi', 'NBI (points)', e.nbi, { type: 'number' }) + fInput('ifse', 'IFSE mensuelle (€)', e.ifse, { type: 'number' }) : fInput('brut', 'Salaire brut mensuel (€)', e.brut, { type: 'number' }) + fInput('heures', 'Heures / semaine', e.heures, { type: 'number' })}
+    ${fInput('quotite', 'Quotité de temps de travail (%)', e.quotite, { type: 'number' })}${fInput('rtt', V.rtt + ' par an', e.rtt, { type: 'number' })}${fInput('enfants', 'Enfants à charge', e.enfants, { type: 'number' })}
+    ${fInput('entree', 'Date d\'entrée', e.entree, { type: 'date' })}${fInput('finEssai', pub ? 'Fin de période d\'essai (contractuels)' : 'Fin de période d\'essai', e.finEssai, { type: 'date' })}${fInput('finContrat', 'Fin de contrat (si CDD)', e.finContrat, { type: 'date' })}
+    ${fSelect('motifCDD', 'Motif du contrat à durée déterminée', [['', '—'], ...V.motifsCDD.map((m) => [m, m])], e.motifCDD, { full: true })}
+    ${fInput('sortie', 'Date de sortie', e.sortie, { type: 'date' })}${fSelect('motifSortie', 'Motif de sortie', ['', ...(pub ? ['Mutation', 'Retraite', 'Démission', 'Fin de contrat', 'Disponibilité', 'Détachement sortant', 'Rupture conventionnelle', 'Licenciement', 'Révocation', 'Décès'] : ['Démission', 'Fin de CDD', 'Rupture conventionnelle', 'Licenciement pour motif personnel', 'Licenciement économique', 'Fin de période d\'essai', 'Retraite', 'Décès'])], e.motifSortie)}
+    ${fText('notes', 'Notes', e.notes)}</div>
+    <div class="callout tip" style="font-size:.88rem">${pub ? 'Un lauréat de concours est d\'abord <strong>stagiaire</strong> (en général un an) avant titularisation. Les contractuels ont un contrat qui doit viser le motif légal de recrutement.' : 'Période d\'essai CDI (maximum légal, renouvellement compris si l\'accord de branche le prévoit) : ouvriers / employés 2 mois (4), techniciens / agents de maîtrise 3 mois (6), cadres 4 mois (8). CDD : 1 jour par semaine, limite 2 semaines (≤ 6 mois) ou 1 mois.'}</div>`;
+  const onSubmit = (fd) => {
+    if (!fd.prenom?.trim() || !fd.nom?.trim()) throw new Error('Prénom et nom obligatoires');
+    if (fd.finContrat && fd.finContrat < fd.entree) throw new Error('La fin de contrat est avant l\'entrée');
+    if (/CDD/.test(fd.statut) && !fd.finContrat) throw new Error('Un contrat à durée déterminée doit avoir une date de fin');
+    const nums = ['echelon', 'im', 'nbi', 'ifse', 'brut', 'heures', 'quotite', 'rtt', 'enfants'];
+    const data = { ...fd }; nums.forEach((k) => { if (k in data) data[k] = data[k] === '' ? '' : Number(data[k]); });
+    let id = e.id;
+    mutate((x) => { if (isNew) { const ne = newEmp(x, data); id = ne.id; x.employees.push(ne); journal(x, `Dossier créé : ${data.prenom} ${data.nom}`); } else { Object.assign(x.employees.find((y) => y.id === e.id), data); journal(x, `Dossier modifié : ${data.prenom} ${data.nom}`); } });
+    location.hash = '#/employee/' + id; router.run();
+  };
+  modal({ title: isNew ? `Nouveau dossier ${V.emp}` : 'Modifier le dossier', body: html, wide: true, onSubmit,
+    danger: !isNew ? { label: 'Supprimer le dossier', onClick: () => { if (!confirm('Supprimer définitivement ce dossier ? (Pour un départ, renseignez plutôt la date de sortie.)')) return false; mutate((x) => { x.employees = x.employees.filter((y) => y.id !== e.id); x.absences = x.absences.filter((a) => a.empId !== e.id); journal(x, `Dossier supprimé : ${e.prenom} ${e.nom}`); }); location.hash = '#/employees'; } } : null });
+  if (isNew) main.innerHTML = page('Nouveau dossier') + '<p class="muted">Remplissez le formulaire.</p>';
+}
+
+function absTable(o, list, actions) {
+  if (!list.length) return '<p class="muted">Aucune absence.</p>';
+  return `<div class="table-wrap"><table><tr><th>${S(o).Emp}</th><th>Type</th><th>Du</th><th>Au</th><th>Jours</th><th>Statut</th>${actions ? '<th></th>' : ''}</tr>${list.map((a) => `<tr class="click" data-abs="${a.id}"><td>${esc(empName(o, a.empId))}</td><td>${esc(a.type)}</td><td>${fmtDate(a.debut)}</td><td>${fmtDate(a.fin)}</td><td>${absenceDays(o, a)}</td>
+    <td><span class="badge ${a.statut === 'validee' ? 'ok' : a.statut === 'refusee' ? 'bad' : 'warn'}">${{ validee: 'Validée', refusee: 'Refusée', demandee: 'En attente' }[a.statut]}</span></td>${actions ? `<td style="white-space:nowrap"><button class="btn sm" data-ok="${a.id}">✓ Valider</button> <button class="btn sm danger" data-ko="${a.id}">✕ Refuser</button></td>` : ''}</tr>`).join('')}</table></div>`;
+}
+function bindAbs(el) {
+  const decide = (id, st) => { mutate((x) => { const a = x.absences.find((y) => y.id === id); a.statut = st; journal(x, `Absence de ${empName(x, a.empId)} ${st === 'validee' ? 'validée' : 'refusée'}`); }); router.run(); };
+  $$('[data-ok]', el).forEach((b) => b.onclick = (ev) => { ev.stopPropagation(); decide(b.dataset.ok, 'validee'); });
+  $$('[data-ko]', el).forEach((b) => b.onclick = (ev) => { ev.stopPropagation(); decide(b.dataset.ko, 'refusee'); });
+  $$('[data-abs]', el).forEach((r) => r.onclick = () => { const o = org(); absenceForm(o, o.absences.find((a) => a.id === r.dataset.abs)); });
+}
+function absenceForm(o, a, empId) {
+  const V = S(o); const isNew = !a; const self = ME.role === 'salarie' && !inSim();
+  a = a || { empId: empId || '', type: V.absences[0], debut: addDays(todayISO(), 7), fin: addDays(todayISO(), 11), statut: self ? 'demandee' : 'validee', motif: '' };
+  const emps = o.employees.filter((e) => isActive(e) || e.id === a.empId);
+  modal({ title: isNew ? 'Nouvelle absence' : 'Absence', body: `<div class="fields">${self ? `<input type="hidden" name="empId" value="${esc(ME.empId)}">` : fSelect('empId', V.Emp, emps.map((e) => [e.id, e.prenom + ' ' + e.nom]), a.empId)}${fSelect('type', 'Type', V.absences, a.type)}
+    ${fInput('debut', 'Du', a.debut, { type: 'date' })}${fInput('fin', 'Au (inclus)', a.fin, { type: 'date' })}${self ? '' : fSelect('statut', 'Statut', [['demandee', 'En attente'], ['validee', 'Validée'], ['refusee', 'Refusée']], a.statut)}${fText('motif', 'Commentaire', a.motif)}</div><p class="muted" id="cnt"></p>`,
+    onOpen(f) { const upd = () => { const fd = Object.fromEntries(new FormData(f).entries()); $('#cnt', f).textContent = `Décompte : ${absenceDays(o, fd)} jour(s).`; }; f.addEventListener('input', upd); upd(); },
+    danger: !isNew && !self ? { label: 'Supprimer', onClick: () => { mutate((x) => { x.absences = x.absences.filter((y) => y.id !== a.id); }); router.run(); } } : null,
+    onSubmit(fd) {
+      if (!fd.empId) throw new Error('Choisissez la personne'); if (fd.fin < fd.debut) throw new Error('La date de fin est avant le début');
+      const overlap = o.absences.find((x) => x.id !== a.id && x.empId === fd.empId && x.statut !== 'refusee' && x.debut <= fd.fin && x.fin >= fd.debut);
+      if (overlap && !confirm(`Attention : chevauchement avec une absence existante (${overlap.type}, ${fmtDate(overlap.debut)} – ${fmtDate(overlap.fin)}). Enregistrer quand même ?`)) return false;
+      mutate((x) => { const data = { ...fd, statut: self ? 'demandee' : fd.statut }; if (isNew) { x.absences.push({ id: uid(), ...data }); journal(x, `Absence saisie pour ${empName(x, fd.empId)} (${fd.type})`); } else Object.assign(x.absences.find((y) => y.id === a.id), data); });
+      router.run();
+    } });
+}
+
+function jobForm(o, j) {
+  const isNew = !j; const pub = isPublic(o);
+  j = j || { titre: '', service: o.services[0], contrat: S(o).statuts[0], typeRecrut: pub ? RECRUT_PUBLIC[0] : '', statut: 'Ouvert', ouvert: todayISO(), description: '', vacance: false };
+  modal({ title: isNew ? 'Nouvelle offre' : 'Modifier l\'offre', wide: true, body: `<div class="fields">${fInput('titre', 'Intitulé du poste', j.titre, { req: true, full: true })}${fSelect('service', 'Service', o.services, j.service)}${fSelect('contrat', 'Statut / contrat visé', S(o).statuts, j.contrat)}
+    ${pub ? fSelect('typeRecrut', 'Voie de recrutement', RECRUT_PUBLIC, j.typeRecrut) : ''}${fSelect('statut', 'Statut de l\'offre', ['Ouvert', 'Pourvu', 'Suspendu', 'Annulé'], j.statut)}${fInput('ouvert', 'Date d\'ouverture', j.ouvert, { type: 'date' })}
+    ${pub ? `<label class="row full" style="font-weight:500"><input type="checkbox" name="vacance" ${j.vacance ? 'checked' : ''}> Déclaration de vacance d'emploi publiée</label>` : ''}${fText('description', 'Fiche de poste : missions, compétences, conditions', j.description)}</div>`,
+    danger: !isNew ? { label: 'Supprimer', onClick: () => { mutate((x) => { x.jobs = x.jobs.filter((y) => y.id !== j.id); x.candidates = x.candidates.filter((c) => c.jobId !== j.id); }); location.hash = '#/recruitment'; } } : null,
+    onSubmit(fd) { if (!fd.titre) throw new Error('Intitulé obligatoire'); let id = j.id;
+      mutate((x) => { if (isNew) { id = uid(); x.jobs.push({ id, ...fd }); journal(x, `Offre créée : ${fd.titre}`); } else Object.assign(x.jobs.find((y) => y.id === j.id), fd); });
+      location.hash = '#/recruitment/' + id; router.run(); } });
+}
+
+function jobPipeline(o, jobId) {
+  const j = o.jobs.find((x) => x.id === jobId); if (!j) return view.recruitment();
+  const cs = o.candidates.filter((c) => c.jobId === j.id);
+  main.innerHTML = page(esc(j.titre), `${esc(j.service)} · ${esc(j.contrat)}${j.typeRecrut ? ' · ' + esc(j.typeRecrut) : ''} · ${j.statut}`, `<a class="btn" href="#/recruitment">← Offres</a><button class="btn" id="ej">Modifier</button><button class="btn primary" id="nc">+ Candidat</button>`) + `
+    ${isPublic(o) && !j.vacance && /Mutation|Lauréat|Détachement|Contractuel/.test(j.typeRecrut) ? '<div class="alert warn">La déclaration de vacance d\'emploi n\'est pas cochée : elle est obligatoire avant la nomination sur un emploi permanent.</div>' : ''}
+    ${j.description ? `<div class="card"><h3>Fiche de poste</h3><p style="white-space:pre-wrap">${esc(j.description)}</p></div>` : ''}
+    <div class="kanban" style="margin-top:14px">${STAGES.map((s) => `<div class="col" data-col="${s}"><h4><span>${s}</span><span>${cs.filter((c) => c.etape === s).length}</span></h4>${cs.filter((c) => c.etape === s).map((c) => `<div class="tcard" data-c="${c.id}"><div class="t">${esc(c.nom)}</div><div class="meta"><span>${esc(c.source)}</span>${c.note ? `<span>${'★'.repeat(Number(c.note))}</span>` : ''}${c.empId ? '<span class="badge ok">dossier créé</span>' : ''}</div></div>`).join('')}</div>`).join('')}</div>
+    <p class="muted">Glissez les cartes d'une étape à l'autre (ou ouvrez une carte pour changer d'étape). Passer un candidat en « Recruté » crée son dossier et son parcours d'intégration.</p>`;
+  $('#ej').onclick = () => jobForm(o, j);
+  $('#nc').onclick = () => candidateForm(o, j);
+  $$('.tcard').forEach((c) => { c.draggable = true; c.ondragstart = (ev) => ev.dataTransfer.setData('text/plain', c.dataset.c); c.onclick = () => candidateForm(o, j, o.candidates.find((x) => x.id === c.dataset.c)); });
+  $$('.col').forEach((col) => { col.ondragover = (ev) => { ev.preventDefault(); col.classList.add('over'); }; col.ondragleave = () => col.classList.remove('over'); col.ondrop = (ev) => { ev.preventDefault(); moveCandidate(ev.dataTransfer.getData('text/plain'), col.dataset.col); jobPipeline(org(), jobId); }; });
+  after();
+}
+function moveCandidate(cid, etape) {
+  mutate((x) => {
+    const c = x.candidates.find((y) => y.id === cid); if (!c || c.etape === etape) return; c.etape = etape;
+    const j = x.jobs.find((y) => y.id === c.jobId);
+    if (etape === 'Recruté' && !c.empId) {
+      const [prenom, ...rest] = c.nom.trim().split(/\s+/);
+      const pub = x.sector === 'public';
+      const statut = SECTORS[x.sector].statuts.includes(j.contrat) ? j.contrat : SECTORS[x.sector].statuts[0];
+      const e = newEmp(x, { prenom, nom: rest.join(' ') || '?', email: c.email, service: j.service, poste: j.titre, statut, entree: addDays(todayISO(), 14), finContrat: /CDD/.test(statut) ? addDays(todayISO(), 194) : '',
+        motifCDD: /CDD/.test(statut) && pub && /remplacement|maternit/i.test(j.titre + ' ' + j.description) ? SECTORS.public.motifsCDD[0] : '' });
+      x.employees.push(e); c.empId = e.id;
+      x.onboardings.push({ id: uid(), empId: e.id, items: ONBOARDING[x.sector].map((t) => ({ t, done: false })) });
+      j.statut = 'Pourvu';
+      journal(x, `${c.nom} recruté(e) sur « ${j.titre} » — dossier et parcours d'intégration créés`);
+      setTimeout(() => toast(`Dossier de ${c.nom} créé : complétez-le (dates, ${pub ? 'grade, indice' : 'salaire'}…)`, 5000), 50);
+    } else journal(x, `${c.nom} → ${etape}`);
+  });
+}
+function candidateForm(o, j, c) {
+  const isNew = !c; c = c || { nom: '', email: '', source: 'Site emploi', etape: 'Candidature', note: '', commentaire: '' };
+  modal({ title: isNew ? 'Nouveau candidat' : c.nom, body: `<div class="fields">${fInput('nom', 'Prénom Nom', c.nom, { req: true })}${fInput('email', 'E-mail', c.email, { type: 'email' })}
+    ${fSelect('source', 'Source', ['Site emploi', 'Place de l\'emploi public', 'France Travail', 'Candidature spontanée', 'Cooptation', 'LinkedIn', 'Mobilité interne', 'Liste d\'aptitude / concours'], c.source)}${fSelect('etape', 'Étape', STAGES, c.etape)}
+    ${fSelect('note', 'Évaluation', [['', '—'], ['1', '★'], ['2', '★★'], ['3', '★★★'], ['4', '★★★★'], ['5', '★★★★★']], c.note)}${fText('commentaire', 'Notes d\'entretien (faits, critères objectifs)', c.commentaire)}</div>`,
+    danger: !isNew ? { label: 'Supprimer', onClick: () => { mutate((x) => { x.candidates = x.candidates.filter((y) => y.id !== c.id); }); jobPipeline(org(), j.id); } } : null,
+    onSubmit(fd) { if (!fd.nom) throw new Error('Nom obligatoire');
+      let cid = c.id; const etape = fd.etape;
+      mutate((x) => { if (isNew) { cid = uid(); x.candidates.push({ id: cid, jobId: j.id, ...fd, etape: 'Candidature' }); } else Object.assign(x.candidates.find((y) => y.id === c.id), { ...fd, etape: c.etape }); });
+      moveCandidate(cid, etape); jobPipeline(org(), j.id); } });
+}
+
+function reviewForm(o, r) {
+  const pub = isPublic(o);
+  modal({ title: `${r.type} ${r.annee} — ${empName(o, r.empId)}`, wide: true, body: `<div class="fields">${fSelect('managerId', 'Évaluateur', [['', '—'], ...o.employees.filter(isActive).map((e) => [e.id, e.prenom + ' ' + e.nom])], r.managerId)}${fInput('date', 'Date de l\'entretien', r.date, { type: 'date' })}
+    ${fSelect('statut', 'Statut', ['À planifier', 'Planifié', 'Réalisé', 'Signé', 'Recours'], r.statut, { full: true })}
+    ${fText('bilan', pub ? 'Résultats professionnels obtenus et manière de servir' : (/professionnel/i.test(r.type) ? 'Parcours depuis le dernier entretien (formations, certifications, évolutions)' : 'Bilan de l\'année'), r.bilan)}
+    ${fText('objectifs', 'Objectifs pour l\'année à venir', r.objectifs)}${fText('formation', 'Besoins de formation', r.formation)}${fText('evolution', 'Perspectives d\'évolution professionnelle', r.evolution)}
+    ${fText('avisAgent', pub ? 'Observations de l\'agent' : 'Commentaires du salarié', r.avisAgent)}</div>`,
+    onSubmit(fd) { mutate((x) => { Object.assign(x.reviews.find((y) => y.id === r.id), fd); if (fd.statut !== r.statut) journal(x, `Entretien de ${empName(x, r.empId)} : ${fd.statut}`); }); router.run(); } });
+}
+
+function trainingForm(o, t) {
+  const isNew = !t; t = t || { intitule: '', type: S(o).trainingTypes[0], organisme: isPublic(o) ? 'CNFPT' : '', date: addDays(todayISO(), 30), duree: 7, cout: 0, participants: [], statut: 'Prévue' };
+  modal({ title: isNew ? 'Nouvelle formation' : t.intitule, wide: true, body: `<div class="fields">${fInput('intitule', 'Intitulé', t.intitule, { req: true, full: true })}${fSelect('type', 'Type', S(o).trainingTypes, t.type)}${fInput('organisme', 'Organisme', t.organisme)}
+    ${fInput('date', 'Date', t.date, { type: 'date' })}${fInput('duree', 'Durée (heures)', t.duree, { type: 'number' })}${fInput('cout', 'Coût total (€)', t.cout, { type: 'number' })}${fSelect('statut', 'Statut', ['Demandée', 'Prévue', 'Réalisée', 'Annulée'], t.statut)}
+    <div class="field full"><label>Participants</label><div style="max-height:180px;overflow:auto;border:1px solid var(--line);border-radius:8px;padding:8px">${o.employees.filter(isActive).map((e) => `<label class="row" style="font-weight:500;margin:0"><input type="checkbox" name="p_${e.id}" ${t.participants.includes(e.id) ? 'checked' : ''}> ${esc(e.prenom + ' ' + e.nom)}</label>`).join('')}</div></div></div>`,
+    danger: !isNew ? { label: 'Supprimer', onClick: () => { mutate((x) => { x.trainings = x.trainings.filter((y) => y.id !== t.id); }); view.training(); } } : null,
+    onSubmit(fd) { if (!fd.intitule) throw new Error('Intitulé obligatoire');
+      const participants = Object.keys(fd).filter((k) => k.startsWith('p_') && fd[k] === true).map((k) => k.slice(2));
+      const data = { intitule: fd.intitule, type: fd.type, organisme: fd.organisme, date: fd.date, duree: Number(fd.duree) || 0, cout: Number(fd.cout) || 0, statut: fd.statut, participants };
+      mutate((x) => { if (isNew) { x.trainings.push({ id: uid(), ...data }); journal(x, `Formation ajoutée : ${data.intitule}`); } else Object.assign(x.trainings.find((y) => y.id === t.id), data); }); view.training(); } });
+}
+
+function payslipHTML(o, e) {
+  const p = payslip(o, e);
+  return `<div class="card"><h3>Bulletin simplifié (mensuel)</h3><table>${p.lines.filter((l) => l[2]).map(([l, d, v]) => `<tr><td>${l}<br><small class="muted">${esc(d)}</small></td><td style="text-align:right">${fmtEur2(v)}</td></tr>`).join('')}
+    <tr><td><strong>Total brut</strong></td><td style="text-align:right"><strong>${fmtEur2(p.gross)}</strong></td></tr>${p.ret.map(([l, v]) => `<tr><td class="muted">− ${l}</td><td style="text-align:right">− ${fmtEur2(v)}</td></tr>`).join('')}
+    <tr><td><strong>Net estimé (avant impôt)</strong></td><td style="text-align:right"><strong>${fmtEur2(p.net)}</strong></td></tr><tr><td class="muted">Coût employeur mensuel estimé</td><td style="text-align:right">${fmtEur2(p.cost)}</td></tr></table><p class="muted" style="margin-top:10px;font-size:.85rem">${esc(p.note)}</p></div>`;
+}
+
+function fillDoc(o, tpl, e) {
+  const p = payslip(o, e);
+  const map = { org: o.name, orgAdresse: o.adresse || '[adresse]', signataire: o.signataire || '[signataire]', ville: o.ville || '[ville]', date: fmtDate(todayISO()), civ: e.civ === 'M.' ? 'Monsieur' : 'Madame', prenom: e.prenom, nom: e.nom,
+    poste: e.poste || '[poste]', categorie: e.categorie, service: e.service, statut: e.statut, grade: e.grade || '[grade]', echelon: e.echelon || '[échelon]', im: e.im || '[IM]', entree: fmtDate(e.entree), finEssai: e.finEssai ? fmtDate(e.finEssai) : '[date]',
+    finContrat: e.finContrat ? fmtDate(e.finContrat) : '[date]', motifCDD: e.motifCDD || '[motif précis]', ccn: o.ccn || '[convention collective]', heures: e.heures || 35, brut: fmtEur2(p.gross) };
+  return tpl.replace(/\{\{(\w+)\}\}/g, (_, k) => map[k] ?? '');
+}
+function docModal(o, docId, empId) {
+  const d = DOCS[o.sector].find((x) => x.id === docId); const e = o.employees.find((x) => x.id === empId);
+  modal({ title: d.t, wide: true, submit: 'Imprimer', cancel: 'Fermer', body: `<textarea id="doctext" style="min-height:420px;font-family:ui-monospace,monospace;font-size:.85rem">${esc(fillDoc(o, d.body, e))}</textarea><div class="row" style="margin-top:8px"><button type="button" class="btn sm" id="dl">⬇️ Télécharger (.txt)</button></div><p class="muted">Trame pédagogique : faites-la valider (juriste, CDG, convention collective) avant usage réel.</p>`,
+    onOpen(f) { $('#dl', f).onclick = () => download(`${d.id}-${e.nom}.txt`, $('#doctext', f).value, 'text/plain'); },
+    onSubmit(fd, f) { const w = window.open('', '_blank'); if (!w) { toast('Autorisez les fenêtres pour imprimer'); return false; } w.document.write(`<pre style="font:14px/1.6 Georgia,serif;white-space:pre-wrap;max-width:720px;margin:40px auto">${esc($('#doctext', f).value)}</pre>`); w.document.close(); w.print(); return false; } });
+  mutate((x) => journal(x, `Document généré : ${d.t} (${e.prenom} ${e.nom})`));
+}
+
+/* ---------- Simulation : missions ---------- */
+function missionsList() {
+  const sc = SCENARIOS[mode()]; const o = org(); const done = o.sim?.done || {};
+  const yearScore = (y) => sc.missions.filter((m) => m.year === y).reduce((s, m) => s + (done[m.id]?.score || 0), 0);
+  return [1, 2, 3].map((y) => { const ms = sc.missions.filter((m) => m.year === y); const all = ms.every((m) => done[m.id]);
+    return `<div class="card"><div class="row between"><h3>Année ${y}</h3><span>${ms.filter((m) => done[m.id]).length} / ${ms.length} · ${yearScore(y)} / ${ms.length * 10} pts</span></div>
+    ${ms.map((m) => `<div class="row click" data-m="${m.id}" style="padding:10px;border-top:1px solid var(--line);cursor:pointer;flex-wrap:nowrap"><span class="badge ${done[m.id] ? (done[m.id].score >= 7 ? 'ok' : 'warn') : o.sim?.active === m.id ? 'acc' : ''}" style="min-width:56px;justify-content:center">${done[m.id] ? done[m.id].score + '/10' : m.kind === 'action' ? '🛠️ action' : '🤔 choix'}</span><span style="flex:1"><strong>${esc(m.title)}</strong></span>${o.sim?.active === m.id && !done[m.id] ? '<span class="badge acc">en cours</span>' : ''}<span>›</span></div>`).join('')}
+    ${all ? `<div class="alert ok" style="margin-top:10px">🎉 Année ${y} terminée : ${yearScore(y)} / ${ms.length * 10}. ${yearScore(y) >= ms.length * 8 ? 'Excellent travail !' : 'Relisez les débriefings des missions où vous avez perdu des points.'}</div>` : ''}</div>`; }).join('');
+}
+function missionView(id) {
+  const sc = SCENARIOS[mode()]; const m = sc.missions.find((x) => x.id === id); if (!m) return view.simulation();
+  const o = org(); const res = o.sim?.done?.[m.id];
+  if (!o.sim.active || o.sim.active !== m.id) { mutate((x) => { x.sim.active = m.id; }); }
+  main.innerHTML = page(`${m.kind === 'action' ? '🛠️' : '🤔'} ${esc(m.title)}`, `${esc(sc.title)} · Année ${m.year}`, '<a class="btn" href="#/simulation">← Toutes les missions</a>') + `
+    <div class="card lesson"><h3>Situation</h3><p>${esc(m.story)}</p>
+    ${m.kind === 'action' ? `<h3>À faire</h3><ol>${m.todo.map((t) => `<li>${esc(t)}</li>`).join('')}</ol><div class="row"><a class="btn" href="#/${m.route}">Aller à l'écran concerné →</a><button class="btn primary" data-checkm="${m.id}">Vérifier ma mission</button></div><div id="mres" style="margin-top:12px"></div>`
+      : `<h3>Que faites-vous ?</h3>${m.options.map((op, i) => `<button class="btn" data-op="${i}" style="display:block;width:100%;text-align:left;white-space:normal;margin-bottom:8px;padding:12px">${String.fromCharCode(65 + i)}. ${esc(op.t)}</button>`).join('')}<div id="mres"></div>`}
+    ${res ? `<div class="alert ok" style="margin-top:12px">Mission déjà réalisée : ${res.score}/10.${m.kind === 'decision' ? ' Vous pouvez la rejouer pour améliorer votre score.' : ''}</div><div class="callout"><strong>Débriefing</strong><br>${esc(m.debrief || m.options?.find((x) => x.s === 10)?.fb || '')}</div>` : ''}</div>`;
+  $$('[data-op]').forEach((b) => b.onclick = () => {
+    const op = m.options[b.dataset.op];
+    $$('[data-op]').forEach((x, i) => { x.disabled = true; x.style.background = m.options[i].s === 10 ? 'var(--ok-bg)' : x === b ? 'var(--bad-bg)' : ''; });
+    completeMission(m, op.s);
+    $('#mres').innerHTML = `<div class="alert ${op.s >= 7 ? 'ok' : op.s >= 4 ? 'warn' : 'bad'}"><strong>${op.s}/10</strong> — ${esc(op.fb)}</div>${nextBtn(m)}`;
+  });
+  after();
+}
+function nextBtn(m) {
+  const sc = SCENARIOS[mode()]; const next = sc.missions[sc.missions.indexOf(m) + 1];
+  return next ? `<a class="btn primary" href="#/simulation/${next.id}">Mission suivante : ${esc(next.title)} →</a>` : '<a class="btn primary" href="#/simulation">🏁 Scénario terminé — voir le bilan</a>';
+}
+function completeMission(m, score) {
+  const sc = SCENARIOS[mode()]; const next = sc.missions[sc.missions.indexOf(m) + 1];
+  mutate((x) => { const prev = x.sim.done[m.id]?.score ?? -1; if (score > prev) x.sim.done[m.id] = { score, date: todayISO() }; x.sim.active = next ? next.id : null; journal(x, `Mission « ${m.title} » : ${score}/10`); });
+}
+function checkMission(id) {
+  const sc = SCENARIOS[mode()]; const m = sc.missions.find((x) => x.id === id); const o = org();
+  const r = m.check(o); const ok = r === true; const msg = ok ? '' : (Array.isArray(r) ? r[1] : 'Pas encore.');
+  if (ok) {
+    const first = !o.sim.done[m.id]; const tries = (o.sim.tries?.[m.id] || 0); const score = Math.max(6, 10 - tries);
+    if (first) completeMission(m, score);
+    modal({ title: '✅ Mission réussie !', submit: null, cancel: 'Fermer', body: `<p><strong>${esc(m.title)}</strong> — ${first ? score : o.sim.done[m.id].score}/10${tries ? ` (${tries} vérification(s) infructueuse(s) avant)` : ''}</p><div class="callout"><strong>Débriefing</strong><br>${esc(m.debrief)}</div>${nextBtn(m)}` });
+    $$('.modal a.btn').forEach((a) => a.addEventListener('click', () => $('.modal-bg')?.remove()));
+  } else {
+    mutate((x) => { x.sim.tries = x.sim.tries || {}; x.sim.tries[m.id] = (x.sim.tries[m.id] || 0) + 1; });
+    const el = $('#mres'); const html = `<div class="alert warn">Pas encore : ${esc(msg)}</div>`;
+    if (el) el.innerHTML = html; else toast('Pas encore : ' + msg, 4000);
+  }
+}
+
+const guard = (fn) => (...a) => { if (!auth.current() || !document.getElementById('main')) return; ME = auth.current(); main = $('#main'); fn(...a); };
+const router = makeRouter(Object.fromEntries(Object.entries(view).map(([k, fn]) => [k, guard(fn)])), guard(() => (ME.role === 'salarie' && !inSim() ? view.me() : view.dash())));
+window.addEventListener('hashchange', () => { if (!auth.current()) boot(); });
+boot();
+
+</script>
+</body>
+</html>

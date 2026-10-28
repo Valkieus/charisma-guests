@@ -1,0 +1,41 @@
+/* Styles propres à Sarah HR */
+.hero { background: linear-gradient(135deg, var(--accent), #7c3aed); color: #fff; border-radius: 16px; padding: 22px; margin-bottom: 14px; }
+.hero h1 { color: #fff; margin-bottom: 4px; }
+.hero .progress { background: rgba(255,255,255,.25); }
+.hero .progress > i { background: #fff; }
+.hero .muted, .hero small { color: rgba(255,255,255,.85); }
+.mod-card { text-decoration: none; color: inherit; display: flex; flex-direction: column; gap: 6px; transition: transform .12s; }
+.mod-card:hover { transform: translateY(-2px); }
+.mod-ico { font-size: 1.7rem; }
+.tagpub { background: #e0e7ff; color: #3730a3; } .tagpriv { background: #fef3c7; color: #92400e; } .tagcom { background: #dcfce7; color: #166534; }
+:root[data-theme="dark"] .tagpub, :root[data-theme="dark"] .tagpriv, :root[data-theme="dark"] .tagcom { background: var(--panel-2); }
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) .tagpub, :root:not([data-theme="light"]) .tagpriv, :root:not([data-theme="light"]) .tagcom { background: var(--panel-2); } }
+
+.flash { perspective: 1200px; max-width: 560px; margin: 0 auto; cursor: pointer; }
+.flash-inner { position: relative; min-height: 240px; transition: transform .45s; transform-style: preserve-3d; }
+.flash.flipped .flash-inner { transform: rotateY(180deg); }
+.flash-face { position: absolute; inset: 0; backface-visibility: hidden; -webkit-backface-visibility: hidden; border-radius: 16px; padding: 26px; display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center; border: 1px solid var(--line); box-shadow: var(--shadow); }
+.flash-front { background: var(--panel); font-size: 1.2rem; font-weight: 700; }
+.flash-back { background: var(--accent-2); transform: rotateY(180deg); font-size: 1.02rem; }
+.flash small { position: absolute; top: 12px; left: 16px; font-weight: 500; font-size: .75rem; }
+
+.choice { display: block; width: 100%; text-align: left; white-space: normal; padding: 12px 14px; margin-bottom: 8px; border: 1px solid var(--line); border-radius: 10px; background: var(--panel); color: var(--text); font: inherit; cursor: pointer; }
+.choice:hover:not(:disabled) { border-color: var(--accent); background: var(--accent-2); }
+.choice.good { background: var(--ok-bg); border-color: var(--ok); }
+.choice.bad { background: var(--bad-bg); border-color: var(--bad); }
+.choice.sel { border-color: var(--accent); background: var(--accent-2); }
+.choice:disabled { cursor: default; }
+
+.memory { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 10px; }
+.mcard { min-height: 96px; border-radius: 12px; border: 1px solid var(--line); background: var(--accent); color: #fff; display: grid; place-items: center; text-align: center; padding: 8px; font-size: .82rem; cursor: pointer; font-weight: 600; user-select: none; }
+.mcard.open { background: var(--panel); color: var(--text); }
+.mcard.done { background: var(--ok-bg); color: var(--ok); border-color: var(--ok); cursor: default; }
+@media (max-width: 600px) { .memory { grid-template-columns: repeat(3, minmax(0, 1fr)); } .mcard { font-size: .74rem; min-height: 84px; } }
+
+.timer { font-variant-numeric: tabular-nums; font-weight: 800; font-size: 1.3rem; }
+.gauge { display: grid; grid-template-columns: 130px 1fr 40px; gap: 8px; align-items: center; margin-bottom: 6px; font-size: .9rem; }
+.badge-big { display: flex; flex-direction: column; align-items: center; gap: 4px; text-align: center; padding: 12px 8px; border-radius: 12px; background: var(--panel-2); font-size: .8rem; }
+.badge-big .i { font-size: 1.8rem; }
+.badge-big.locked { opacity: .35; filter: grayscale(1); }
+.cert { text-align: center; border: 4px double var(--accent); border-radius: 16px; padding: 40px 24px; background: var(--panel); }
+.big-btn { font-size: 1.05rem; padding: 12px 20px; }
